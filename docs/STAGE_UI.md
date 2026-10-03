@@ -207,20 +207,26 @@ A pörgetés most valódi Phaser overlayt használ:
 - a PNG és a feliratok közös `wheelContainer` részei, ezért együtt forognak;
 - a mutató külön Phaser objektum, ezért fixen marad a kerék fölött.
 
-Pörgetéskor a játék előre kiválasztja a célcikkelyt, majd a kerék 5–7 teljes
-fordulat után kb. 5200 ms alatt `Cubic.easeOut` lassulással pontosan annak
-a cikkelynek a közepére áll.
+Pörgetéskor a játék előre kiválasztja a célcikkelyt, majd a kerék 2–3 teljes
+fordulat után kb. 3600 ms alatt `Cubic.easeOut` lassulással pontosan annak
+a cikkelynek a közepére áll. A kisebb fordulatszám miatt a teljes animáció
+rövidebb, ugyanakkor maga a kerék is lassabbnak érződik.
 
-A megállás még nem alkalmazza rögtön az eredményt. Előbb
-`wheelConfirm` állapotba lépünk, az overlay megmutatja az eredményt, és
-engedélyezi a `Jóváhagyás` gombot.
+Megálláskor:
 
-Jóváhagyás után:
+1. a játék `wheelResult` állapotba lép;
+2. a kerék közepén nagy, nagybetűs eredmény jelenik meg;
+3. az eredmény 1500 ms-ig látható;
+4. ezután az overlay automatikusan bezárul és lefut az
+   `applyPendingWheelResult()`.
+
+Az eredmény alkalmazásakor:
 
 1. pénzmezőnél beáll `state.wheelValue`, majd a játék betűt vár;
 2. `CSŐD` esetén nullázódik a fordulópénz és játékosváltás történik;
-3. `KIMARADSZ` esetén azonnal játékosváltás történik;
-4. Bot esetén a jóváhagyás 900 ms után automatikus.
+3. `KIMARADSZ` esetén azonnal játékosváltás történik.
+
+Külön `Jóváhagyás` gomb már nincs.
 
 ### 7.2 Mássalhangzó
 

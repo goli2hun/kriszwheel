@@ -148,7 +148,6 @@
     wheelResult: document.getElementById("wheelResult"),
     wheelOverlay: document.getElementById("wheelOverlay"),
     wheelOverlayResult: document.getElementById("wheelOverlayResult"),
-    wheelApproveBtn: document.getElementById("wheelApproveBtn"),
     testBtn: document.getElementById("testBtn"),
     testDialog: document.getElementById("testDialog"),
     testAnswerDialogText: document.getElementById("testAnswerDialogText"),
@@ -427,7 +426,7 @@
     el.spinBtn.disabled = !human || state.phase !== "spin";
     el.solveBtn.disabled =
       !human ||
-      ["spinning", "wheelConfirm", "roundEnd", "setup"].includes(state.phase);
+      ["spinning", "wheelResult", "roundEnd", "setup"].includes(state.phase);
 
     // A középső képi gomb csak jelzi, hogy most betűt várunk.
     // A tényleges választás közvetlen billentyűleütéssel történik.
@@ -738,7 +737,7 @@
       const desiredMod = (360 - localCenter) % 360;
       const currentMod = ((this.rotationDeg % 360) + 360) % 360;
       const delta = (desiredMod - currentMod + 360) % 360;
-      const fullTurns = Phaser.Math.Between(5, 7);
+      const fullTurns = Phaser.Math.Between(2, 3);
       const target = this.rotationDeg + fullTurns * 360 + delta;
 
       this.tweens.killTweensOf(this.wheelContainer);
@@ -746,7 +745,7 @@
       this.tweens.add({
         targets: this.wheelContainer,
         angle: target,
-        duration: 5200,
+        duration: 3600,
         ease: "Cubic.easeOut",
         onComplete: () => {
           this.rotationDeg = target;
@@ -788,15 +787,15 @@
   function openWheelOverlay() {
     el.wheelOverlay.classList.add("open");
     el.wheelOverlay.setAttribute("aria-hidden", "false");
-    el.wheelOverlayResult.textContent = "Pörög…";
-    el.wheelOverlayResult.className = "wheel-overlay-result spinning";
-    el.wheelApproveBtn.disabled = true;
+    el.wheelOverlayResult.textContent = "";
+    el.wheelOverlayResult.className = "wheel-overlay-result";
   }
 
   function closeWheelOverlay() {
     el.wheelOverlay.classList.remove("open");
     el.wheelOverlay.setAttribute("aria-hidden", "true");
-    el.wheelApproveBtn.disabled = true;
+    el.wheelOverlayResult.textContent = "";
+    el.wheelOverlayResult.className = "wheel-overlay-result";
   }
 
   function applyPendingWheelResult() {
@@ -880,25 +879,25 @@
 
     const started = scene.spinTo(index, () => {
       state.pendingWheelSegment = segment;
-      state.phase = "wheelConfirm";
+      state.phase = "wheelResult";
 
-      el.wheelOverlayResult.textContent = formatWheelResult(segment);
+      const resultText = formatWheelResult(segment)
+        .toLocaleUpperCase("hu-HU");
+
+      el.wheelOverlayResult.textContent = resultText;
       el.wheelOverlayResult.className =
-        "wheel-overlay-result " + segment.type;
-      el.wheelApproveBtn.disabled = false;
+        "wheel-overlay-result show " + segment.type;
 
       setMessage(
-        `A kerék eredménye: ${formatWheelResult(segment)}. ` +
-        (fromBot ? "Bot jóváhagyja…" : "Jóváhagyásra vár.")
+        `A kerék eredménye: ${formatWheelResult(segment)}.`
       );
       updateControls();
 
-      if (fromBot) {
-        state.wheelConfirmTimer = setTimeout(
-          applyPendingWheelResult,
-          900
-        );
-      }
+      clearTimeout(state.wheelConfirmTimer);
+      state.wheelConfirmTimer = setTimeout(
+        applyPendingWheelResult,
+        1500
+      );
     });
 
     if (!started) {
@@ -911,10 +910,6 @@
 
   el.startGameBtn.addEventListener("click", startGame);
   el.spinBtn.addEventListener("click", () => spinWheel(false));
-  el.wheelApproveBtn.addEventListener("click", () => {
-    if (state.phase !== "wheelConfirm") return;
-    applyPendingWheelResult();
-  });
 
   function isTextEntryTarget(target) {
     return (

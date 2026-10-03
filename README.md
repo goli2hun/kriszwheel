@@ -15,8 +15,10 @@ Első játszható böngészős prototípus.
   - a feltöltött `assets/images/wheel.png` képből Phaser 3 forgó kerék
   - 24 képi cikkely; a jelenlegi 12 játékmező kétszer fut körbe
   - az összegek / CSŐD / KIMARADSZ feliratokat Phaser rajzolja a képre
-  - 5–7 teljes fordulat, kb. 5,2 mp-es fokozatos lassulás
-  - megállás után külön `Jóváhagyás` gomb alkalmazza az eredményt
+  - 2–3 teljes fordulat, kb. 3,6 mp-es fokozatos lassulás
+  - rövidebb és lassabb pörgetési érzet
+  - megálláskor az eredmény nagy betűkkel a kerék közepén jelenik meg
+  - 1,5 mp után az overlay automatikusan bezárul és az eredmény életbe lép
 - Pénzmezők
 - CSŐD
 - KIMARADSZ
