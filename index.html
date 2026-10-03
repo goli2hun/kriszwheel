@@ -62,25 +62,36 @@
       <h2>Játékosok</h2>
       <p>Legalább két játékost válassz. Alapértelmezés: Krisz + Bot.</p>
 
-      <div class="player-picker">
+      <div class="player-picker" aria-label="Játékosok kiválasztása">
         <label class="player-option">
           <input type="checkbox" value="Krisz" checked />
-          <span class="avatar">K</span>
+          <span class="avatar-frame">
+            <img class="avatar-photo" src="assets/images/krisz.png" alt="Krisz profilképe" />
+          </span>
           <strong>Krisz</strong>
         </label>
+
         <label class="player-option">
           <input type="checkbox" value="Adri" />
-          <span class="avatar">A</span>
+          <span class="avatar-frame">
+            <img class="avatar-photo" src="assets/images/adri.png" alt="Adri profilképe" />
+          </span>
           <strong>Adri</strong>
         </label>
+
         <label class="player-option">
           <input type="checkbox" value="Aliz" />
-          <span class="avatar">Á</span>
-          <strong>Aliz</strong>
+          <span class="avatar-frame">
+            <img class="avatar-photo" src="assets/images/lizus.png" alt="Alíz profilképe" />
+          </span>
+          <strong>Alíz</strong>
         </label>
+
         <label class="player-option">
           <input type="checkbox" value="Bot" checked />
-          <span class="avatar bot">B</span>
+          <span class="avatar-frame">
+            <img class="avatar-photo" src="assets/images/bot.png" alt="Bot profilképe" />
+          </span>
           <strong>Bot</strong>
         </label>
       </div>

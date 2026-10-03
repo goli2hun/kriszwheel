@@ -4,7 +4,10 @@ Első játszható böngészős prototípus.
 
 ## Mit tud?
 
-- Játékosválasztás: Krisz, Adri, Aliz, Bot
+- Játékosválasztás: Krisz, Adri, Alíz, Bot
+  - saját profilképek a `assets/images/` könyvtárból
+  - kijelöléskor kör alakú arany-kék fénygyűrű
+  - kijelölés nélkül a fénygyűrű teljesen eltűnik
 - Minimum 2 játékos
 - Alapértelmezés: Krisz + Bot
 - Végtelen számú feladvány/forduló
@@ -47,7 +50,7 @@ A Phaser 3 jelenleg CDN-ről töltődik be, ezért az első betöltéshez intern
 ## Jelenlegi architektúra
 
 - `index.html` – UI szerkezet
-- `styles.css` – megjelenés, lobby háttér és izzóanimáció
+- `styles.css` – megjelenés, lobby háttér, profilkép-kijelölés és izzóanimáció
 - `app.js` – játékszabályok, állapotgép, Bot, Phaser kerék, SFX vezérlés
 - `assets/sound/sfx/letter_hit.wav` – betűtalálat
 - `assets/sound/sfx/letter_miss.wav` – nincs ilyen betű

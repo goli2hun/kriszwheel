@@ -98,39 +98,154 @@ h2 {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
-  padding: 18px 12px;
-  border: 1px solid rgba(255,255,255,.12);
-  border-radius: 18px;
-  background: rgba(255,255,255,.035);
-}
-
-.player-option:has(input:checked) {
-  border-color: #72a8ff;
-  background: rgba(75, 139, 255, .14);
-  box-shadow: inset 0 0 0 1px rgba(114, 168, 255, .25);
+  gap: 12px;
+  min-width: 0;
+  padding: 14px 10px 16px;
+  border: 1px solid rgba(255, 255, 255, .08);
+  border-radius: 22px;
+  background: rgba(255, 255, 255, .025);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    transform .18s ease,
+    background .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
 }
 
 .player-option input {
   position: absolute;
-  top: 12px;
-  right: 12px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
-.avatar {
-  width: 58px;
-  height: 58px;
-  display: grid;
-  place-items: center;
+.avatar-frame {
+  position: relative;
+  width: 108px;
+  height: 108px;
+  flex: 0 0 auto;
   border-radius: 50%;
-  background: linear-gradient(135deg, #4e8cff, #765cff);
-  font-size: 1.4rem;
-  font-weight: 900;
-  box-shadow: 0 8px 20px rgba(50, 104, 255, .3);
+  isolation: isolate;
+  transition: transform .18s ease;
 }
 
-.avatar.bot {
-  background: linear-gradient(135deg, #4cc9a6, #2a8bb8);
+.avatar-frame::before {
+  content: "";
+  position: absolute;
+  inset: -7px;
+  z-index: -1;
+  border: 3px solid rgba(255, 220, 113, .98);
+  border-radius: 50%;
+  opacity: 0;
+  transform: scale(.92);
+  box-shadow:
+    0 0 8px rgba(255, 244, 190, .95),
+    0 0 20px rgba(255, 193, 52, .90),
+    0 0 38px rgba(43, 132, 255, .72);
+  transition:
+    opacity .2s ease,
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.avatar-frame::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  pointer-events: none;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .34),
+    inset 0 -14px 24px rgba(0, 14, 42, .18);
+}
+
+.avatar-photo {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+  filter: saturate(.82) brightness(.86);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, .34);
+  transition:
+    filter .2s ease,
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.player-option strong {
+  color: #dbe8ff;
+  font-size: 1rem;
+  letter-spacing: .025em;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, .45);
+  transition: color .18s ease, text-shadow .18s ease;
+}
+
+.player-option:hover {
+  transform: translateY(-3px);
+}
+
+.player-option:hover .avatar-photo {
+  filter: saturate(.94) brightness(.96);
+  transform: scale(1.025);
+}
+
+.player-option:has(input:focus-visible) {
+  outline: 2px solid #ffe18a;
+  outline-offset: 4px;
+}
+
+.player-option:has(input:checked) {
+  border-color: rgba(255, 219, 111, .34);
+  background:
+    radial-gradient(circle at 50% 20%, rgba(69, 134, 255, .20), transparent 58%),
+    rgba(255, 255, 255, .045);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 12px 28px rgba(0, 8, 28, .22);
+}
+
+.player-option:has(input:checked) .avatar-frame {
+  transform: translateY(-2px) scale(1.035);
+}
+
+.player-option:has(input:checked) .avatar-frame::before {
+  opacity: 1;
+  transform: scale(1);
+  animation: selectedAvatarGlow 1.8s ease-in-out infinite alternate;
+}
+
+.player-option:has(input:checked) .avatar-photo {
+  filter: saturate(1.06) brightness(1.04);
+  box-shadow:
+    0 12px 30px rgba(0, 0, 0, .36),
+    0 0 12px rgba(255, 216, 96, .22);
+}
+
+.player-option:has(input:checked) strong {
+  color: #ffe292;
+  text-shadow:
+    0 0 10px rgba(255, 216, 92, .38),
+    0 2px 10px rgba(0, 0, 0, .55);
+}
+
+@keyframes selectedAvatarGlow {
+  from {
+    box-shadow:
+      0 0 7px rgba(255, 244, 190, .85),
+      0 0 18px rgba(255, 193, 52, .76),
+      0 0 30px rgba(43, 132, 255, .56);
+  }
+
+  to {
+    box-shadow:
+      0 0 11px rgba(255, 250, 218, 1),
+      0 0 27px rgba(255, 190, 39, .98),
+      0 0 48px rgba(52, 142, 255, .82);
+  }
 }
 
 .game-grid {
@@ -457,40 +572,31 @@ body.lobby-active .player-picker {
 }
 
 body.lobby-active .player-option {
-  min-height: 116px;
-  border-color: rgba(255, 218, 112, .18);
-  background: linear-gradient(180deg, rgba(23, 61, 116, .42), rgba(8, 29, 66, .52));
-  transition:
-    transform .16s ease,
-    border-color .16s ease,
-    background .16s ease,
-    box-shadow .16s ease;
+  min-height: 158px;
+  padding: 14px 8px 16px;
+  border-color: transparent;
+  background: rgba(7, 25, 58, .28);
+  backdrop-filter: blur(5px);
 }
 
 body.lobby-active .player-option:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 218, 112, .42);
-  background: linear-gradient(180deg, rgba(31, 76, 138, .52), rgba(10, 38, 82, .62));
+  border-color: rgba(255, 220, 119, .16);
+  background: rgba(11, 38, 82, .46);
 }
 
 body.lobby-active .player-option:has(input:checked) {
-  border-color: rgba(255, 218, 112, .92);
-  background: linear-gradient(180deg, rgba(51, 99, 164, .55), rgba(15, 48, 99, .70));
+  border-color: rgba(255, 218, 112, .24);
+  background:
+    radial-gradient(circle at 50% 24%, rgba(54, 126, 255, .24), transparent 58%),
+    linear-gradient(180deg, rgba(19, 58, 117, .45), rgba(8, 29, 66, .44));
   box-shadow:
-    inset 0 0 0 1px rgba(255, 240, 174, .22),
-    0 0 20px rgba(255, 194, 58, .14);
+    inset 0 0 0 1px rgba(255, 239, 180, .06),
+    0 10px 30px rgba(0, 10, 35, .30);
 }
 
-body.lobby-active .avatar {
-  background: linear-gradient(135deg, #3e78df, #274d9e);
-  border: 2px solid rgba(255, 221, 126, .64);
-  box-shadow:
-    0 8px 20px rgba(13, 46, 110, .45),
-    0 0 16px rgba(255, 208, 82, .08);
-}
-
-body.lobby-active .avatar.bot {
-  background: linear-gradient(135deg, #2b9c9d, #185985);
+body.lobby-active .avatar-frame {
+  width: 116px;
+  height: 116px;
 }
 
 body.lobby-active #startGameBtn {
@@ -544,8 +650,12 @@ body.lobby-active .lobby-light-fx {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .lobby-bulb-glow {
+  .lobby-bulb-glow,
+  .player-option:has(input:checked) .avatar-frame::before {
     animation: none;
+  }
+
+  .lobby-bulb-glow {
     opacity: .58;
   }
 }
@@ -582,6 +692,16 @@ body.lobby-active .lobby-light-fx {
 
   .player-picker {
     grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+
+  body.lobby-active .player-option {
+    min-height: 145px;
+  }
+
+  body.lobby-active .avatar-frame {
+    width: 102px;
+    height: 102px;
   }
 
   .game-grid {
