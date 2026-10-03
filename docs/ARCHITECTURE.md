@@ -1,29 +1,20 @@
 # KriszWheel – architektúra
 
-## 1. Áttekintés
+## 1. Alapelv
 
-A projekt build lépés nélküli frontend alkalmazás.
+A projekt build nélküli frontend alkalmazás.
 
-Technológiák:
+Technológia:
 
-- HTML5
-- CSS3
+- HTML
+- CSS
 - vanilla JavaScript
 - SVG
 - Phaser 3.90
-- statikus HTTP kiszolgálás
 
-Nincs jelenleg:
+Nincs backend, bundler vagy framework.
 
-- backend;
-- adatbázis;
-- Node build pipeline;
-- framework;
-- bundler.
-
-## 2. Betöltési sorrend
-
-Az `index.html` végén:
+## 2. Betöltés
 
 ```html
 <script src="config/game-config.js"></script>
@@ -32,84 +23,41 @@ Az `index.html` végén:
 
 A sorrend kötelező.
 
-A `game-config.js` létrehozza:
+A config létrehozza:
 
-```js
-window.KRISZWHEEL_CONFIG
-```
+`window.KRISZWHEEL_CONFIG`
 
-Az `app.js` induláskor aliasokat készít:
+Az `app.js` aliasai:
 
-```js
-CONFIG
-GAMEPLAY_CONFIG
-WHEEL_CONFIG
-BOT_CONFIG
-AUDIO_CONFIG
-DEBUG_CONFIG
-```
-
-Ha egy konfigurációs kulcs hiányzik, az `app.js` több helyen fallback értéket
-használ.
+- `CONFIG`
+- `GAMEPLAY_CONFIG`
+- `WHEEL_CONFIG`
+- `BOT_CONFIG`
+- `AUDIO_CONFIG`
+- `VICTORY_CONFIG`
+- `DEBUG_CONFIG`
 
 ## 3. Fő fájlok
 
 ### index.html
 
-Feladata:
-
-- lobby DOM;
-- játékszínpad DOM;
-- SVG puzzle overlay;
-- wheel overlay konténere;
-- dialogok;
-- script betöltési sorrend.
+DOM, overlayek, dialogok, scriptbetöltés.
 
 ### styles.css
 
-Feladata:
-
-- lobby vizuális megjelenése;
-- profilválasztó;
-- játékszínpad;
-- pixelpontos hotspotok;
-- puzzle betűanimáció;
-- aktuális játékos panel;
-- Phaser wheel overlay;
-- dialogok;
-- debug és játék vége gomb.
+Lobby, stage, hotspotok, puzzle, wheel overlay, feedback, victory overlay.
 
 ### app.js
 
-Feladata:
-
-- játékállapot;
-- játékosok;
-- feladványok;
-- pörgetés;
-- Phaser WheelScene;
-- betűbevitel;
-- pontozás;
-- magánhangzó-vásárlás;
-- megfejtés;
-- Bot;
-- SFX;
-- dialog események.
+Játékszabály, state machine, render, Phaser scene-ek, Bot, hangok.
 
 ### config/game-config.js
 
-Feladata:
-
-- módosítható játékparaméterek;
-- kerékparaméterek;
-- mezőlista;
-- Bot hangolása;
-- audio;
-- debug.
+Hangolható paraméterek.
 
 ## 4. State
 
-A központi `state` objektum fontosabb mezői:
+Fontos mezők:
 
 ```text
 players
@@ -124,6 +72,7 @@ botTimer
 wheelConfirmTimer
 playerTransitionTimer
 roundEndTimer
+victoryButtonTimer
 feedbackTimer
 roundNumber
 justRevealed
@@ -131,111 +80,43 @@ pendingWheelSegment
 pendingWheelFromBot
 ```
 
-### phase értékek
+## 5. Phase értékek
 
-#### setup
-
-Lobby / nincs aktív játék.
-
-#### spin
-
-Az aktuális játékos pörgethet.
-
-#### spinning
-
-A Phaser kerék éppen mozog.
-
-#### wheelResult
-
-A kerék megállt, az eredmény 1,5 másodpercig látható.
-
-#### letter
-
-Pénzmező után mássalhangzót várunk.
-
-#### playerTransition
-
-Konfigurálható szünet két játékos között. A vezérlés letiltott, a váltás oka
-színpadi feedbackként látszik.
-
-#### roundEnd
-
-A feladvány megoldódott. Előbb lefut a hiányzó betűk felfedése, majd
-megjelenik a győzelmi overlay és elindulhat a Phaser tűzijáték.
-
-## 5. Fő állapotátmenetek
-
-```text
-startGame()
-  → newRound()
-  → spin
-
-spinWheel()
-  spin → spinning
-
-Phaser tween onComplete
-  spinning → wheelResult
-
-applyPendingWheelResult()
-  money → letter
-  bankrupt → nextPlayer() → spin
-  skip → nextPlayer() → spin
-
-handleConsonant()
-  hit → spin
-  miss → nextPlayer() → playerTransition → spin
-
-buyVowel()
-  hit → spin
-  miss → nextPlayer() → spin
-
-trySolve()
-  success → finishRound() → betűfelfedés → roundEnd dialog
-  fail → nextPlayer() → playerTransition → spin
-```
+- `setup` – lobby
+- `spin` – pörgethető
+- `spinning` – kerék mozog
+- `wheelResult` – megállt eredmény látszik
+- `letter` – mássalhangzót vár
+- `playerTransition` – váltási szünet
+- `roundEnd` – megfejtett forduló, felfedés / victory
 
 ## 6. Phaser scene-ek
 
-A projekt két külön Phaser játékot használ:
-
-- `WheelScene` – szerencsekerék;
-- `VictoryScene` – győzelmi tűzijáték.
-
-A `VictoryScene` külön canvasban fut a `#victoryFx` elemben, ezért a
-keréktől függetlenül indítható és leállítható.
-
-## 7. Phaser kerék
+Két külön Phaser instance fut.
 
 ### WheelScene
 
-A `WheelScene`:
+Feladata:
 
-1. preloadolja a `wheel.image` konfiguráció szerinti assetet;
-2. létrehozza a wheel containert;
-3. ráhelyezi a Phaser Text feliratokat;
-4. létrehozza a fix mutatót;
-5. `spinTo(index)` segítségével célmezőre forgat.
+- wheel PNG betöltés;
+- cikkelyfeliratok;
+- fix mutató;
+- célpozícióra forgatás.
 
-A PNG és a feliratok ugyanabban a containerben vannak, ezért együtt forognak.
+### VictoryScene
 
-A mutató külön objektum.
+Feladata:
 
-### Célpozíció
+- tűzijáték burstök;
+- Phaser circle részecskék;
+- tweenes kifutás és fade;
+- konfigurálható színek és sűrűség.
 
-A számítás figyelembe veszi:
+A két scene külön canvasban működik.
 
-- `startOffsetDeg`;
-- `pointerAngleDeg`;
-- cikkelyszám;
-- aktuális kerékrotáció;
-- teljes fordulatok száma.
+## 7. Kerékmodell
 
-Ez biztosítja, hogy a kiválasztott logikai mező és a mutatónál megálló képi
-cikkely egyezzen.
-
-## 8. Wheel segment modell
-
-Egy mező:
+Logikai mező:
 
 ```js
 {
@@ -245,121 +126,120 @@ Egy mező:
 }
 ```
 
-Típusok:
+Típus:
 
-- `money`
-- `bankrupt`
-- `skip`
+- money
+- bankrupt
+- skip
 
-A tényleges cikkelylista:
-
-```text
-segments × segmentRepeat
-```
-
-A jelenlegi kerék:
+Tényleges cikkelyszám:
 
 ```text
-12 × 2 = 24
+segments.length × segmentRepeat
 ```
 
-## 9. Feladványtábla
+Jelenleg:
 
-A tábla SVG-alapú.
+`12 × 2 = 24`
 
-A `STAGE_GRID` tartalmazza a 15 × 4 képi cella pontos koordinátáit.
+## 8. Kerék célpozíció
+
+A számítás figyelembe veszi:
+
+- `startOffsetDeg`;
+- `pointerAngleDeg`;
+- segment index;
+- aktuális rotáció;
+- teljes fordulatok.
+
+Így a logikai eredmény és a vizuális megállás egyezik.
+
+## 9. Puzzle render
+
+A `STAGE_GRID` a 15 × 4 képi cella geometriája.
+
+A `layoutPuzzleRows()` tördel.
 
 A `renderPuzzle()`:
 
-- kiszámolja a sorokat;
-- középre igazítja őket;
-- csak a tényleges karakterhelyekre rajzol fehér cellát;
-- felfedi a punctuation karaktereket;
-- a felfedett betűket SVG `text` elemekként rajzolja.
+1. vízszintesen középre igazítja a sort;
+2. a teljes sorblokkot függőlegesen középre teszi;
+3. SVG rectet rajzol;
+4. SVG textként rajzolja a betűt;
+5. új találatnál késleltetett animációt ad.
 
 ## 10. Billentyűkezelés
 
-A dokumentumszintű `keydown` listener kezeli a betűket.
+Globális `keydown`.
 
-Nem dolgozik fel billentyűt, ha:
+Nem kezel betűt, ha:
 
-- modifier van lenyomva;
-- ismételt keydown érkezik;
-- nem aktív a játéknézet;
-- input/textarea/select/contentEditable kapja az eseményt;
-- nyitott dialog van;
+- modifier aktív;
+- repeat esemény;
+- nem aktív a game screen;
+- input/textarea/select/contentEditable aktív;
+- dialog nyitva van;
 - Bot van soron.
 
-Így a Megfejtés mező biztonságosan gépelhető.
+## 11. Játékosváltás
 
-## 11. Hangrendszer
+A `nextPlayer()` előbb `playerTransition` állapotba lép.
 
-A hangfájlok induláskor `Audio` objektumként cache-be kerülnek.
+Csak a timer végén változik a `currentIndex`.
 
-Lejátszáskor a játék:
+Ez megakadályozza az azonnali avatar- és turn-váltást.
 
-```js
-source.cloneNode()
-```
+## 12. Megfejtés és victory
 
-példányt használ.
+A solve form submit:
 
-Ennek előnye, hogy egymást gyorsan követő találati hangok nem vágják le
-egymást.
+1. bezárja a dialogot;
+2. utána értékel.
 
-## 12. Bot
+Helyes válaszkor a `finishRound()` kiszámolja a még animálandó betűhelyek
+számát, majd csak a felfedés után hívja a `showVictoryOverlay()` függvényt.
 
-A Bot timer-alapú.
-
-Nincs külön thread vagy worker.
-
-Fő döntési sorrend:
-
-1. megfejtés megkísérlése;
-2. esetleges magánhangzó-vásárlás;
-3. pörgetés.
-
-Pénzmező után külön timer választ mássalhangzót.
-
-## 13. UI rétegek
-
-A játékszínpad rétegrendje leegyszerűsítve:
+## 13. UI rétegrend
 
 ```text
-studo_jatekszinpad.png
-        ↓
-SVG puzzle overlay
-        ↓
+stage PNG
+  ↓
+SVG puzzle
+  ↓
 category / used letters / player panel
-        ↓
+  ↓
 image hotspots
-        ↓
-debug / game end controls
-        ↓
+  ↓
+feedback / debug / game end
+  ↓
 wheel overlay
+  ↓
+victory overlay
 ```
 
-## 14. Kompatibilitási réteg
+## 14. Hang
 
-A `.stage-logic-bridge` továbbra is tartalmaz néhány korábbi DOM elemet:
+A hangok `Audio` cache-ből mennek.
 
-- játékoslista;
-- aktív játékos szöveg;
-- belső message.
+Lejátszáskor `cloneNode()` készül, ezért az egymást követő találati hangok
+nem vágják le egymást.
 
-Ezek vizuálisan a viewporton kívül vannak, de a régi logikai kód egy része
-még használja őket.
+## 15. Kompatibilitási réteg
 
-Későbbi refaktorban eltávolíthatók.
+A `.stage-logic-bridge` még megtart néhány régi, offscreen DOM elemet:
 
-## 15. Invariánsok
+- playersList;
+- activePlayerText;
+- message.
 
-A fejlesztés során ezeket érdemes megtartani:
+Későbbi refaktorban eltávolítható.
 
-- `config/game-config.js` az `app.js` előtt töltődjön;
-- a wheel segmentek száma egyezzen a képi cikkelyek számával;
-- a stage háttér csere esetén újra kell mérni a grid/hotspot koordinátákat;
-- a puzzle state változtatása után `renderAll()` / `updateControls()`
-  szükséges, ahol releváns;
-- minden Bot timer-t törölni kell játék- vagy fordulóváltáskor;
-- a wheel result csak a megállás után alkalmazódjon.
+## 16. Fontos invariánsok
+
+- config mindig az app előtt töltődjön;
+- wheel segment count egyezzen a PNG cikkelyszámmal;
+- stage háttércsere után koordinátákat újra kell mérni;
+- timer-eket forduló/játék vége előtt törölni kell;
+- Bot ne kapjon emberi inputot;
+- solve dialog záródjon az értékelés előtt;
+- victory csak a betűfelfedés után jelenjen meg.

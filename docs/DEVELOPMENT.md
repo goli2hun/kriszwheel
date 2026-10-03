@@ -2,252 +2,165 @@
 
 ## 1. Előfeltételek
 
-Lokális futtatáshoz:
-
 - Git
 - Python 3
 - modern böngésző
-- internetkapcsolat a Phaser CDN első betöltéséhez
+- internet a Phaser CDN miatt
 
-Nincs szükség:
+Nincs szükség Node.js-re vagy buildre.
 
-- Node.js-re;
-- npm-re;
-- build parancsra;
-- adatbázisra.
+## 2. Indítás
 
-## 2. Repository frissítése és indítás
+Windows:
 
-### start.bat
+`start.bat`
 
-Windows alatt a legegyszerűbb:
-
-```text
-start.bat
-```
-
-A script:
-
-```text
-cd a repo gyökerére
-→ git pull --ff-only origin main
-→ python -m http.server 8080
-```
-
-Ha `python` nincs, `py -3` fallbacket próbál.
-
-### Kézzel
+Kézzel:
 
 ```powershell
 git pull --ff-only origin main
 python -m http.server 8080
 ```
 
-Böngésző:
+URL:
 
-```text
-http://localhost:8080
-```
+`http://localhost:8080`
 
-## 3. Gyors ellenőrzési lista
+## 3. Teljes smoke test
 
-Módosítás után érdemes végigpróbálni:
+Módosítás után:
 
-1. lobby betöltődik;
-2. legalább két játékos kiválasztható;
+1. lobby betölt;
+2. játékosválasztás működik;
 3. játék indul;
-4. puzzle megjelenik;
-5. pörgetés overlay feljön;
-6. kerék megáll és eredményt mutat;
-7. overlay automatikusan bezár;
-8. kisbetű/nagybetű egyaránt működik;
-9. több találat sorban villan fel;
-10. pontozás helyes;
-11. magánhangzó ára levonódik;
-12. megfejtés elküldésekor a dialog azonnal bezár;
-13. helytelen megfejtés látható visszajelzést ad;
-14. helyes megfejtésnél a betűk a fordulóvégi dialog előtt fedődnek fel;
-15. játékosváltás előtt lefut a konfigurált szünet;
-16. győzelmi overlay megjelenik;
-17. győztes avatar/pénzek helyesek;
-18. Phaser tűzijáték fut;
-19. a két győzelmi gomb késleltetve válik aktívvá;
-20. Következő feladvány új fordulót indít;
-21. győzelmi Játék vége közvetlenül a lobbyba visz;
-22. felső Játék vége továbbra is megerősítést kér;
-23. Teszt gomb csak akkor látszik, ha engedélyezett.
+4. puzzle közép–közép;
+5. Pörgetés hover;
+6. Magánhangzó hover disabled állapotban is;
+7. Megfejtés hover;
+8. wheel overlay feljön;
+9. kerék célmezőre áll;
+10. eredmény automatikusan eltűnik;
+11. kis/nagybetű működik;
+12. ékezetes betű működik;
+13. több találat sorban villan;
+14. hangok sorban szólnak;
+15. magánhangzó ára levonódik;
+16. hibás solve dialog azonnal bezár;
+17. helytelen feedback látszik;
+18. játékosváltási szünet működik;
+19. helyes solve után teljes betűfelfedés lefut;
+20. victory overlay megjelenik;
+21. avatar és pénzek helyesek;
+22. tűzijáték fut;
+23. victory gombok késleltetve aktívak;
+24. Következő feladvány működik;
+25. victory Játék vége lobbyba visz;
+26. stage Játék vége megerősítést kér;
+27. Teszt gomb config szerint működik.
 
-## 4. Konfiguráció módosítása
+## 4. Config-first szabály
 
-A legtöbb hangolási feladathoz ne az `app.js`-t módosítsd.
-
-Először nézd meg:
+Hangolás előtt mindig nézd meg:
 
 `config/game-config.js`
 
-Például pörgetés:
+Ne hardcode-olj olyan értéket az `app.js`-be, ami configból kezelhető.
 
-```js
-wheel: {
-  minFullTurns: 2,
-  maxFullTurns: 3,
-  spinDurationMs: 3600,
-  easing: "Cubic.easeOut",
-  resultDisplayMs: 1500
-}
-```
+## 5. Kerék csere
 
-Módosítás után böngészőfrissítés elegendő.
+Új assetnél:
 
-## 5. Kerék asset cseréje
+1. asset az `assets/images/` alá;
+2. `wheel.image`;
+3. cikkelyszám;
+4. `segments.length × segmentRepeat`;
+5. `startOffsetDeg`;
+6. `pointerAngleDeg`;
+7. `labelRadius`;
+8. több célmező tesztje.
 
-Új kerék esetén:
+## 6. Stage háttér csere
 
-1. tedd az assetet az `assets/images/` könyvtárba;
-2. állítsd a `wheel.image` értéket;
-3. számold meg a cikkelyeket;
-4. ellenőrizd:
-   `segments.length × segmentRepeat = képi cikkelyszám`;
-5. szükség esetén állítsd:
-   - `startOffsetDeg`;
-   - `pointerAngleDeg`;
-   - `labelRadius`;
-   - `wheelSize`;
-6. tesztelj több célmezőt.
+Újramérendő:
 
-## 6. Kerék feliratok
-
-A PNG-be ne égess pénzösszegeket, ha nem szükséges.
-
-A projekt jelenlegi elve:
-
-- PNG → csak vizuális kerék;
-- config → logikai mezők;
-- Phaser Text → feliratok.
-
-Ez biztosítja, hogy a kerék vizuálisan cserélhető maradjon.
-
-## 7. Stúdió háttér cseréje
-
-A stage háttér erősen koordinátafüggő.
-
-Csere után újra kell ellenőrizni:
-
-- `STAGE_GRID`;
-- kategóriasáv;
-- használt betűk;
-- gomb-hotspotok;
+- STAGE_GRID;
+- category;
+- used letters;
+- fő hotspotok;
 - avatarpanel;
-- játék vége;
-- Teszt gomb.
+- feedback;
+- debug/game-end.
 
-A stage koordináták dokumentációja:
+## 7. Új puzzle
 
-[STAGE_UI.md](STAGE_UI.md)
-
-## 8. Új feladvány hozzáadása
-
-Jelenleg az `app.js` `PUZZLES` tömbjéhez adj új elemet:
-
-```js
-{ category: "Film", text: "VALAMILYEN FELADVÁNY" }
-```
+Jelenleg az `app.js` `PUZZLES` tömbjébe kerül.
 
 Fontos:
 
-- a szöveg nagybetűs legyen a jelenlegi adatkészlet konvenciója szerint;
 - férjen el 15 × 4 cellán;
-- hosszú szavak esetén teszteld a tördelést.
+- hosszú szó esetén tördelést tesztelni;
+- kategóriát megadni.
 
-Későbbi terv: külön JSON/SQLite adatforrás.
+## 8. Új játékos
 
-## 9. Új játékos hozzáadása
+Módosítandó:
 
-Jelenleg több helyen kell módosítani:
+- index.html lobby;
+- portré asset;
+- `PLAYER_IMAGES` mapping.
 
-- lobby checkbox az `index.html`-ben;
-- profilkép az `assets/images/` alatt;
-- `PLAYER_IMAGES` mapping az `app.js`-ben.
+## 9. Hangcsere
 
-A Bot speciális:
+A fájlutak és fontos hangerők configból állíthatók.
 
-```js
-isBot: name === "Bot"
-```
+## 10. Victory tuning
 
-Új bot-típushoz ez a logika refaktorálandó.
+Config:
 
-## 10. Hangok cseréje
-
-A fájlok elérési útja konfigurálható:
-
-```js
-audio: {
-  files: {
-    letterHit: "...",
-    letterMiss: "...",
-    solveSuccess: "...",
-    solveFail: "..."
-  }
-}
-```
-
-A hangerők szintén konfigurálhatók.
+- fireworks;
+- fireworksDurationMs;
+- burstIntervalMs;
+- particlesPerBurst;
+- buttonDelayMs;
+- colors.
 
 ## 11. Debug
 
-A Teszt gomb:
+`debug.showTestButton`
 
-```js
-debug: {
-  showTestButton: true
-}
-```
-
-Release-jellegű tesztnél állítsd `false`-ra.
+Release-jellegű tesztnél célszerű false.
 
 ## 12. Gyakori hibák
 
-### A wheel overlay nem jelenik meg
+### Rossz mezőn áll meg a kerék
 
 Ellenőrizd:
 
-- Phaser CDN betöltődött-e;
-- `wheel.image` útvonal helyes-e;
-- böngésző console hibáit;
-- az asset elérhető-e HTTP-n.
+- cikkelyszám;
+- repeat;
+- startOffsetDeg;
+- pointerAngleDeg.
 
-### A kerék rossz mezőn áll meg
+### Stage hotspot elcsúszik
 
-Ellenőrizd:
+Háttérgeometria változott.
 
-- képi cikkelyszám;
-- `segments × segmentRepeat`;
-- `startOffsetDeg`;
-- `pointerAngleDeg`.
+### Phaser nem indul
 
-### A feliratok nem a cikkelyek közepén vannak
+Ellenőrizd a CDN-t és a console-t.
 
-Állítsd:
+### start.bat nem pullol
 
-- `labelRadius`;
-- `startOffsetDeg`.
-
-### A stage gomb nem ott kattintható, ahol látszik
-
-A háttérkép geometria megváltozott. A CSS hotspot koordinátákat újra kell mérni.
-
-### A start.bat nem frissít
-
-A `git pull --ff-only` szándékosan megáll, ha a branch nem frissíthető
-fast-forward módon. Ez védi a helyi munkát.
+A `--ff-only` szándékosan nem írja felül a helyi munkát.
 
 ## 13. Dokumentációs szabály
 
-Funkciómódosításnál frissítsd:
+Funkciómódosításnál:
 
-- `README.md` – ha felhasználói szinten változik;
-- `docs/GAMEPLAY.md` – ha szabály változik;
-- `docs/ARCHITECTURE.md` – ha state/fájlstruktúra változik;
-- `docs/STAGE_UI.md` – ha UI/koordináta/Phaser változik;
-- `config/README.md` – ha config kulcs változik.
+- README – felhasználói szint;
+- GAMEPLAY – szabály;
+- ARCHITECTURE – state / technika;
+- STAGE_UI – UI / koordináta;
+- DEVELOPMENT – fejlesztői workflow;
+- config/README – config kulcs;
+- ROADMAP – terv változás.

@@ -1,30 +1,22 @@
 # KriszWheel – játékszabály és játékfolyam
 
-Ez a dokumentum a **jelenleg implementált** játékmenetet írja le.
+Ez a dokumentum a jelenleg implementált szabályokat írja le.
 
 ## 1. Játék indítása
 
-A lobbyban legalább két játékost kell kiválasztani.
+A lobbyban legalább két játékost kell kijelölni.
 
-Elérhető játékosok:
-
-- Krisz
-- Adri
-- Alíz
-- Bot
-
-A Bot automatikus játékos.
-
-A `Játék indítása` után:
+A játék indulásakor:
 
 1. létrejön a játékoslista;
-2. minden játékos `roundMoney = 0` és `totalMoney = 0` értékkel indul;
-3. az első feladvány betöltődik;
-4. az első játékos `spin` állapotból kezd.
+2. `roundMoney = 0`;
+3. `totalMoney = 0`;
+4. betöltődik az első feladvány;
+5. az első játékos `spin` állapotból indul.
 
-## 2. Feladványok
+## 2. Feladvány
 
-A feladvány jelenleg két adatból áll:
+A feladvány:
 
 ```js
 {
@@ -33,310 +25,204 @@ A feladvány jelenleg két adatból áll:
 }
 ```
 
-Az aktuális készlet még az `app.js` fájlban található.
+A készlet jelenleg az `app.js` fájlban van.
 
-Új fordulónál:
+Új fordulónál törlődik:
 
-- új feladvány választódik;
-- a korábbi használt betűk törlődnek;
-- a felfedett betűk törlődnek;
-- minden játékos `roundMoney` értéke nullázódik;
-- a `totalMoney` megmarad.
+- használt betűk;
+- felfedett betűk;
+- minden játékos `roundMoney` értéke.
 
-## 3. Pörgetés
+A `totalMoney` megmarad.
 
-A Pörgetés gomb a Phaser kerék-overlayt indítja.
+## 3. Kerékpörgetés
 
-Folyamat:
+`spin → spinning → wheelResult`
 
-1. a játék `spinning` állapotba kerül;
-2. véletlen cikkely választódik;
-3. a kerék a konfigurált fordulatszámmal és easinggel a célmezőre lassul;
-4. megálláskor a játék `wheelResult` állapotba kerül;
-5. az eredmény nagy betűkkel megjelenik a kerék közepén;
-6. a `resultDisplayMs` idő letelte után az eredmény automatikusan életbe lép.
+A játék véletlen célcikkelyt választ, majd Phaser fizikailag annak megfelelő
+szögre forgatja a kereket.
+
+Megálláskor:
+
+1. nagy eredmény jelenik meg középen;
+2. vár `wheel.resultDisplayMs` ideig;
+3. automatikusan alkalmazza az eredményt.
 
 ### Pénzmező
 
-Pénzmező után:
+`wheelValue = mező értéke`
 
-- `state.wheelValue` megkapja a mező értékét;
-- a játék `letter` állapotba kerül;
-- mássalhangzó adható meg.
+A játék `letter` állapotba kerül.
 
 ### CSŐD
 
-`CSŐD` esetén:
-
-- az aktuális játékos `roundMoney` értéke 0 lesz;
-- a kör a következő játékosra kerül.
+- `roundMoney = 0`
+- játékosváltás
 
 ### KIMARADSZ
 
-`KIMARADSZ` esetén:
-
-- nincs pénzváltozás;
-- a kör azonnal a következő játékosra kerül.
+- pénz nem változik
+- játékosváltás
 
 ## 4. Mássalhangzó
 
-Mássalhangzó csak `letter` állapotban fogadható el.
+Csak `letter` állapotban fogadható el.
 
-A játék a billentyűleütést:
+A billentyű:
 
-1. NFC Unicode-formára normalizálja;
-2. `hu-HU` locale szerint nagybetűssé alakítja;
-3. ellenőrzi, hogy egyetlen betű-e;
-4. ellenőrzi, hogy nem magánhangzó-e;
-5. ellenőrzi, hogy még nem használták-e.
+- Unicode NFC-normalizálást kap;
+- `hu-HU` locale szerint nagybetűsödik;
+- nem lehet már használt;
+- nem lehet magánhangzó.
 
-Ezért például:
-
-```text
-k = K
-á = Á
-ő = Ő
-```
-
-### Találat
-
-Ha a betű szerepel:
+Találat:
 
 ```text
-nyeremény = találatok száma × wheelValue
+roundMoney += találatok × wheelValue
 ```
 
-Példa:
+Találat után ugyanaz a játékos újra pörget.
 
-```text
-kipörgetett mező: 2500 Ft
-betű: L
-találatok: 3
-nyeremény: 7500 Ft
-```
+Nincs találat esetén játékosváltás következik.
 
-A nyeremény hozzáadódik az aktuális játékos `roundMoney` értékéhez.
+## 5. Több azonos találat
 
-Ezután ugyanaz a játékos ismét pörgethet.
+A cellák sorban fedődnek fel.
 
-### Nincs találat
+Időköz:
 
-Ha a betű nem szerepel:
+`gameplay.letterHitGapMs`
 
-- megszólal a `letter_miss` hang;
-- a kör a következő játékosra kerül.
+Alap:
 
-### Már használt betű
+`500 ms`
 
-A már használt betű nem fogadható el újra.
+A találati hang ugyanebben a ritmusban szól.
 
-## 5. Többszörös betűtalálat
+## 6. Magánhangzó
 
-Ha ugyanaz a betű több helyen szerepel:
+Magánhangzó közvetlen billentyűleütéssel vásárolható `spin` és `letter`
+állapotban.
 
-- a cellák nem egyszerre villannak fel;
-- sorban kapják a `stageLetterReveal` animációt;
-- minden felfedéshez találati hang tartozik;
-- a lépések közötti idő a `gameplay.letterHitGapMs` konfiguráció.
-
-Alapérték:
-
-```text
-500 ms
-```
-
-## 6. Magánhangzó-vásárlás
-
-A magánhangzó külön dialog nélkül, közvetlen billentyűleütéssel vásárolható.
-
-A jelenlegi magánhangzók:
+Magánhangzók:
 
 ```text
 A Á E É I Í O Ó Ö Ő U Ú Ü Ű
 ```
 
-A vásárlás megengedett `spin` és `letter` állapotban.
-
-Feltételek:
-
-- emberi játékos van soron;
-- elegendő `roundMoney` áll rendelkezésre;
-- a betű magánhangzó;
-- a betűt még nem használták.
-
-Az alapár:
-
-```text
-5000 Ft
-```
-
-Konfiguráció:
+Ár:
 
 `gameplay.vowelPrice`
 
-A költség a találatok számától függetlenül levonódik.
+Alap:
 
-### Találat
+`5000 Ft`
 
-Ha van ilyen magánhangzó:
-
-- a betű(k) felfedődnek;
-- a játékos ugyanúgy `spin` állapotba kerül.
-
-### Nincs találat
-
-Ha nincs ilyen magánhangzó:
-
-- a vásárlás ára már levonásra került;
-- a kör a következő játékosra kerül.
+A költség minden esetben levonódik, akkor is, ha nincs találat.
 
 ## 7. Megfejtés
 
-A `Megfejtés` gomb dialogot nyit.
+A Megfejtés gomb dialogot nyit.
 
-A teljes választ szövegként kell megadni.
+Submitkor a dialog azonnal bezár.
 
-Összehasonlításkor a játék:
+A válasz normalizálása:
 
-- NFC-normalizálást használ;
-- magyar locale szerint nagybetűsít;
-- a többszörös szóközöket egy szóközzé alakítja;
-- levágja a szélső szóközöket.
+- NFC;
+- magyar nagybetű;
+- több szóköz → egy szóköz;
+- trim.
 
-### Sikeres megfejtés
+### Hibás válasz
 
-Siker esetén:
+- hibahang;
+- `HELYTELEN MEGFEJTÉS` visszajelzés;
+- `playerTransition`;
+- következő játékos.
 
-1. minden hiányzó betű felfedődik;
-2. a `roundMoney` hozzáadódik a `totalMoney` értékhez;
-3. a játék `roundEnd` állapotba kerül;
-4. a felfedési animáció után megjelenik a győzelmi overlay;
-5. Phaser tűzijáték indul;
-6. késleltetve megjelenik a `Következő feladvány` és `Játék vége` gomb.
+### Helyes válasz
 
-### Hibás megfejtés
+1. a dialog már zárva van;
+2. a rejtett betűk sorban felfedődnek;
+3. `roundMoney` hozzáadódik a `totalMoney` értékhez;
+4. `phase = roundEnd`;
+5. a játék kivárja a felfedési animáció végét;
+6. megjelenik a győzelmi overlay.
 
-A megfejtés elküldésekor a beviteli dialog azonnal bezár.
+## 8. Játékosváltás
 
-Hibás megfejtés esetén:
-
-- hibahang szól;
-- a színpadon `HELYTELEN MEGFEJTÉS` visszajelzés jelenik meg;
-- lefut a konfigurált játékosváltási szünet;
-- ezután a kör a következő játékosra kerül.
-
-### Helyes megfejtés UI-folyama
-
-Helyes válasznál:
-
-1. a beviteli dialog már zárva van;
-2. a hiányzó betűk sorban felfedődnek;
-3. a játék kivárja a legutolsó betű `stageLetterReveal` animációját;
-4. csak ezután nyílik meg a győzelmi overlay.
-
-## 8. Játékosváltási szünet
-
-A `nextPlayer()` nem vált azonnal játékost.
-
-Átmeneti állapot:
+Állapot:
 
 `playerTransition`
 
-Alap késleltetés:
-
-`1000 ms`
-
-Konfiguráció:
+Idő:
 
 `gameplay.playerSwitchDelayMs`
 
-A késleltetés alatt:
+Alap:
 
-- a jelenlegi avatar még látható;
-- a játékgombok nem aktívak;
-- a váltás oka rövid, látható színpadi üzenetként megjelenik.
+`1000 ms`
 
-Az idő letelte után:
+Ez alatt:
 
-1. `currentIndex` a következő játékosra lép;
-2. `phase = "spin"`;
-3. frissül az avatar/pénz panel;
-4. Bot esetén elindul a Bot következő lépése.
+- az aktuális játékos még látható;
+- új akció nem adható;
+- a váltás oka színpadi üzenetként látszik.
+
+Az idő végén lép tovább a `currentIndex`.
 
 ## 9. Győzelmi képernyő
 
-A győzelmi overlay a teljes betűfelfedés után jelenik meg.
-
 Tartalma:
 
-- győztes profilképe;
-- győztes neve;
-- megfejtett feladvány;
-- forduló nyereménye;
-- összesített nyeremény;
+- nyertes avatar;
+- nyertes neve;
+- feladvány;
+- forduló pénze;
+- összes pénz;
 - Phaser tűzijáték.
 
-A gombok a `victory.buttonDelayMs` után válnak aktívvá.
+A gombok a `victory.buttonDelayMs` idő után aktiválódnak.
 
 ### Következő feladvány
 
-Bezárja a győzelmi overlayt, leállítja a tűzijátékot, majd új fordulót indít.
+- overlay bezár;
+- tűzijáték leáll;
+- következő kezdőjátékos;
+- új puzzle;
+- `roundMoney` nullázódik.
 
 ### Játék vége
 
-A győzelmi képernyő `Játék vége` gombja megerősítés nélkül közvetlenül
-visszatér a lobbyba.
-
+A győzelmi képernyőn közvetlenül visszatér a lobbyba.
 
 ## 10. Bot
-
-A Bot ugyanazt az alap játékszabályt használja.
-
-Konfigurálható viselkedések:
-
-- általános gondolkodási késleltetés;
-- megfejtési próbálkozás küszöbe;
-- megfejtési próbálkozás esélye;
-- magánhangzó-vásárlási esély;
-- betűválasztás késleltetései.
 
 A Bot:
 
 - pörget;
-- pénzmező után mássalhangzót választ;
+- mássalhangzót választ;
 - időnként magánhangzót vásárol;
-- megfelelő felfedettségnél megpróbálhatja megfejteni a feladványt.
+- bizonyos felfedettségnél megpróbál megfejteni.
 
-A Bot döntései szándékosan egyszerűek; jelenleg nem használ nyelvi modellt.
+A döntések és timer-ek konfigurálhatók.
 
-## 11. Játék vége
+## 11. Játék vége a színpadról
 
-A jobb felső `Játék vége` gomb megerősítő dialogot nyit.
+A jobb felső gomb megerősítést kér:
 
-Kérdés:
+`Vége a játéknak?`
 
-```text
-Vége a játéknak?
-```
-
-- `Nem`: dialog bezár, állapot nem változik.
-- `Igen`: timer-ek leállnak, a kerék-overlay bezár, a játék visszatér a lobbyba.
+- Nem → játék folytatódik.
+- Igen → lobby.
 
 ## 12. Teszt mód
 
-A `Teszt` gomb dialogban megmutatja az aktuális megfejtést.
+A Teszt gomb megmutatja az aktuális megfejtést.
 
-Konfiguráció:
+`debug.showTestButton = false` esetén elrejthető.
 
-```js
-debug: {
-  showTestButton: true
-}
-```
-
-`false` esetén a gomb nem látszik.
-
-## 13. Játékállapotok röviden
+## 13. Állapotfolyam
 
 ```text
 setup
@@ -349,13 +235,21 @@ wheelResult
   ↓
 letter
   ├─ találat → spin
-  └─ hiba → playerTransition → következő játékos → spin
+  └─ hiba → playerTransition → spin
 
-megfejtés sikeres
+hibás megfejtés
+  ↓
+playerTransition
+  ↓
+spin
+
+helyes megfejtés
   ↓
 roundEnd
   ↓
-következő feladvány → spin
+betűfelfedés
+  ↓
+victory overlay
+  ├─ következő feladvány → spin
+  └─ játék vége → setup
 ```
-
-A magánhangzó `spin` és `letter` állapotban is megadható.

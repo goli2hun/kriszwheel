@@ -452,3 +452,18 @@ Ne töltsd az `app.js`-t a config előtt.
 
 Ne tegyél titkos adatot ebbe a fájlba: kliensoldali JavaScript, minden
 böngészőből olvasható.
+
+
+## 11. Kapcsolódó roadmap
+
+A következő tervezett konfigurációs bővítések:
+
+- puzzle adatforrás;
+- teljes játék / session szabályok;
+- scoreboard;
+- Bot nehézségi profilok;
+- mobil input.
+
+Részletek:
+
+[../docs/ROADMAP.md](../docs/ROADMAP.md)

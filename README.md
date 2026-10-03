@@ -1,145 +1,167 @@
 # KriszWheel
 
-Böngészős, magyar nyelvű Szerencsekerék-játék saját lobbyval, TV-stúdió jellegű
-játékszínpaddal, Phaser 3 kerékanimációval, billentyűzetes betűbevitellel és
-konfigurálható játékszabályokkal.
+Magyar nyelvű, böngészős Szerencsekerék-játék saját lobbyval, TV-stúdió jellegű
+játékszínpaddal, Phaser 3 kerékanimációval, billentyűzetes betűbevitellel,
+Bot-játékossal, győzelmi effektekkel és központi konfigurációval.
 
-A projekt jelenleg frontend-alapú prototípus: nincs még backend, adatbázis vagy
+A projekt jelenleg frontend-only prototípus: nincs még backend, adatbázis vagy
 Whisper integráció.
 
-## Jelenlegi funkciók
+## Jelenlegi állapot
 
-### Lobby és játékosok
+### Lobby
 
-- Választható játékosok: Krisz, Adri, Alíz és Bot.
-- Minimum 2 játékos szükséges.
-- Alapértelmezett kijelölés: Krisz + Bot.
-- Minden játékoshoz saját profilkép tartozik.
-- A kijelölt játékosok arany-kék fénygyűrűt kapnak.
-- A Bot automatikusan játszik.
+Választható játékosok:
+
+- Krisz
+- Adri
+- Alíz
+- Bot
+
+Minimum két játékos szükséges. Alapértelmezett kijelölés: Krisz + Bot.
+
+A lobby saját stúdió-hátteret és játékosportrékat használ.
 
 ### Játékszínpad
 
-A fő háttér:
+Háttér:
 
 `assets/images/studo_jatekszinpad.png`
 
-Natív mérete: **1672 × 941 px**.
+Natív méret:
 
-A kép fölött külön HTML/SVG/Phaser rétegek működnek:
+`1672 × 941 px`
+
+A háttér fölött külön HTML, SVG és Phaser rétegek működnek.
+
+Jelenlegi funkciók:
 
 - 15 × 4-es feladványtábla;
-- közép–közép feladványelrendezés: vízszintes és függőleges középre igazítás;
+- vízszintes és függőleges **közép–közép** elrendezés;
 - kategória;
 - használt betűk;
 - aktuális játékos avatarja, neve és fordulópénze;
-- Pörgetés / középső képi hotspot / Megfejtés vezérlés;
-- jobb felső `Játék vége`;
-- alsó `Teszt` debug gomb;
-- Phaser kerék-overlay.
+- Pörgetés;
+- Magánhangzó képi hotspot;
+- Megfejtés;
+- jobb felső Játék vége;
+- Teszt debug gomb;
+- Phaser kerék-overlay;
+- színpadi visszajelzések;
+- teljes győzelmi overlay Phaser tűzijátékkal.
 
 ### Szerencsekerék
 
-A kerék asset:
+Asset:
 
 `assets/images/wheel.png`
 
-A jelenlegi beállítás:
+A jelenlegi konfiguráció:
 
 - 24 képi cikkely;
 - 12 logikai mező × 2 ismétlés;
-- Phaser rajzolja rá a feliratokat;
+- a feliratokat Phaser rajzolja rá;
 - 2–3 teljes fordulat;
-- 3600 ms animáció;
-- `Cubic.easeOut` lassulás;
-- megálláskor nagy eredmény a kerék közepén;
-- az eredmény 1500 ms után automatikusan életbe lép;
-- pénzmező, `CSŐD` és `KIMARADSZ` támogatott.
+- 3600 ms pörgetés;
+- `Cubic.easeOut`;
+- megállás után nagy eredmény középen;
+- 1500 ms után automatikus eredményalkalmazás.
 
-A fenti értékek nem hardcode-olt beállításként kezelendők: a
-`config/game-config.js` fájlban módosíthatók.
+A kerék viselkedése a `config/game-config.js` fájlból állítható.
 
 ### Betűbevitel
 
-A normál betűbevitel közvetlenül a fizikai billentyűzetről történik.
+A betűket közvetlenül a fizikai billentyűzetről adjuk meg.
 
-- kis- és nagybetű között nincs különbség;
-- a kód magyar locale szerint nagybetűsít;
-- ékezetes magyar betűk támogatottak;
-- mássalhangzó csak sikeres pénzmezős pörgetés után adható meg;
+- kisbetű = nagybetű;
+- magyar ékezetes betűk támogatottak;
+- mássalhangzó pénzmezős pörgetés után adható meg;
 - magánhangzó közvetlen billentyűleütéssel vásárolható;
-- a magánhangzó alapára 5000 Ft;
-- a Megfejtés dialog szövegmezőjének gépelését a globális billentyűkezelő
-  nem zavarja.
+- nincs külön betűbeviteli dialog.
 
-### Pénz és fordulók
+A látható Magánhangzó gomb hoverre akkor is felvillan, ha logikailag éppen
+disabled. Ez kizárólag vizuális visszajelzés.
 
-Játékosváltáskor az új játékos nem azonnal válik aktívvá. Az alap
-átmeneti szünet **1000 ms**, a `gameplay.playerSwitchDelayMs`
-konfigurációval módosítható. Ezalatt látható visszajelzés jelenik meg.
+### Megfejtés
 
-Mássalhangzó-találatnál:
+A Megfejtés dialog submit után azonnal bezár.
 
-```text
-nyeremény = találatok száma × kipörgetett összeg
-```
+- hibás válasz: `HELYTELEN MEGFEJTÉS` színpadi visszajelzés;
+- helyes válasz: előbb végigfut a hiányzó betűk felfedése;
+- csak ezután jelenik meg a győzelmi képernyő.
 
-A játék két pénzértéket tart fenn játékosonként:
+### Játékosváltás
 
-- `roundMoney` – az aktuális feladványban megszerzett összeg;
-- `totalMoney` – a már megnyert fordulók összesített nyereménye.
+A játékosváltás nem azonnali.
 
-Sikeres megfejtéskor a `roundMoney` hozzáadódik a `totalMoney` értékhez.
+Alap szünet:
 
-### Hangok
+`1000 ms`
 
-Jelenlegi SFX-ek:
+Konfiguráció:
 
-- `assets/sound/sfx/letter_hit.wav`
-- `assets/sound/sfx/letter_miss.wav`
-- `assets/sound/sfx/solve_success.wav`
-- `assets/sound/sfx/solve_fail.wav`
+`gameplay.playerSwitchDelayMs`
 
-Többszörös betűtalálatnál a cellák felvillanása és a találati hang egymás után
-következik. Az alap időköz 500 ms, konfigurálható.
-
-### Megfejtés UI
-
-A megfejtés elküldésekor a beviteli dialog **azonnal bezár**.
-
-- helytelen megfejtésnél látható `HELYTELEN MEGFEJTÉS` visszajelzés jelenik meg;
-- helyes megfejtésnél előbb végigfut a hiányzó betűk felfedése;
-- a fordulóvégi dialog csak a felfedési animáció után jelenik meg;
-- Enter és a `Megfejtem` gomb ugyanazt a submit folyamatot használja.
+A szünet alatt a vezérlés tiltott és rövid színpadi visszajelzés látható.
 
 ### Győzelmi képernyő
 
-Sikeres megfejtés után, a hiányzó betűk felfedése után teljes képernyős
-győzelmi overlay jelenik meg:
+Sikeres megfejtés után:
 
-- középen a győztes avatarja;
-- a győztes neve;
-- a megfejtett feladvány;
-- a forduló és az összesített nyeremény;
-- Phaserrel rajzolt tűzijáték.
+- győztes avatar;
+- győztes neve;
+- megfejtett feladvány;
+- forduló nyereménye;
+- összesített nyeremény;
+- Phaser tűzijáték.
 
-A gombok késleltetve jelennek meg:
+A gombok késleltetve válnak aktívvá:
 
-- `Következő feladvány` – új forduló;
-- `Játék vége` – közvetlen visszatérés a lobbyba.
+- `Következő feladvány`
+- `Játék vége`
 
-### Játék vége és tesztfunkció
+A győzelmi képernyő `Játék vége` gombja közvetlenül a lobbyba visz.
 
-- jobb felső `Játék vége`: megerősítő dialog után visszatérés a lobbyba;
-- győzelmi képernyő `Játék vége`: közvetlen visszatérés a lobbyba;
-- `Teszt`: dialogban mutatja az aktuális megfejtést;
-- a `Teszt` gomb konfigurációból elrejthető.
+### Játék vége
+
+Két út van:
+
+1. jobb felső `Játék vége` → megerősítő dialog;
+2. győzelmi képernyő `Játék vége` → közvetlen lobby.
+
+### Hangok
+
+Jelenlegi SFX:
+
+- `letter_hit.wav`
+- `letter_miss.wav`
+- `solve_success.wav`
+- `solve_fail.wav`
+
+Több azonos találatnál a felvillanások és a találati hangok sorban futnak.
+
+Alap ritmus:
+
+`500 ms`
+
+## Pénzmodell
+
+Játékosonként:
+
+- `roundMoney` – aktuális feladványban megszerzett pénz;
+- `totalMoney` – már megnyert fordulók összesített pénze.
+
+Mássalhangzó-találat:
+
+```text
+találatok száma × kipörgetett összeg
+```
+
+Sikeres megfejtéskor a `roundMoney` hozzáadódik a `totalMoney` értékhez.
 
 ## Indítás
 
-### Windows – ajánlott
-
-A repo gyökerében:
+### Windows
 
 ```text
 start.bat
@@ -147,11 +169,10 @@ start.bat
 
 A script:
 
-1. a repository gyökerére vált;
-2. ellenőrzi a Git elérhetőségét;
-3. lefuttatja a `git pull --ff-only origin main` parancsot;
-4. sikeres frissítés után elindítja a lokális HTTP szervert a 8080 porton;
-5. először a `python`, utána a `py -3` parancsot próbálja.
+1. a repository mappájára vált;
+2. `git pull --ff-only origin main`;
+3. elindítja a webszervert 8080 porton;
+4. `python`, majd `py -3` fallbacket használ.
 
 Elérés:
 
@@ -161,31 +182,20 @@ http://localhost:8080
 
 Leállítás:
 
-```text
-Ctrl+C
-```
+`Ctrl+C`
 
-A script nem használ `git reset --hard` parancsot, tehát nem törli
-automatikusan a helyi módosításokat.
-
-### Kézi indítás
+### Kézzel
 
 ```powershell
-cd kriszwheel
 git pull --ff-only origin main
 python -m http.server 8080
 ```
 
-A Phaser 3 CDN-ről töltődik be, ezért az első betöltéshez internetkapcsolat
-szükséges.
-
 ## Konfiguráció
 
-Központi konfiguráció:
+Központi fájl:
 
-```text
-config/game-config.js
-```
+`config/game-config.js`
 
 Fő csoportok:
 
@@ -196,16 +206,17 @@ Fő csoportok:
 - `victory`
 - `debug`
 
-Részletes leírás:
+Részletes referencia:
 
-- [Konfigurációs referencia](config/README.md)
+[config/README.md](config/README.md)
 
 ## Dokumentáció
 
 - [Játékszabály és játékfolyam](docs/GAMEPLAY.md)
-- [Architektúra és state machine](docs/ARCHITECTURE.md)
-- [Játékszínpad és overlay](docs/STAGE_UI.md)
+- [Architektúra](docs/ARCHITECTURE.md)
+- [Játékszínpad és UI](docs/STAGE_UI.md)
 - [Fejlesztői útmutató](docs/DEVELOPMENT.md)
+- [Roadmap](docs/ROADMAP.md)
 - [Konfigurációs referencia](config/README.md)
 
 ## Projektstruktúra
@@ -224,6 +235,7 @@ kriszwheel/
 │   ├── ARCHITECTURE.md
 │   ├── DEVELOPMENT.md
 │   ├── GAMEPLAY.md
+│   ├── ROADMAP.md
 │   └── STAGE_UI.md
 └── assets/
     ├── images/
@@ -238,19 +250,7 @@ kriszwheel/
         └── sfx/
 ```
 
-## Betöltési sorrend
-
-Az `index.html` végén:
-
-```html
-<script src="config/game-config.js"></script>
-<script src="app.js"></script>
-```
-
-Ez fontos: az `app.js` indulásakor már rendelkezésre kell állnia a
-`window.KRISZWHEEL_CONFIG` objektumnak.
-
-## Jelenlegi technológia
+## Technológia
 
 - HTML5
 - CSS3
@@ -259,17 +259,10 @@ Ez fontos: az `app.js` indulásakor már rendelkezésre kell állnia a
 - Phaser 3.90
 - statikus HTTP szerver
 
-Nincs szükség build lépésre vagy Node.js-re.
+Nincs build lépés és nincs Node.js-függőség.
 
-## Ismert korlátok / következő nagyobb lépések
+## Következő lépések
 
-- a feladványok még az `app.js`-ben vannak;
-- nincs SQLite/FastAPI backend;
-- nincs teljes scoreboard;
-- nincs Whisper hangvezérlés;
-- a mobilnézet még nem végleges;
-- a jelenlegi hangok prototípus-hangok;
-- a színpad néhány HTML azonosítója történeti okból régi elnevezést visel.
+A részletes, priorizált terv:
 
-A következő fejlesztések előtt érdemes a dokumentáció megfelelő részét is
-frissíteni.
+[docs/ROADMAP.md](docs/ROADMAP.md)
