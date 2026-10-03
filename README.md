@@ -1,87 +1,142 @@
-# Szerencsekerék – Basic Prototype
+# KriszWheel
 
-Első játszható böngészős prototípus.
+Böngészős, magyar nyelvű Szerencsekerék-játék saját lobbyval, TV-stúdió jellegű
+játékszínpaddal, Phaser 3 kerékanimációval, billentyűzetes betűbevitellel és
+konfigurálható játékszabályokkal.
 
-## Mit tud?
+A projekt jelenleg frontend-alapú prototípus: nincs még backend, adatbázis vagy
+Whisper integráció.
 
-- Játékosválasztás: Krisz, Adri, Alíz, Bot
-  - saját profilképek a `assets/images/` könyvtárból
-  - kijelöléskor kör alakú arany-kék fénygyűrű
-  - kijelölés nélkül a fénygyűrű teljesen eltűnik
-- Minimum 2 játékos
-- Alapértelmezés: Krisz + Bot
-- Végtelen számú feladvány/forduló
-- Pörgetés
-  - a feltöltött `assets/images/wheel.png` képből Phaser 3 forgó kerék
-  - 24 képi cikkely; a jelenlegi 12 játékmező kétszer fut körbe
-  - az összegek / CSŐD / KIMARADSZ feliratokat Phaser rajzolja a képre
-  - 2–3 teljes fordulat, kb. 3,6 mp-es fokozatos lassulás
-  - rövidebb és lassabb pörgetési érzet
-  - megálláskor az eredmény nagy betűkkel a kerék közepén jelenik meg
-  - 1,5 mp után az overlay automatikusan bezárul és az eredmény életbe lép
-- Pénzmezők
-- CSŐD
-- KIMARADSZ
-- Mássalhangzó megadása
-  - sikeres pörgetés után közvetlenül a billentyűzeten
-  - nincs külön beviteli dialógus
-- Találatonkénti pénzjóváírás
-- Magánhangzó vásárlása 5 000 Ft-ért
-  - a kívánt magánhangzó billentyűjének lenyomásával
-  - nincs külön beviteli dialógus
-- Megfejtés
-- Hibás betű / hibás megfejtés után körváltás
-- Egyszerű automatikus Bot
-- Phaser 3 kerékanimáció a `wheel.png` sprite-tal és programozott feliratokkal
-- Reszponzív alap UI
-- Stúdió lobby háttér: `assets/images/studio_lobby.png`
-- A jobb oldali kerék nagy izzóin reszponzív SVG/CSS váltott fényanimáció
-- Pixelpontos játékszínpad overlay a `studo_jatekszinpad.png` képre
-  - a feltöltött háttér tényleges 15 × 4 cellájára illesztett SVG feladvány
-  - a feladvány aktív cellái fehérre váltanak, a betűk finom fényanimációval jelennek meg
-  - felül a kategória/feladványtípus jelenik meg
-  - a gombok feletti kék sávban a már használt betűk látszanak
-  - a képen lévő Pörgetés / Mássalhangzó / Megfejtés gombok kattinthatók és hoverre kivilágosodnak
-  - legalul egy kis `Teszt` gomb nyitja meg dialogban az aktuális megfejtést
-  - a megfejtés már nem látszik állandóan a játékszínpadon
-  - jobb felül `Játék vége` gomb: megerősítés után visszatérés a lobbyba
-  - `Nem` választásnál a játék változatlan állapotból folytatódik
-  - jobb alul az aktuális játékos profilképe, neve és fordulópénze látszik
-  - a panel játékosváltáskor és pénzváltozáskor automatikusan frissül
-- Alap SFX hangok a `assets/sound/sfx/` könyvtárból
-  - minden betűtalálatnál annyi rövid, game-show jellegű csippanás szól, ahányszor a betű szerepel
-  - több találatnál a felvillanások és csippanások 0,5 másodperces lépésekben követik egymást
-  - külön hang nulla találatra
-  - külön hang sikeres és sikertelen megfejtésre
+## Jelenlegi funkciók
+
+### Lobby és játékosok
+
+- Választható játékosok: Krisz, Adri, Alíz és Bot.
+- Minimum 2 játékos szükséges.
+- Alapértelmezett kijelölés: Krisz + Bot.
+- Minden játékoshoz saját profilkép tartozik.
+- A kijelölt játékosok arany-kék fénygyűrűt kapnak.
+- A Bot automatikusan játszik.
+
+### Játékszínpad
+
+A fő háttér:
+
+`assets/images/studo_jatekszinpad.png`
+
+Natív mérete: **1672 × 941 px**.
+
+A kép fölött külön HTML/SVG/Phaser rétegek működnek:
+
+- 15 × 4-es feladványtábla;
+- kategória;
+- használt betűk;
+- aktuális játékos avatarja, neve és fordulópénze;
+- Pörgetés / középső képi hotspot / Megfejtés vezérlés;
+- jobb felső `Játék vége`;
+- alsó `Teszt` debug gomb;
+- Phaser kerék-overlay.
+
+### Szerencsekerék
+
+A kerék asset:
+
+`assets/images/wheel.png`
+
+A jelenlegi beállítás:
+
+- 24 képi cikkely;
+- 12 logikai mező × 2 ismétlés;
+- Phaser rajzolja rá a feliratokat;
+- 2–3 teljes fordulat;
+- 3600 ms animáció;
+- `Cubic.easeOut` lassulás;
+- megálláskor nagy eredmény a kerék közepén;
+- az eredmény 1500 ms után automatikusan életbe lép;
+- pénzmező, `CSŐD` és `KIMARADSZ` támogatott.
+
+A fenti értékek nem hardcode-olt beállításként kezelendők: a
+`config/game-config.js` fájlban módosíthatók.
+
+### Betűbevitel
+
+A normál betűbevitel közvetlenül a fizikai billentyűzetről történik.
+
+- kis- és nagybetű között nincs különbség;
+- a kód magyar locale szerint nagybetűsít;
+- ékezetes magyar betűk támogatottak;
+- mássalhangzó csak sikeres pénzmezős pörgetés után adható meg;
+- magánhangzó közvetlen billentyűleütéssel vásárolható;
+- a magánhangzó alapára 5000 Ft;
+- a Megfejtés dialog szövegmezőjének gépelését a globális billentyűkezelő
+  nem zavarja.
+
+### Pénz és fordulók
+
+Mássalhangzó-találatnál:
+
+```text
+nyeremény = találatok száma × kipörgetett összeg
+```
+
+A játék két pénzértéket tart fenn játékosonként:
+
+- `roundMoney` – az aktuális feladványban megszerzett összeg;
+- `totalMoney` – a már megnyert fordulók összesített nyereménye.
+
+Sikeres megfejtéskor a `roundMoney` hozzáadódik a `totalMoney` értékhez.
+
+### Hangok
+
+Jelenlegi SFX-ek:
+
+- `assets/sound/sfx/letter_hit.wav`
+- `assets/sound/sfx/letter_miss.wav`
+- `assets/sound/sfx/solve_success.wav`
+- `assets/sound/sfx/solve_fail.wav`
+
+Többszörös betűtalálatnál a cellák felvillanása és a találati hang egymás után
+következik. Az alap időköz 500 ms, konfigurálható.
+
+### Játék vége és tesztfunkció
+
+- `Játék vége`: megerősítő dialog után visszatérés a lobbyba.
+- `Nem`: a játékállapot változatlan marad.
+- `Teszt`: dialogban mutatja az aktuális megfejtést.
+- A `Teszt` gomb konfigurációból elrejthető.
 
 ## Indítás
 
 ### Windows – ajánlott
 
-A repository gyökerében található:
+A repo gyökerében:
 
 ```text
 start.bat
 ```
 
-Dupla kattintásra vagy terminálból futtatva:
+A script:
 
-1. a script a saját könyvtárára vált;
-2. lefuttatja a `git pull --ff-only origin main` parancsot;
-3. sikeres frissítés után elindítja a lokális webszervert a `8080` porton;
-4. először a `python`, szükség esetén a `py -3` parancsot próbálja.
+1. a repository gyökerére vált;
+2. ellenőrzi a Git elérhetőségét;
+3. lefuttatja a `git pull --ff-only origin main` parancsot;
+4. sikeres frissítés után elindítja a lokális HTTP szervert a 8080 porton;
+5. először a `python`, utána a `py -3` parancsot próbálja.
 
-A játék ezután itt érhető el:
+Elérés:
 
 ```text
 http://localhost:8080
 ```
 
-A szerver leállítása: `Ctrl+C`.
+Leállítás:
 
-A script szándékosan nem használ `git reset --hard` parancsot, ezért nem
-törli automatikusan a helyi módosításokat. Ha a repository nem frissíthető
-fast-forward módon, hibaüzenettel megáll.
+```text
+Ctrl+C
+```
+
+A script nem használ `git reset --hard` parancsot, tehát nem törli
+automatikusan a helyi módosításokat.
 
 ### Kézi indítás
 
@@ -91,62 +146,99 @@ git pull --ff-only origin main
 python -m http.server 8080
 ```
 
-A Phaser 3 jelenleg CDN-ről töltődik be, ezért az első betöltéshez internetkapcsolat kell.
+A Phaser 3 CDN-ről töltődik be, ezért az első betöltéshez internetkapcsolat
+szükséges.
 
 ## Konfiguráció
 
-A központi játékbeállítások:
+Központi konfiguráció:
 
 ```text
 config/game-config.js
 ```
 
-Innen állítható többek között:
+Fő csoportok:
 
-- a kerék fordulatszáma, sebessége, easingje és eredmény-kijelzési ideje;
-- a kerék képe, mérete, feliratpozíciója és mezői;
-- a magánhangzó ára;
-- a találati animációk közötti idő;
-- a Bot időzítései és döntési valószínűségei;
-- a hangfájlok és hangerők;
-- a fejlesztői `Teszt` gomb láthatósága.
+- `gameplay`
+- `wheel`
+- `bot`
+- `audio`
+- `debug`
 
-Részletes leírás: [config/README.md](config/README.md)
+Részletes leírás:
+
+- [Konfigurációs referencia](config/README.md)
 
 ## Dokumentáció
 
-A játékszínpad pixelpontos felépítése, koordinátái, gomb-hotspotjai,
-betűfelfedése és hanglogikája külön dokumentumban található:
+- [Játékszabály és játékfolyam](docs/GAMEPLAY.md)
+- [Architektúra és state machine](docs/ARCHITECTURE.md)
+- [Játékszínpad és overlay](docs/STAGE_UI.md)
+- [Fejlesztői útmutató](docs/DEVELOPMENT.md)
+- [Konfigurációs referencia](config/README.md)
 
-- [Játékszínpad és overlay technikai leírás](docs/STAGE_UI.md)
+## Projektstruktúra
 
-## Jelenlegi architektúra
+```text
+kriszwheel/
+├── app.js
+├── index.html
+├── styles.css
+├── start.bat
+├── README.md
+├── config/
+│   ├── game-config.js
+│   └── README.md
+├── docs/
+│   ├── ARCHITECTURE.md
+│   ├── DEVELOPMENT.md
+│   ├── GAMEPLAY.md
+│   └── STAGE_UI.md
+└── assets/
+    ├── images/
+    │   ├── adri.png
+    │   ├── bot.png
+    │   ├── krisz.png
+    │   ├── lizus.png
+    │   ├── studio_lobby.png
+    │   ├── studo_jatekszinpad.png
+    │   └── wheel.png
+    └── sound/
+        └── sfx/
+```
 
-- `config/game-config.js` – központi játék- és kerékkonfiguráció
-- `index.html` – UI szerkezet
-- `styles.css` – lobby, pixelpontos játékszínpad overlay, profilképek és fényanimációk
-- `app.js` – játékszabályok, állapotgép, Bot, Phaser kerék, SFX vezérlés
-- `assets/images/wheel.png` – 24 cikkelyes, szöveg nélküli Phaser kerék asset
-- `assets/sound/sfx/letter_hit.wav` – betűtalálat
-- `assets/sound/sfx/letter_miss.wav` – nincs ilyen betű
-- `assets/sound/sfx/solve_success.wav` – sikeres megfejtés
-- `assets/sound/sfx/solve_fail.wav` – sikertelen megfejtés
+## Betöltési sorrend
 
-Ez még kizárólag frontend prototípus. FastAPI, SQLite és Whisper nincs bekötve.
+Az `index.html` végén:
 
-Fontos: a jelenlegi `studo_jatekszinpad.png` ténylegesen **15 × 4** kék cellát tartalmaz,
-ezért a mostani SVG overlay ehhez a geometriához igazodik.
+```html
+<script src="config/game-config.js"></script>
+<script src="app.js"></script>
+```
 
-## Következő fejlesztési fázis
+Ez fontos: az `app.js` indulásakor már rendelkezésre kell állnia a
+`window.KRISZWHEEL_CONFIG` objektumnak.
 
-1. Játékszabályok finomítása és konfigurációs fájl
-2. Jobb Bot
-3. Saját feladvány-adatbázis
-4. FastAPI backend + SQLite
-5. Lobby / közös belépés integráció
-6. Hangvezérlés Whisperrel:
-   - „Pörgetek!”
-   - „K mint Károly”
-   - „Magánhangzó”
-   - „Megfejtem”
-7. Hangok, mutató kattogás, vizuális effektek
+## Jelenlegi technológia
+
+- HTML5
+- CSS3
+- vanilla JavaScript
+- SVG
+- Phaser 3.90
+- statikus HTTP szerver
+
+Nincs szükség build lépésre vagy Node.js-re.
+
+## Ismert korlátok / következő nagyobb lépések
+
+- a feladványok még az `app.js`-ben vannak;
+- nincs SQLite/FastAPI backend;
+- nincs teljes scoreboard;
+- nincs Whisper hangvezérlés;
+- a mobilnézet még nem végleges;
+- a jelenlegi hangok prototípus-hangok;
+- a színpad néhány HTML azonosítója történeti okból régi elnevezést visel.
+
+A következő fejlesztések előtt érdemes a dokumentáció megfelelő részét is
+frissíteni.

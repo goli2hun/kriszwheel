@@ -1,53 +1,392 @@
-# KriszWheel konfiguráció
+# KriszWheel – konfigurációs referencia
 
-A játék központi konfigurációja:
+Központi konfiguráció:
 
 `config/game-config.js`
 
-A fájl az `app.js` előtt töltődik be, és a
-`window.KRISZWHEEL_CONFIG` objektumot hozza létre.
+A fájl az `app.js` előtt töltődik be, és ezt hozza létre:
 
-## Fő csoportok
+```js
+window.KRISZWHEEL_CONFIG
+```
 
-### gameplay
+## 1. Betöltés
 
-- `vowelPrice` – magánhangzó ára Ft-ban.
-- `letterHitGapMs` – több azonos találat felvillanása/hangja közötti idő.
+`index.html`:
 
-### wheel
+```html
+<script src="config/game-config.js"></script>
+<script src="app.js"></script>
+```
 
-- `image` – kerék asset.
-- `canvasSize` – Phaser canvas logikai mérete.
-- `wheelSize` – kerék képi mérete a canvason.
-- `labelRadius` – a feliratok távolsága a középponttól.
-- `startOffsetDeg` – a cikkelyek induló szöge.
-- `pointerAngleDeg` – a fix mutató iránya.
-- `minFullTurns`, `maxFullTurns` – teljes fordulatok száma.
-- `spinDurationMs` – pörgetés időtartama.
-- `easing` – Phaser tween easing.
-- `resultDisplayMs` – a megállás utáni eredmény kijelzési ideje.
-- `segments` – pénz / CSŐD / KIMARADSZ mezők.
-- `segmentRepeat` – hányszor ismétlődjön a megadott mezősor a képi keréken.
+A sorrend kötelező.
 
-A jelenlegi `wheel.png` 24 cikkelyes, ezért 12 mező × 2 ismétlés van beállítva.
+## 2. gameplay
 
-### bot
+### gameplay.vowelPrice
 
-A Bot gondolkodási ideje, megfejtési hajlandósága, magánhangzó-vásárlási
-esélye és a betűválasztás időzítése.
+Típus: szám.
 
-### audio
+Alap:
 
-A hangfájlok elérési útja és a fontos hangerők.
+```js
+vowelPrice: 5000
+```
 
-### debug
+A magánhangzó-vásárlás ára Ft-ban.
 
-- `showTestButton` – a fejlesztői Teszt gomb megjelenítése.
+A vásárlás az aktuális játékos `roundMoney` értékéből vonódik le.
 
-## Fontos
+### gameplay.letterHitGapMs
 
-A konfiguráció módosítása után elég újratölteni az oldalt.
+Típus: szám, ms.
 
-A `segments` elemszám × `segmentRepeat` értékének meg kell egyeznie a
-kerékgrafika tényleges cikkelyszámával, különben a feliratok és a képi
-cikkelyek nem fognak pontosan illeszkedni.
+Alap:
+
+```js
+letterHitGapMs: 500
+```
+
+Ha ugyanaz a betű többször szerepel, az egyes cellák felvillanása és a
+találati hang között ennyi idő telik el.
+
+## 3. wheel
+
+### wheel.image
+
+```js
+image: "assets/images/wheel.png"
+```
+
+A Phaser által betöltött kerékgrafika.
+
+Javasolt:
+
+- négyzetes kép;
+- frontális kerék;
+- átlátszó háttér;
+- ne tartalmazzon beégetett összegeket.
+
+### wheel.canvasSize
+
+```js
+canvasSize: 600
+```
+
+A Phaser scene logikai szélessége és magassága.
+
+### wheel.wheelSize
+
+```js
+wheelSize: 536
+```
+
+A keréksprite megjelenített mérete a Phaser canvason.
+
+### wheel.labelRadius
+
+```js
+labelRadius: 188
+```
+
+A cikkelyfeliratok távolsága a kerék középpontjától.
+
+### wheel.startOffsetDeg
+
+```js
+startOffsetDeg: -90
+```
+
+A 0. cikkely kezdő szöge.
+
+A jelenlegi assethez -90 fok illeszkedik.
+
+### wheel.pointerAngleDeg
+
+```js
+pointerAngleDeg: -90
+```
+
+A fix mutató iránya.
+
+-90 fok = felül.
+
+### wheel.minFullTurns / wheel.maxFullTurns
+
+```js
+minFullTurns: 2,
+maxFullTurns: 3
+```
+
+Pörgetésenként véletlenül választott teljes fordulatszám tartománya.
+
+A kisebb fordulatszám lassabb vizuális érzetet ad ugyanazon időtartam mellett.
+
+### wheel.spinDurationMs
+
+```js
+spinDurationMs: 3600
+```
+
+A tween teljes időtartama ms-ban.
+
+### wheel.easing
+
+```js
+easing: "Cubic.easeOut"
+```
+
+Phaser tween easing név.
+
+A `easeOut` karakter miatt a kerék a végén fokozatosan lassul.
+
+### wheel.resultDisplayMs
+
+```js
+resultDisplayMs: 1500
+```
+
+Megállás után ennyi ideig látszik a nagy középső eredmény.
+
+Utána az overlay automatikusan bezár és az eredmény alkalmazódik.
+
+### wheel.retryDelayMs
+
+```js
+retryDelayMs: 250
+```
+
+Ha a Phaser scene még nem áll készen, ennyi idő után próbáljuk újra a
+pörgetést.
+
+### Feliratbeállítások
+
+```js
+labelFontFamily: "Arial Black, Arial, sans-serif",
+labelFontSizePx: 15,
+longLabelFontSizePx: 11,
+longLabelThreshold: 7,
+labelColor: "#ffffff",
+labelStrokeColor: "#10152f",
+labelStrokeThickness: 4
+```
+
+`longLabelThreshold` fölött a kisebb `longLabelFontSizePx` használódik.
+
+### wheel.segmentRepeat
+
+```js
+segmentRepeat: 2
+```
+
+A `segments` tömb hányszor ismétlődjön a teljes keréken.
+
+### wheel.segments
+
+Példa:
+
+```js
+{ label: "5 000", type: "money", value: 5000 }
+```
+
+Típusok:
+
+#### money
+
+```js
+{ label: "5 000", type: "money", value: 5000 }
+```
+
+`value` lesz a mássalhangzó találatonkénti alapösszeg.
+
+#### bankrupt
+
+```js
+{ label: "CSŐD", type: "bankrupt", value: 0 }
+```
+
+Nullázza az aktuális `roundMoney` értéket és játékost vált.
+
+#### skip
+
+```js
+{ label: "KIMARADSZ", type: "skip", value: 0 }
+```
+
+Pénzmódosítás nélkül játékost vált.
+
+### Kritikus kerékszabály
+
+```text
+segments.length × segmentRepeat = képi cikkelyek száma
+```
+
+Jelenleg:
+
+```text
+12 × 2 = 24
+```
+
+Ha ez nem igaz, a logikai és képi mezők elcsúsznak.
+
+## 4. bot
+
+### bot.actionDelayMs
+
+```js
+actionDelayMs: 900
+```
+
+A Bot általános gondolkodási késleltetése.
+
+### bot.solveRevealRatio
+
+```js
+solveRevealRatio: 0.72
+```
+
+Ekkora felfedettségi aránytól próbálhat megfejteni.
+
+0–1 tartomány.
+
+### bot.solveChance
+
+```js
+solveChance: 0.45
+```
+
+A megfejtési kísérlet valószínűsége, ha a küszöb teljesül.
+
+### bot.solveDelayMs
+
+```js
+solveDelayMs: 700
+```
+
+A megfejtés bejelentése és végrehajtása közti késleltetés.
+
+### bot.vowelBuyChance
+
+```js
+vowelBuyChance: 0.18
+```
+
+Magánhangzó-vásárlás esélye, ha van elég pénze.
+
+### bot.vowelDelayMs
+
+```js
+vowelDelayMs: 550
+```
+
+A Bot magánhangzó-választásának késleltetése.
+
+### bot.consonantAfterWheelDelayMs
+
+```js
+consonantAfterWheelDelayMs: 650
+```
+
+Pénzmező után ennyi idő múlva választ mássalhangzót.
+
+### bot.consonantSubmitDelayMs
+
+```js
+consonantSubmitDelayMs: 550
+```
+
+A kiválasztott betű bejelentése és tényleges beadása közti idő.
+
+## 5. audio
+
+### audio.defaultVolume
+
+```js
+defaultVolume: 0.70
+```
+
+Általános fallback hangerő.
+
+### Specifikus hangerők
+
+```js
+letterHitVolume: 0.72,
+solveSuccessVolume: 0.75,
+solveFailVolume: 0.72
+```
+
+0–1 tartomány ajánlott.
+
+### audio.files
+
+```js
+files: {
+  letterHit: "assets/sound/sfx/letter_hit.wav",
+  letterMiss: "assets/sound/sfx/letter_miss.wav",
+  solveSuccess: "assets/sound/sfx/solve_success.wav",
+  solveFail: "assets/sound/sfx/solve_fail.wav"
+}
+```
+
+A fájlutak a repo gyökeréhez képest értendők.
+
+## 6. debug
+
+### debug.showTestButton
+
+```js
+showTestButton: true
+```
+
+- `true`: látszik a Teszt gomb;
+- `false`: a gomb `hidden` osztályt kap.
+
+## 7. Példák
+
+### Lassabb kerék
+
+```js
+minFullTurns: 1,
+maxFullTurns: 2,
+spinDurationMs: 4200
+```
+
+### Gyorsabb eredmény-eltűnés
+
+```js
+resultDisplayMs: 800
+```
+
+### Drágább magánhangzó
+
+```js
+vowelPrice: 8000
+```
+
+### Teszt gomb elrejtése
+
+```js
+showTestButton: false
+```
+
+## 8. Módosítás után
+
+Nincs build lépés.
+
+Mentés után frissítsd a böngészőt.
+
+Ha cache miatt nem látszik:
+
+```text
+Ctrl+F5
+```
+
+## 9. Amit ne tegyél
+
+Ne változtasd úgy a `segments` / `segmentRepeat` kombinációt, hogy ne
+egyezzen a wheel asset tényleges cikkelyszámával.
+
+Ne töltsd az `app.js`-t a config előtt.
+
+Ne tegyél titkos adatot ebbe a fájlba: kliensoldali JavaScript, minden
+böngészőből olvasható.

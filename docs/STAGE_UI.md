@@ -1,23 +1,6 @@
-# Játékszínpad és overlay – technikai dokumentáció
+# KriszWheel – játékszínpad és overlay
 
-Ez a dokumentum a Szerencsekerék jelenlegi, kép-alapú játékszínpadának működését írja le.
-
-## 1. Cél
-
-A játéknézet nem egy hagyományos webes panelrendszer. A
-`assets/images/studo_jatekszinpad.png` egy 1672 × 941 px-es, 16:9 arányú
-stúdiódíszlet, amely fölé célzott HTML/SVG interaktív rétegek kerülnek.
-
-Az alapelv:
-
-- a PNG adja a teljes látványt;
-- az SVG rajzolja a feladvány fehér mezőit és a felfedett betűket;
-- a HTML overlay írja ki a kategóriát és a már használt betűket;
-- átlátszó HTML gombok ülnek a képre generált gombok fölött;
-- a meglévő játéklogika továbbra is az `app.js`-ben fut.
-- a hangolható játékparaméterek a `config/game-config.js` fájlban vannak.
-
-## 2. Háttérkép és koordinátarendszer
+## 1. Alapkép
 
 Fájl:
 
@@ -27,32 +10,38 @@ Natív méret:
 
 `1672 × 941 px`
 
-A játéktér ugyanezt a koordinátarendszert használja. A fő SVG:
+A `.stage-canvas` ugyanilyen képarányt tart fenn.
 
-```html
-<svg viewBox="0 0 1672 941" preserveAspectRatio="xMidYMid meet">
+A cél, hogy a háttér és az összes ráhelyezett funkcionális réteg együtt
+skálázódjon.
+
+## 2. Rétegek
+
+```text
+PNG stúdió háttér
+    ↓
+SVG puzzle board
+    ↓
+kategória + használt betűk
+    ↓
+aktuális játékos panel
+    ↓
+képi hotspotok
+    ↓
+Teszt / Játék vége
+    ↓
+Phaser wheel overlay
 ```
-
-A `.stage-canvas` megtartja a 1672:941 képarányt. Emiatt a rajzolt elemek
-együtt skálázódnak a háttérrel, és nem külön-külön reagálnak a viewport
-méretére.
 
 ## 3. Feladványtábla
 
-### 3.1 A jelenlegi kép tényleges geometriája
-
-A háttérképen jelenleg:
+A háttér jelenlegi táblája:
 
 - 15 oszlop;
 - 4 sor;
-- összesen 60 cella
+- 60 képi cella.
 
-található.
-
-Ez fontos eltérés a korábbi 14 × 5 tervhez képest. A kód szándékosan a
-**ténylegesen feltöltött képhez** igazodik.
-
-Az `app.js`-ben ezt a `STAGE_GRID` konstans írja le:
+A koordináták az `app.js` `STAGE_GRID` objektumában vannak.
 
 ```js
 cols: 15
@@ -61,44 +50,49 @@ x: [311, 388, 465, 541, 618, 694, 771, 848, 924, 1001, 1078, 1155, 1233, 1310, 1
 y: [192, 269, 345, 420]
 ```
 
-Az oszlopszélességek és sormagasságok külön tömbökben vannak megadva,
-mert a generált képen néhány cella 1-2 pixellel eltér.
+A szélesség és magasság cellánként/soronként külön tárolt, mert a generált
+háttér nem teljesen pixelazonos cellákat tartalmaz.
 
-### 3.2 Feladvány tördelése
+## 4. Tördelés
 
 A `layoutPuzzleRows()`:
 
-1. szavanként dolgozza fel a feladványt;
-2. legfeljebb 15 karakteres sorokat készít;
-3. maximum 4 sort használ;
-4. több lehetséges tördelés közül a kiegyensúlyozottabbat választja;
-5. a sort vízszintesen középre igazítja a táblán.
+- szavanként tördel;
+- maximum 15 karaktert enged soronként;
+- legfeljebb 4 sort használ;
+- kiegyensúlyozott elrendezést keres;
+- minden sort vízszintesen középre igazít.
 
-### 3.3 Fehér mezők
+Ha nincs jó szavas tördelés, fallback darabolást használ.
 
-A PNG-ben lévő kék cellát az SVG csak akkor takarja fehér mezővel, ha az
-adott helyen tényleges karakter szerepel a feladványban.
+## 5. Cellák
 
-A fehér mező SVG `rect`, enyhe függőleges gradienssel. Az arany keret nem
-SVG-ben készül: az továbbra is a háttérképből látszik.
+Az SVG csak ott rajzol fehér mezőt, ahol tényleges karakter van.
 
-Ezért a vizuális rétegrend:
+Rétegrend:
 
 ```text
-PNG kék cella + arany keret
-        ↓
-SVG fehér cellabelső
-        ↓
+háttér kék cellája + arany keret
+          ↓
+SVG fehér belső rect
+          ↓
 SVG betű
 ```
 
-A szóközökhöz nem rajzolunk fehér mezőt.
+A szóközök nem kapnak fehér mezőt.
 
-## 4. Betűk megjelenítése
+Írásjelek azonnal látszanak.
 
-A betűk SVG `text` elemek.
+## 6. Betűstílus
 
-Jelenlegi tipográfiai irány:
+A felfedett betűk:
+
+- `Arial Black` jellegűek;
+- sötét színűek;
+- középre igazítottak;
+- SVG `text` elemek.
+
+A jelenlegi CSS alap:
 
 ```css
 font-family: "Arial Black", Arial, Helvetica, sans-serif;
@@ -107,37 +101,38 @@ font-weight: 900;
 fill: #17162d;
 ```
 
-A cél az eredeti műsor táblájához hasonló, vastag, sötét, jól olvasható
-TV-s karakter.
+## 7. Betűfelfedési animáció
 
-### 4.1 Találat animáció
+Új találatnál a betű bekerül:
 
-Találatnál a betű bekerül a `state.justRevealed` halmazba.
+`state.justRevealed`
 
-A `stageLetterReveal` animáció:
+Az animáció:
 
-- halványan indul;
-- kb. 68%-os méretről nő;
-- rövid fehér/kék glow-t kap;
-- enyhén túlnő 109%-ra;
-- végül visszaáll normál méretre és sötét színre.
+1. áttetsző / kicsi kezdés;
+2. fehér-kék glow;
+3. enyhe túlnövés;
+4. normál sötét betű.
 
-Ha ugyanaz a megtalált betű több helyen szerepel, az egyes cellák
-`500 ms` eltéréssel kapják meg az animációt. A hang ugyanilyen ütemezést
-használ, ezért a vizuális felvillanás és a csippanás sorban együtt halad.
+Több azonos betű esetén az egyes találatok sorban indulnak.
 
-A következő render után a `justRevealed` halmaz törlődik, így a már
-korábban felfedett betűk nem animálódnak újra.
+Konfiguráció:
 
-## 5. Kategória / feladványtípus
+`gameplay.letterHitGapMs`
 
-A felső, üres kék csíkba kerül a feladvány kategóriája.
+Alapérték:
 
-DOM elem:
+`500 ms`
+
+A hang ugyanilyen ritmusban követi a felfedést.
+
+## 8. Kategória
+
+DOM:
 
 `#categoryText`
 
-Pozíció a teljes 1672 × 941 színpadhoz viszonyítva:
+Pozíció:
 
 ```css
 left: 27.87%;
@@ -146,48 +141,29 @@ width: 44.38%;
 height: 6.91%;
 ```
 
-A kategória nagybetűs, középre igazított, arany-fehér tónusú szöveg.
+A szöveg nagybetűs és középre igazított.
 
-Példák:
+## 9. Használt betűk
 
-- MONDÁS
-- BUDAPEST
-- TERMÉSZET
-- HELY
-- KIFEJEZÉS
-- ÉTEL
-
-## 6. Használt betűk
-
-A három nagy gomb feletti hosszú kék sáv a már elhasznált betűket mutatja.
-
-DOM elem:
+DOM:
 
 `#usedLetters`
 
-A megjelenítés formája például:
+A mező a `state.usedLetters` tartalmát jeleníti meg.
+
+Példa:
 
 ```text
-HASZNÁLT BETŰK    A  K  R  S  T
+A  K  R  S  T
 ```
 
-A forrás a meglévő `state.usedLetters` halmaz. A renderelést a
-`renderUsedLetters()` végzi.
+## 10. Fő képi hotspotok
 
-## 7. Képi gombok és hotspotok
-
-A háttérkép már tartalmazza a három gomb grafikáját és feliratát. Ezért
-nem rajzolunk rájuk új látható HTML gombot.
-
-Ehelyett három átlátszó `button` ül pontosan fölöttük.
-
-### 7.1 Pörgetés
+### Pörgetés
 
 DOM:
 
 `#spinBtn`
-
-Hotspot:
 
 ```css
 left: 22.73%;
@@ -196,75 +172,27 @@ width: 15.85%;
 height: 7.01%;
 ```
 
-A `spinWheel(false)` logikát indítja.
+A `spinWheel(false)` függvényt indítja.
 
-A pörgetés most valódi Phaser overlayt használ:
+### Középső hotspot
 
-- asset: `assets/images/wheel.png`;
-- a PNG 24 színes cikkelyt tartalmaz, felirat nélkül;
-- a jelenlegi 12 játékmező kétszer kerül körbe, így mind a 24 cikkelyhez
-  tartozik logikai eredmény;
-- a feliratokat Phaser `Text` objektumok rajzolják a megfelelő cikkelyre;
-- a PNG és a feliratok közös `wheelContainer` részei, ezért együtt forognak;
-- a mutató külön Phaser objektum, ezért fixen marad a kerék fölött.
-
-Pörgetéskor a játék előre kiválasztja a célcikkelyt, majd a kerék 2–3 teljes
-fordulat után kb. 3600 ms alatt `Cubic.easeOut` lassulással pontosan annak
-a cikkelynek a közepére áll. A kisebb fordulatszám miatt a teljes animáció
-rövidebb, ugyanakkor maga a kerék is lassabbnak érződik.
-
-Megálláskor:
-
-1. a játék `wheelResult` állapotba lép;
-2. a kerék közepén nagy, nagybetűs eredmény jelenik meg;
-3. az eredmény 1500 ms-ig látható;
-4. ezután az overlay automatikusan bezárul és lefut az
-   `applyPendingWheelResult()`.
-
-Az eredmény alkalmazásakor:
-
-1. pénzmezőnél beáll `state.wheelValue`, majd a játék betűt vár;
-2. `CSŐD` esetén nullázódik a fordulópénz és játékosváltás történik;
-3. `KIMARADSZ` esetén azonnal játékosváltás történik.
-
-Külön `Jóváhagyás` gomb már nincs.
-
-### 7.2 Mássalhangzó
-
-DOM:
+DOM azonosító:
 
 `#consonantStageBtn`
 
-Hotspot:
+Ez történeti elnevezés.
 
-```css
-left: 40.79%;
-top: 86.29%;
-width: 18.42%;
-height: 7.01%;
-```
+A normál betűbevitel már nem dialogon és nem ezen a gombon keresztül történik,
+hanem közvetlenül a billentyűzetről. A hotspot jelenleg csak segédüzenetet
+képes kiírni, ha a játék `letter` állapotban van.
 
-Csak akkor aktív, amikor a játék állapota `letter`. A gomb maga már nem
-nyit beviteli ablakot: a felhasználó közvetlenül a fizikai billentyűzeten
-nyomja le a kívánt mássalhangzót.
+A későbbi UI-refaktorban érdemes az azonosítót és a képi funkciót egységesíteni.
 
-A globális `keydown` kezelés csak akkor fogadja el a karaktert, ha:
-
-- a játéknézet aktív;
-- emberi játékos van soron;
-- nincs nyitott dialog;
-- nem szövegbeviteli mezőben gépelünk;
-- a játék `letter` fázisban van.
-
-Ezért a Megfejtés mezőbe történő gépelést nem zavarja.
-
-### 7.3 Megfejtés
+### Megfejtés
 
 DOM:
 
 `#solveBtn`
-
-Hotspot:
 
 ```css
 left: 61.42%;
@@ -273,184 +201,165 @@ width: 15.85%;
 height: 7.01%;
 ```
 
-A meglévő megfejtés dialógust nyitja.
+A megfejtés dialogot nyitja.
 
-### 7.4 Hover
+## 11. Aktuális játékos panel
 
-A hotspotok alapállapotban teljesen átlátszók.
+A jobb alsó panel:
 
-Hover/fókusz esetén:
+- avatart;
+- nevet;
+- aktuális `roundMoney` értéket
 
-- enyhe fehér-kék fényréteg jelenik meg;
-- arany glow kerül a gomb köré;
-- a háttérképen lévő eredeti gomb vizuálisan világosabbnak tűnik.
+mutat.
 
-A felirat továbbra is a PNG része.
-
-### 7.5 Közvetlen billentyűzetes betűbevitel
-
-A mássalhangzó- és magánhangzó-beviteli dialógusok megszűntek.
-
-Pénzmező kipörgetése után:
-
-- egy mássalhangzó billentyű közvetlenül meghívja a
-  `handleConsonant()` függvényt;
-- egy magánhangzó billentyű közvetlenül a `buyVowel()` függvényt hívja;
-- magánhangzó vásárlása csak elegendő fordulópénz esetén sikerül;
-- a magyar ékezetes magánhangzók is támogatottak:
-  `Á É Í Ó Ö Ő Ú Ü Ű`.
-
-A magánhangzó közvetlenül `spin` fázisban is vásárolható, így a korábbi
-játékszabály megmarad, csak a külön dialog tűnt el.
-
-## 8. Aktuális játékos panel
-
-A színpad jobb alsó részén külön státuszpanel mutatja az éppen soron lévő
-játékost.
-
-Megjelenített adatok:
-
-- játékos profilképe;
-- játékos neve;
-- aktuális fordulópénz.
-
-Kép-hozzárendelés:
-
-```js
-const PLAYER_IMAGES = {
-  Krisz: "assets/images/krisz.png",
-  Adri: "assets/images/adri.png",
-  Aliz: "assets/images/lizus.png",
-  Bot: "assets/images/bot.png"
-};
-```
-
-DOM elemek:
+DOM:
 
 - `#stageCurrentAvatar`
 - `#stageCurrentPlayerName`
 - `#stageCurrentMoney`
 
-A panel frissítését a `renderAll()` végzi, ezért automatikusan változik:
+A `renderAll()` frissíti.
 
-- játékosváltáskor;
-- találat után;
-- CSŐD után;
-- új forduló indításakor.
+Kép mapping:
 
-A pénzmező a játékos `roundMoney` értékét mutatja, tehát az adott
-fordulóban aktuálisan megszerzett összeget, nem a teljes játék összesített
-nyereményét.
-
-## 9. Teszt megfejtés
-
-A megfejtés fejlesztési segítségként már **nem jelenik meg állandóan** a
-játékszínpadon.
-
-A színpad legalján egy kisméretű `Teszt` gomb található:
-
-- DOM: `#testBtn`
-- dialog: `#testDialog`
-- megfejtés szövege: `#testAnswerDialogText`
-
-Kattintáskor az aktuális feladvány kerül a dialogba:
-
-```js
-el.testAnswerDialogText.textContent = state.puzzle.text;
-el.testDialog.showModal();
+```text
+Krisz → assets/images/krisz.png
+Adri  → assets/images/adri.png
+Aliz  → assets/images/lizus.png
+Bot   → assets/images/bot.png
 ```
 
-Így a megfejtés csak akkor látszik, amikor tesztelés közben külön kérjük.
-Ez továbbra is fejlesztői segédfunkció; a végleges játékban eltávolítható
-vagy debug kapcsolóhoz köthető.
-
-## 10. Játék vége
-
-A játékszínpad jobb felső sarkában külön `Játék vége` gomb található.
+## 12. Phaser kerék overlay
 
 DOM:
 
-- gomb: `#endGameBtn`
-- megerősítő dialog: `#endGameDialog`
-- `Nem`: `#endGameCancelBtn`
-- `Igen`: `#endGameConfirmBtn`
+- `#wheelOverlay`
+- `#wheelGame`
+- `#wheelOverlayResult`
 
-Kattintás után a dialog kérdése:
+A Phaser canvas az overlay közepén jelenik meg.
 
-`Vége a játéknak?`
+### Kerék asset
 
-Működés:
+Konfiguráció:
 
-- `Nem`: a dialog bezárul, a játékállapot nem változik;
-- `Igen`: a játék `setup` állapotba kerül, a játékszínpad eltűnik,
-  és ismét a lobby jelenik meg.
+`wheel.image`
 
-A tényleges visszalépést a `returnToLobby()` függvény végzi.
+Alap:
 
-## 11. Találati hang
+`assets/images/wheel.png`
 
-Fájl:
+### Cikkelyek
 
-`assets/sound/sfx/letter_hit.wav`
+A PNG nem tartalmaz összegeket.
 
-A hang saját generált, rövid game-show jellegű csippanás.
+A feliratokat a Phaser rajzolja rá a `wheel.segments` konfigurációból.
 
-A `playHitSequence(count)` annyiszor indítja el a hangot, ahány
-előfordulása van a megtalált betűnek.
+A PNG és a text objektumok a `wheelContainer` részei, ezért együtt forognak.
 
-Példa:
+### Mutató
+
+A mutató külön Phaser objektum, így nem forog.
+
+A célpozíció számításához használt konfiguráció:
+
+- `wheel.startOffsetDeg`
+- `wheel.pointerAngleDeg`
+
+### Pörgetés
+
+Konfiguráció:
+
+- `wheel.minFullTurns`
+- `wheel.maxFullTurns`
+- `wheel.spinDurationMs`
+- `wheel.easing`
+
+Alap:
 
 ```text
-3 találat → csipp – csipp – csipp
+2–3 fordulat
+3600 ms
+Cubic.easeOut
 ```
 
-Jelenlegi időköz:
+### Megállás
 
-`500 ms`
+A megállás után:
 
-A hang minden lejátszásnál külön `Audio.cloneNode()` példányon indul, ezért
-a rövid hangok nem vágják le egymást.
+1. `wheelResult` állapot;
+2. nagy, nagybetűs eredmény középen;
+3. várakozás `wheel.resultDisplayMs` ideig;
+4. automatikus overlay bezárás;
+5. eredmény alkalmazása.
 
-További SFX:
+Alap:
 
-- `letter_miss.wav` – nincs ilyen betű;
-- `solve_success.wav` – sikeres megfejtés;
-- `solve_fail.wav` – hibás megfejtés.
+`1500 ms`
 
-## 12. Rejtett kompatibilitási réteg
+## 13. Teszt gomb
 
-A jelenlegi prototípus még tartalmaz olyan korábbi logikai elemeket, amelyek
-vizuálisan nem részei az új színpadnak.
+DOM:
 
-A `.stage-logic-bridge` a viewporton kívül tartja többek között:
+`#testBtn`
 
-- a játékoslista korábbi renderét;
-- az aktív játékos szövegét;
-- a belső státuszüzenetet.
+A gomb dialogban mutatja az aktuális megfejtést.
 
-Erre azért van szükség, hogy az új színpad fejlesztése közben a meglévő
-játékmenet ne törjön el.
+Konfiguráció:
 
-Ez átmeneti megoldás. A későbbi refaktorban ezeket külön állapot/UI
-komponensekre érdemes bontani.
+`debug.showTestButton`
 
-## 13. Jelenlegi korlátok és következő lépések
+`false` esetén a gomb `hidden` osztályt kap.
 
-Jelenleg még nincs véglegesen integrálva:
+## 14. Játék vége
 
-1. a teljes játékos-scoreboard véglegesítése (az aktuális játékos panel már működik);
-2. a feladványok külső JSON/SQLite adatforrása;
-3. Whisper-alapú hangvezérlés;
-4. mobil-specifikus játéknézet.
+DOM:
 
-## 14. Fontos fejlesztési szabály
+- `#endGameBtn`
+- `#endGameDialog`
+- `#endGameCancelBtn`
+- `#endGameConfirmBtn`
 
-A játékszínpad pozícióit mindig a **1672 × 941-es alapképre** mérjük.
+`Nem`:
 
-Ne használjunk külön viewport-pixel koordinátákat a puzzle cellákhoz vagy a
-gombokhoz. Az SVG `viewBox` és a százalékos hotspot pozíciók biztosítják,
-hogy az overlay és a háttér együtt skálázódjon.
+- csak bezárja a dialogot.
 
-Ha a `studo_jatekszinpad.png` képet lecseréljük olyan verzióra, amelynek
-a táblageometriája eltér, a `STAGE_GRID` és a hotspot koordináták újramérése
-szükséges.
+`Igen`:
+
+- timer-ek törlése;
+- wheel overlay bezárása;
+- `setup` state;
+- visszatérés a lobbyhoz.
+
+## 15. Hangok
+
+A hangok forrása és hangerői a konfigurációban vannak.
+
+A találati hang minden előfordulásnál külön `Audio.cloneNode()` példányból
+indul, így a hangok nem vágják le egymást.
+
+## 16. Reszponzivitás
+
+A játékszínpad a 1672:941 képarányt tartja.
+
+A puzzle koordináták az SVG `viewBox` miatt együtt skálázódnak.
+
+A Phaser wheel overlay saját négyzetes területet használ.
+
+A mobil-specifikus végleges layout még nincs kész.
+
+## 17. Háttérkép cseréje
+
+Ha a `studo_jatekszinpad.png` képet lecseréljük, ellenőrizni kell:
+
+1. képarány;
+2. puzzle grid;
+3. kategóriasáv;
+4. használt betűk sáv;
+5. fő gombok hotspotjai;
+6. avatar panel helye;
+7. debug/game-end gombok;
+8. wheel overlay vizuális aránya.
+
+Ha a grid geometriája változik, a `STAGE_GRID` újramérése kötelező.
