@@ -155,9 +155,10 @@
                 class="stage-image-hotspot stage-solve-hotspot"
                 aria-label="Megfejtés"></button>
 
-        <div class="stage-test-answer" aria-label="Teszt megfejtés">
-          TESZT: <strong id="testAnswerText">–</strong>
-        </div>
+        <button id="testBtn"
+                type="button"
+                class="stage-test-btn"
+                aria-label="Teszt megfejtés megjelenítése">Teszt</button>
 
         <div class="stage-logic-bridge" aria-hidden="true">
           <div id="playersList"></div>
@@ -177,6 +178,16 @@
       <div class="dialog-actions">
         <button value="cancel" class="btn">Mégse</button>
         <button value="default" id="solveConfirmBtn" class="btn btn-primary">Megfejtem</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="testDialog">
+    <form method="dialog" class="test-dialog-form">
+      <h3>Teszt megfejtés</h3>
+      <p id="testAnswerDialogText" class="test-dialog-answer">–</p>
+      <div class="dialog-actions">
+        <button value="close" class="btn btn-primary">Bezárás</button>
       </div>
     </form>
   </dialog>

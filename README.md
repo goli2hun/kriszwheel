@@ -37,7 +37,8 @@ Első játszható böngészős prototípus.
   - felül a kategória/feladványtípus jelenik meg
   - a gombok feletti kék sávban a már használt betűk látszanak
   - a képen lévő Pörgetés / Mássalhangzó / Megfejtés gombok kattinthatók és hoverre kivilágosodnak
-  - teszteléshez a megfejtés kis fehér szöveggel megjelenik a három gomb alatt
+  - legalul egy kis `Teszt` gomb nyitja meg dialogban az aktuális megfejtést
+  - a megfejtés már nem látszik állandóan a játékszínpadon
   - jobb alul az aktuális játékos profilképe, neve és fordulópénze látszik
   - a panel játékosváltáskor és pénzváltozáskor automatikusan frissül
 - Alap SFX hangok a `assets/sound/sfx/` könyvtárból

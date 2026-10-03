@@ -324,21 +324,25 @@ nyereményét.
 
 ## 9. Teszt megfejtés
 
-Fejlesztési segítségként a teljes aktuális megfejtés kis fehér betűkkel
-megjelenik a három fő gomb alatt.
+A megfejtés fejlesztési segítségként már **nem jelenik meg állandóan** a
+játékszínpadon.
 
-DOM:
+A színpad legalján egy kisméretű `Teszt` gomb található:
 
-`#testAnswerText`
+- DOM: `#testBtn`
+- dialog: `#testDialog`
+- megfejtés szövege: `#testAnswerDialogText`
 
-Az érték minden új fordulóban:
+Kattintáskor az aktuális feladvány kerül a dialogba:
 
 ```js
-el.testAnswerText.textContent = state.puzzle.text;
+el.testAnswerDialogText.textContent = state.puzzle.text;
+el.testDialog.showModal();
 ```
 
-Ez kizárólag tesztfunkció, a végleges játékban el kell távolítani vagy
-debug kapcsolóhoz kell kötni.
+Így a megfejtés csak akkor látszik, amikor tesztelés közben külön kérjük.
+Ez továbbra is fejlesztői segédfunkció; a végleges játékban eltávolítható
+vagy debug kapcsolóhoz köthető.
 
 ## 10. Találati hang
 

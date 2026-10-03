@@ -135,7 +135,9 @@
     solveBtn: document.getElementById("solveBtn"),
     message: document.getElementById("message"),
     wheelResult: document.getElementById("wheelResult"),
-    testAnswerText: document.getElementById("testAnswerText"),
+    testBtn: document.getElementById("testBtn"),
+    testDialog: document.getElementById("testDialog"),
+    testAnswerDialogText: document.getElementById("testAnswerDialogText"),
     solveDialog: document.getElementById("solveDialog"),
     solveForm: document.getElementById("solveForm"),
     solveInput: document.getElementById("solveInput"),
@@ -214,7 +216,6 @@
 
     state.currentIndex = (state.roundNumber === 1) ? 0 : state.currentIndex;
     el.categoryText.textContent = state.puzzle.category;
-    el.testAnswerText.textContent = state.puzzle.text;
     el.wheelResult.textContent = "–";
     el.wheelResult.classList.remove("spinning", "bankrupt", "skip", "money");
     setMessage(`${currentPlayer().name} következik. Pörgess!`);
@@ -863,6 +864,13 @@
   el.consonantStageBtn.addEventListener("click", () => {
     if (el.consonantStageBtn.disabled) return;
     setMessage("Nyomj le egy mássalhangzót a billentyűzeten.");
+  });
+
+  el.testBtn.addEventListener("click", () => {
+    if (!state.puzzle) return;
+
+    el.testAnswerDialogText.textContent = state.puzzle.text;
+    el.testDialog.showModal();
   });
 
   el.solveBtn.addEventListener("click", () => {

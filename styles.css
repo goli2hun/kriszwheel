@@ -1043,32 +1043,6 @@ body.game-active .app-shell {
   to { transform: scale(1.04); opacity: 1; }
 }
 
-/* Teszt-segédfelirat a három gomb alatt. Később eltávolítható. */
-.stage-test-answer {
-  position: absolute;
-  z-index: 22;
-  left: 20%;
-  right: 20%;
-  top: 94.15%;
-  min-height: 2.8%;
-  overflow: hidden;
-  pointer-events: none;
-  color: rgba(255, 255, 255, .72);
-  font-size: .54cqw;
-  font-weight: 600;
-  letter-spacing: .035em;
-  line-height: 1.15;
-  text-align: center;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, .72);
-}
-
-.stage-test-answer strong {
-  color: #ffffff;
-  font-weight: 800;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stage-basic-spin-result.spinning {
     animation: none;
@@ -1190,4 +1164,74 @@ body.game-active .app-shell {
   text-shadow:
     0 .08cqw .18cqw rgba(0, 0, 0, .65),
     0 0 .48cqw rgba(84, 168, 255, .28);
+}
+
+
+/* --------------------------------------------------------------------------
+   Teszt megfejtés – apró debug gomb a színpad legalján
+   -------------------------------------------------------------------------- */
+
+.stage-test-btn {
+  position: absolute;
+  z-index: 36;
+  left: 50%;
+  top: 95.55%;
+  transform: translateX(-50%);
+  min-width: 5.4%;
+  height: 2.7%;
+  padding: 0 .7cqw;
+  border: 1px solid rgba(255, 255, 255, .42);
+  border-radius: 999px;
+  color: rgba(255, 255, 255, .86);
+  background: rgba(2, 13, 38, .68);
+  box-shadow:
+    0 .16cqw .45cqw rgba(0, 0, 0, .34),
+    inset 0 1px 0 rgba(255, 255, 255, .08);
+  font-size: .52cqw;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+  cursor: pointer;
+  backdrop-filter: blur(6px);
+  transition:
+    background .14s ease,
+    border-color .14s ease,
+    box-shadow .14s ease,
+    color .14s ease;
+}
+
+.stage-test-btn:hover,
+.stage-test-btn:focus-visible {
+  color: #ffffff;
+  border-color: rgba(255, 222, 127, .72);
+  background: rgba(9, 39, 89, .88);
+  box-shadow:
+    0 0 .55cqw rgba(255, 215, 94, .26),
+    0 .16cqw .5cqw rgba(0, 0, 0, .38),
+    inset 0 1px 0 rgba(255, 255, 255, .13);
+}
+
+.test-dialog-form {
+  display: grid;
+  gap: 14px;
+}
+
+.test-dialog-form h3 {
+  margin-bottom: 0;
+  text-align: center;
+}
+
+.test-dialog-answer {
+  margin: 4px 0 8px;
+  padding: 14px 16px;
+  border: 1px solid rgba(255, 218, 108, .24);
+  border-radius: 12px;
+  color: #fff2b7;
+  background: rgba(255, 255, 255, .035);
+  font-size: 1.12rem;
+  font-weight: 900;
+  line-height: 1.45;
+  text-align: center;
+  letter-spacing: .025em;
 }
