@@ -93,6 +93,26 @@ python -m http.server 8080
 
 A Phaser 3 jelenleg CDN-ről töltődik be, ezért az első betöltéshez internetkapcsolat kell.
 
+## Konfiguráció
+
+A központi játékbeállítások:
+
+```text
+config/game-config.js
+```
+
+Innen állítható többek között:
+
+- a kerék fordulatszáma, sebessége, easingje és eredmény-kijelzési ideje;
+- a kerék képe, mérete, feliratpozíciója és mezői;
+- a magánhangzó ára;
+- a találati animációk közötti idő;
+- a Bot időzítései és döntési valószínűségei;
+- a hangfájlok és hangerők;
+- a fejlesztői `Teszt` gomb láthatósága.
+
+Részletes leírás: [config/README.md](config/README.md)
+
 ## Dokumentáció
 
 A játékszínpad pixelpontos felépítése, koordinátái, gomb-hotspotjai,
@@ -102,6 +122,7 @@ betűfelfedése és hanglogikája külön dokumentumban található:
 
 ## Jelenlegi architektúra
 
+- `config/game-config.js` – központi játék- és kerékkonfiguráció
 - `index.html` – UI szerkezet
 - `styles.css` – lobby, pixelpontos játékszínpad overlay, profilképek és fényanimációk
 - `app.js` – játékszabályok, állapotgép, Bot, Phaser kerék, SFX vezérlés

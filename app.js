@@ -1,9 +1,16 @@
 (() => {
   "use strict";
 
+  const CONFIG = window.KRISZWHEEL_CONFIG ?? {};
+  const GAMEPLAY_CONFIG = CONFIG.gameplay ?? {};
+  const WHEEL_CONFIG = CONFIG.wheel ?? {};
+  const BOT_CONFIG = CONFIG.bot ?? {};
+  const AUDIO_CONFIG = CONFIG.audio ?? {};
+  const DEBUG_CONFIG = CONFIG.debug ?? {};
+
   const VOWELS = new Set(["A", "Á", "E", "É", "I", "Í", "O", "Ó", "Ö", "Ő", "U", "Ú", "Ü", "Ű"]);
   const ALPHABET = "AÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVWXYZ".split("");
-  const VOWEL_PRICE = 5000;
+  const VOWEL_PRICE = Number(GAMEPLAY_CONFIG.vowelPrice ?? 5000);
 
   // A feltöltött stúdiókép tényleges geometriája: 15 oszlop × 4 sor.
   // Ezek a koordináták közvetlenül a 1672 × 941 px háttér kék celláinak belsejére mutatnak.
@@ -25,10 +32,10 @@
   };
 
   const SFX = {
-    letterHit: "assets/sound/sfx/letter_hit.wav",
-    letterMiss: "assets/sound/sfx/letter_miss.wav",
-    solveSuccess: "assets/sound/sfx/solve_success.wav",
-    solveFail: "assets/sound/sfx/solve_fail.wav"
+    letterHit: AUDIO_CONFIG.files?.letterHit ?? "assets/sound/sfx/letter_hit.wav",
+    letterMiss: AUDIO_CONFIG.files?.letterMiss ?? "assets/sound/sfx/letter_miss.wav",
+    solveSuccess: AUDIO_CONFIG.files?.solveSuccess ?? "assets/sound/sfx/solve_success.wav",
+    solveFail: AUDIO_CONFIG.files?.solveFail ?? "assets/sound/sfx/solve_fail.wav"
   };
 
   const sfxCache = Object.fromEntries(
@@ -39,7 +46,7 @@
     })
   );
 
-  function playSfx(name, volume = 0.7) {
+  function playSfx(name, volume = Number(AUDIO_CONFIG.defaultVolume ?? 0.7)) {
     const source = sfxCache[name];
     if (!source) return;
 
@@ -50,14 +57,14 @@
     });
   }
 
-  const LETTER_HIT_GAP_MS = 500;
+  const LETTER_HIT_GAP_MS = Number(GAMEPLAY_CONFIG.letterHitGapMs ?? 500);
 
   function playHitSequence(count) {
     const safeCount = Math.max(0, Number(count) || 0);
 
     for (let i = 0; i < safeCount; i += 1) {
       setTimeout(
-        () => playSfx("letterHit", 0.72),
+        () => playSfx("letterHit", Number(AUDIO_CONFIG.letterHitVolume ?? 0.72)),
         i * LETTER_HIT_GAP_MS
       );
     }
@@ -88,7 +95,7 @@
     { category: "Étel", text: "TÚRÓS CSUSZA SZALONNÁVAL" }
   ];
 
-  const WHEEL_BASE_SEGMENTS = [
+  const DEFAULT_WHEEL_SEGMENTS = [
     { label: "1 000", type: "money", value: 1000 },
     { label: "1 500", type: "money", value: 1500 },
     { label: "2 000", type: "money", value: 2000 },
@@ -103,13 +110,20 @@
     { label: "10 000", type: "money", value: 10000 }
   ];
 
-  // A feltöltött wheel.png 24 cikkelyes. A jelenlegi 12 mezős
-  // játékgazdaság kétszer fut körbe, így minden képi cikkelyhez tartozik
-  // egy valódi játékmező.
-  const WHEEL_SEGMENTS = [
-    ...WHEEL_BASE_SEGMENTS.map(segment => ({ ...segment })),
-    ...WHEEL_BASE_SEGMENTS.map(segment => ({ ...segment }))
-  ];
+  const WHEEL_BASE_SEGMENTS =
+    Array.isArray(WHEEL_CONFIG.segments) && WHEEL_CONFIG.segments.length
+      ? WHEEL_CONFIG.segments
+      : DEFAULT_WHEEL_SEGMENTS;
+
+  const WHEEL_SEGMENT_REPEAT = Math.max(
+    1,
+    Math.floor(Number(WHEEL_CONFIG.segmentRepeat ?? 2))
+  );
+
+  const WHEEL_SEGMENTS = Array.from(
+    { length: WHEEL_SEGMENT_REPEAT },
+    () => WHEEL_BASE_SEGMENTS.map(segment => ({ ...segment }))
+  ).flat();
 
   const state = {
     players: [],
@@ -164,6 +178,11 @@
     endGameCancelBtn: document.getElementById("endGameCancelBtn"),
     endGameConfirmBtn: document.getElementById("endGameConfirmBtn")
   };
+
+  el.testBtn.classList.toggle(
+    "hidden",
+    DEBUG_CONFIG.showTestButton === false
+  );
 
   const normalize = (s) =>
     s.normalize("NFC")
@@ -539,12 +558,12 @@
 
   function trySolve(answer, fromBot = false) {
     if (normalize(answer) === state.puzzle.text) {
-      playSfx("solveSuccess", 0.75);
+      playSfx("solveSuccess", Number(AUDIO_CONFIG.solveSuccessVolume ?? 0.75));
       finishRound(currentPlayer());
       return true;
     }
 
-    playSfx("solveFail", 0.72);
+    playSfx("solveFail", Number(AUDIO_CONFIG.solveFailVolume ?? 0.72));
 
     if (!fromBot) {
       nextPlayer("Hibás megfejtés.");
@@ -625,20 +644,20 @@
     state.botTimer = setTimeout(() => {
       if (!currentPlayer()?.isBot) return;
 
-      if (revealedRatio() >= 0.72 && Math.random() < 0.45) {
+      if (revealedRatio() >= Number(BOT_CONFIG.solveRevealRatio ?? 0.72) && Math.random() < Number(BOT_CONFIG.solveChance ?? 0.45)) {
         setMessage("Bot megpróbálja megfejteni…");
-        setTimeout(() => trySolve(state.puzzle.text, true), 700);
+        setTimeout(() => trySolve(state.puzzle.text, true), Number(BOT_CONFIG.solveDelayMs ?? 700));
         return;
       }
 
       if (
         p.roundMoney >= VOWEL_PRICE &&
-        Math.random() < 0.18 &&
+        Math.random() < Number(BOT_CONFIG.vowelBuyChance ?? 0.18) &&
         [...VOWELS].some(ch => !state.usedLetters.has(ch))
       ) {
         const vowel = randomUnusedVowel();
         setMessage(`Bot magánhangzót vásárol: ${vowel}`);
-        setTimeout(() => buyVowel(vowel, true), 550);
+        setTimeout(() => buyVowel(vowel, true), Number(BOT_CONFIG.vowelDelayMs ?? 550));
         return;
       }
 
@@ -646,7 +665,7 @@
         setMessage("Bot pörget…");
         spinWheel(true);
       }
-    }, 900);
+    }, Number(BOT_CONFIG.actionDelayMs ?? 900));
   }
 
   function escapeHtml(str) {
@@ -668,15 +687,16 @@
     }
 
     preload() {
-      this.load.image("wheel-face", "assets/images/wheel.png");
+      this.load.image("wheel-face", WHEEL_CONFIG.image ?? "assets/images/wheel.png");
     }
 
     create() {
-      const cx = 300;
-      const cy = 300;
-      const wheelSize = 536;
-      const labelRadius = 188;
-      const startOffsetDeg = -90;
+      const canvasSize = Number(WHEEL_CONFIG.canvasSize ?? 600);
+      const cx = canvasSize / 2;
+      const cy = canvasSize / 2;
+      const wheelSize = Number(WHEEL_CONFIG.wheelSize ?? 536);
+      const labelRadius = Number(WHEEL_CONFIG.labelRadius ?? 188);
+      const startOffsetDeg = Number(WHEEL_CONFIG.startOffsetDeg ?? -90);
 
       this.wheelContainer = this.add.container(cx, cy);
 
@@ -694,12 +714,15 @@
         const y = Math.sin(midRad) * labelRadius;
 
         const text = this.add.text(x, y, segment.label, {
-          fontFamily: "Arial Black, Arial, sans-serif",
+          fontFamily: WHEEL_CONFIG.labelFontFamily ?? "Arial Black, Arial, sans-serif",
           fontStyle: "bold",
-          fontSize: segment.label.length > 7 ? "11px" : "15px",
-          color: "#ffffff",
-          stroke: "#10152f",
-          strokeThickness: 4,
+          fontSize:
+            segment.label.length > Number(WHEEL_CONFIG.longLabelThreshold ?? 7)
+              ? `${Number(WHEEL_CONFIG.longLabelFontSizePx ?? 11)}px`
+              : `${Number(WHEEL_CONFIG.labelFontSizePx ?? 15)}px`,
+          color: WHEEL_CONFIG.labelColor ?? "#ffffff",
+          stroke: WHEEL_CONFIG.labelStrokeColor ?? "#10152f",
+          strokeThickness: Number(WHEEL_CONFIG.labelStrokeThickness ?? 4),
           align: "center"
         }).setOrigin(.5);
 
@@ -733,11 +756,20 @@
     spinTo(index, onComplete) {
       if (!this.ready || !this.wheelContainer) return false;
 
-      const localCenter = (index + 0.5) * this.segmentAngle;
-      const desiredMod = (360 - localCenter) % 360;
+      const startOffsetDeg = Number(WHEEL_CONFIG.startOffsetDeg ?? -90);
+      const pointerAngleDeg = Number(WHEEL_CONFIG.pointerAngleDeg ?? -90);
+      const localCenter =
+        startOffsetDeg + (index + 0.5) * this.segmentAngle;
+      const desiredMod =
+        ((pointerAngleDeg - localCenter) % 360 + 360) % 360;
       const currentMod = ((this.rotationDeg % 360) + 360) % 360;
       const delta = (desiredMod - currentMod + 360) % 360;
-      const fullTurns = Phaser.Math.Between(2, 3);
+      const minFullTurns = Math.max(0, Math.floor(Number(WHEEL_CONFIG.minFullTurns ?? 2)));
+      const maxFullTurns = Math.max(
+        minFullTurns,
+        Math.floor(Number(WHEEL_CONFIG.maxFullTurns ?? 3))
+      );
+      const fullTurns = Phaser.Math.Between(minFullTurns, maxFullTurns);
       const target = this.rotationDeg + fullTurns * 360 + delta;
 
       this.tweens.killTweensOf(this.wheelContainer);
@@ -745,8 +777,8 @@
       this.tweens.add({
         targets: this.wheelContainer,
         angle: target,
-        duration: 3600,
-        ease: "Cubic.easeOut",
+        duration: Number(WHEEL_CONFIG.spinDurationMs ?? 3600),
+        ease: WHEEL_CONFIG.easing ?? "Cubic.easeOut",
         onComplete: () => {
           this.rotationDeg = target;
           onComplete?.();
@@ -760,8 +792,8 @@
   const phaserGame = new Phaser.Game({
     type: Phaser.AUTO,
     parent: "wheelGame",
-    width: 600,
-    height: 600,
+    width: Number(WHEEL_CONFIG.canvasSize ?? 600),
+    height: Number(WHEEL_CONFIG.canvasSize ?? 600),
     transparent: true,
     scene: [WheelScene],
     scale: {
@@ -846,8 +878,11 @@
           return;
         }
         setMessage(`Bot betűje: ${consonant}`);
-        setTimeout(() => handleConsonant(consonant, true), 550);
-      }, 650);
+        setTimeout(
+          () => handleConsonant(consonant, true),
+          Number(BOT_CONFIG.consonantSubmitDelayMs ?? 550)
+        );
+      }, Number(BOT_CONFIG.consonantAfterWheelDelayMs ?? 650));
     }
   }
 
@@ -857,7 +892,7 @@
     const scene = getWheelScene();
     if (!scene?.ready || !scene.wheelContainer) {
       setMessage("A kerék még betöltődik…");
-      state.botTimer = setTimeout(() => spinWheel(fromBot), 250);
+      state.botTimer = setTimeout(() => spinWheel(fromBot), Number(WHEEL_CONFIG.retryDelayMs ?? 250));
       return;
     }
 
@@ -896,7 +931,7 @@
       clearTimeout(state.wheelConfirmTimer);
       state.wheelConfirmTimer = setTimeout(
         applyPendingWheelResult,
-        1500
+        Number(WHEEL_CONFIG.resultDisplayMs ?? 1500)
       );
     });
 

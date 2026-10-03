@@ -15,6 +15,7 @@ Az alapelv:
 - a HTML overlay írja ki a kategóriát és a már használt betűket;
 - átlátszó HTML gombok ülnek a képre generált gombok fölött;
 - a meglévő játéklogika továbbra is az `app.js`-ben fut.
+- a hangolható játékparaméterek a `config/game-config.js` fájlban vannak.
 
 ## 2. Háttérkép és koordinátarendszer
 
