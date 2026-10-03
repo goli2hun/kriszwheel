@@ -121,6 +121,10 @@ A `stageLetterReveal` animáció:
 - enyhén túlnő 109%-ra;
 - végül visszaáll normál méretre és sötét színre.
 
+Ha ugyanaz a megtalált betű több helyen szerepel, az egyes cellák
+`500 ms` eltéréssel kapják meg az animációt. A hang ugyanilyen ütemezést
+használ, ezért a vizuális felvillanás és a csippanás sorban együtt halad.
+
 A következő render után a `justRevealed` halmaz törlődik, így a már
 korábban felfedett betűk nem animálódnak újra.
 
@@ -328,7 +332,7 @@ Példa:
 
 Jelenlegi időköz:
 
-`180 ms`
+`500 ms`
 
 A hang minden lejátszásnál külön `Audio.cloneNode()` példányon indul, ezért
 a rövid hangok nem vágják le egymást.

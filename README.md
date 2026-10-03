@@ -38,6 +38,7 @@ Első játszható böngészős prototípus.
   - a panel játékosváltáskor és pénzváltozáskor automatikusan frissül
 - Alap SFX hangok a `assets/sound/sfx/` könyvtárból
   - minden betűtalálatnál annyi rövid, game-show jellegű csippanás szól, ahányszor a betű szerepel
+  - több találatnál a felvillanások és csippanások 0,5 másodperces lépésekben követik egymást
   - külön hang nulla találatra
   - külön hang sikeres és sikertelen megfejtésre
 

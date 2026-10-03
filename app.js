@@ -50,7 +50,7 @@
     });
   }
 
-  const LETTER_HIT_GAP_MS = 180;
+  const LETTER_HIT_GAP_MS = 500;
 
   function playHitSequence(count) {
     const safeCount = Math.max(0, Number(count) || 0);
@@ -335,6 +335,7 @@
     el.puzzleBoard.innerHTML = "";
 
     const rows = layoutPuzzleRows(state.puzzle.text);
+    let revealSequenceIndex = 0;
 
     rows.forEach((rowText, rowIndex) => {
       const chars = [...rowText];
@@ -375,13 +376,23 @@
         const shouldShow = !isLetter || state.revealed.has(char);
 
         if (shouldShow) {
+          const isNewReveal = state.justRevealed.has(char);
           const letter = createSvgElement("text", {
             x: x + width / 2,
             y: y + height / 2 + 1,
             class:
               "stage-puzzle-letter" +
-              (state.justRevealed.has(char) ? " new-reveal" : "")
+              (isNewReveal ? " new-reveal" : "")
           });
+
+          if (isNewReveal) {
+            letter.style.setProperty(
+              "--reveal-delay",
+              `${revealSequenceIndex * LETTER_HIT_GAP_MS}ms`
+            );
+            revealSequenceIndex += 1;
+          }
+
           letter.textContent = char;
           group.appendChild(letter);
         }
