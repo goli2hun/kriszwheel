@@ -39,6 +39,8 @@ Első játszható böngészős prototípus.
   - a képen lévő Pörgetés / Mássalhangzó / Megfejtés gombok kattinthatók és hoverre kivilágosodnak
   - legalul egy kis `Teszt` gomb nyitja meg dialogban az aktuális megfejtést
   - a megfejtés már nem látszik állandóan a játékszínpadon
+  - jobb felül `Játék vége` gomb: megerősítés után visszatérés a lobbyba
+  - `Nem` választásnál a játék változatlan állapotból folytatódik
   - jobb alul az aktuális játékos profilképe, neve és fordulópénze látszik
   - a panel játékosváltáskor és pénzváltozáskor automatikusan frissül
 - Alap SFX hangok a `assets/sound/sfx/` könyvtárból

@@ -146,7 +146,10 @@
     roundTitle: document.getElementById("roundTitle"),
     roundText: document.getElementById("roundText"),
     nextRoundBtn: document.getElementById("nextRoundBtn"),
-    endGameBtn: document.getElementById("endGameBtn")
+    endGameBtn: document.getElementById("endGameBtn"),
+    endGameDialog: document.getElementById("endGameDialog"),
+    endGameCancelBtn: document.getElementById("endGameCancelBtn"),
+    endGameConfirmBtn: document.getElementById("endGameConfirmBtn")
   };
 
   const normalize = (s) =>
@@ -892,7 +895,7 @@
     setTimeout(newRound, 0);
   });
 
-  el.endGameBtn.addEventListener("click", () => {
+  function returnToLobby() {
     clearTimeout(state.botTimer);
     state.phase = "setup";
     document.body.classList.remove("game-active");
@@ -900,5 +903,20 @@
     el.gameScreen.classList.add("hidden");
     el.setupScreen.classList.remove("hidden");
     el.message.textContent = "";
+  }
+
+  el.endGameBtn.addEventListener("click", () => {
+    if (!document.body.classList.contains("game-active")) return;
+    el.endGameDialog.showModal();
+  });
+
+  el.endGameConfirmBtn.addEventListener("click", e => {
+    e.preventDefault();
+    el.endGameDialog.close("confirmed");
+    returnToLobby();
+  });
+
+  el.endGameCancelBtn.addEventListener("click", () => {
+    // method="dialog" bezárja az ablakot; a játékállapot változatlan marad.
   });
 })();

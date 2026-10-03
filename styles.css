@@ -1235,3 +1235,68 @@ body.game-active .app-shell {
   text-align: center;
   letter-spacing: .025em;
 }
+
+
+/* --------------------------------------------------------------------------
+   Játék vége – jobb felső sarok + megerősítés
+   -------------------------------------------------------------------------- */
+
+.stage-end-game-btn {
+  position: absolute;
+  z-index: 45;
+  top: 2.0%;
+  right: 1.8%;
+  min-width: 8.6%;
+  height: 4.2%;
+  padding: 0 .9cqw;
+  border: 1px solid rgba(255, 177, 155, .56);
+  border-radius: 999px;
+  color: #fff1ed;
+  background:
+    linear-gradient(180deg, rgba(112, 26, 39, .88), rgba(66, 12, 25, .92));
+  box-shadow:
+    0 .25cqw .65cqw rgba(0, 0, 0, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .11);
+  font-size: .63cqw;
+  font-weight: 900;
+  letter-spacing: .045em;
+  cursor: pointer;
+  backdrop-filter: blur(7px);
+  transition:
+    transform .14s ease,
+    border-color .14s ease,
+    background .14s ease,
+    box-shadow .14s ease;
+}
+
+.stage-end-game-btn:hover,
+.stage-end-game-btn:focus-visible {
+  transform: translateY(-.05cqw);
+  border-color: rgba(255, 214, 178, .88);
+  background:
+    linear-gradient(180deg, rgba(145, 39, 51, .96), rgba(82, 15, 28, .96));
+  box-shadow:
+    0 0 .65cqw rgba(255, 121, 103, .24),
+    0 .28cqw .75cqw rgba(0, 0, 0, .34),
+    inset 0 1px 0 rgba(255, 255, 255, .14);
+}
+
+.end-game-dialog-form {
+  display: grid;
+  gap: 12px;
+  min-width: min(360px, 78vw);
+}
+
+.end-game-dialog-form h3,
+.end-game-dialog-form p {
+  text-align: center;
+}
+
+.end-game-dialog-form h3 {
+  margin-bottom: 0;
+}
+
+.end-game-dialog-form p {
+  margin-bottom: 6px;
+  color: #c8d9f4;
+}

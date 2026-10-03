@@ -55,7 +55,6 @@
         <p class="eyebrow">KÍSÉRLETI LABOR</p>
         <h1>Szerencsekerék</h1>
       </div>
-      <button id="endGameBtn" class="btn btn-danger">Játék vége</button>
     </header>
 
     <section id="setupScreen" class="panel setup-panel">
@@ -102,6 +101,10 @@
 
     <section id="gameScreen" class="stage-screen hidden">
       <div class="stage-canvas">
+        <button id="endGameBtn"
+                type="button"
+                class="stage-end-game-btn"
+                aria-label="Játék vége">Játék vége</button>
         <svg class="stage-puzzle-overlay"
              viewBox="0 0 1672 941"
              preserveAspectRatio="xMidYMid meet"
@@ -178,6 +181,17 @@
       <div class="dialog-actions">
         <button value="cancel" class="btn">Mégse</button>
         <button value="default" id="solveConfirmBtn" class="btn btn-primary">Megfejtem</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="endGameDialog">
+    <form method="dialog" class="end-game-dialog-form">
+      <h3>Vége a játéknak?</h3>
+      <p>Biztosan vissza szeretnél lépni a lobbyba?</p>
+      <div class="dialog-actions">
+        <button id="endGameCancelBtn" value="cancel" class="btn">Nem</button>
+        <button id="endGameConfirmBtn" value="default" class="btn btn-danger">Igen</button>
       </div>
     </form>
   </dialog>

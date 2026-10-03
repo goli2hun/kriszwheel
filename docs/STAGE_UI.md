@@ -344,7 +344,30 @@ el.testDialog.showModal();
 Ez továbbra is fejlesztői segédfunkció; a végleges játékban eltávolítható
 vagy debug kapcsolóhoz köthető.
 
-## 10. Találati hang
+## 10. Játék vége
+
+A játékszínpad jobb felső sarkában külön `Játék vége` gomb található.
+
+DOM:
+
+- gomb: `#endGameBtn`
+- megerősítő dialog: `#endGameDialog`
+- `Nem`: `#endGameCancelBtn`
+- `Igen`: `#endGameConfirmBtn`
+
+Kattintás után a dialog kérdése:
+
+`Vége a játéknak?`
+
+Működés:
+
+- `Nem`: a dialog bezárul, a játékállapot nem változik;
+- `Igen`: a játék `setup` állapotba kerül, a játékszínpad eltűnik,
+  és ismét a lobby jelenik meg.
+
+A tényleges visszalépést a `returnToLobby()` függvény végzi.
+
+## 11. Találati hang
 
 Fájl:
 
@@ -374,7 +397,7 @@ További SFX:
 - `solve_success.wav` – sikeres megfejtés;
 - `solve_fail.wav` – hibás megfejtés.
 
-## 11. Rejtett kompatibilitási réteg
+## 12. Rejtett kompatibilitási réteg
 
 A jelenlegi prototípus még tartalmaz olyan korábbi logikai elemeket, amelyek
 vizuálisan nem részei az új színpadnak.
@@ -392,7 +415,7 @@ játékmenet ne törjön el.
 Ez átmeneti megoldás. A későbbi refaktorban ezeket külön állapot/UI
 komponensekre érdemes bontani.
 
-## 12. Jelenlegi korlátok és következő lépések
+## 13. Jelenlegi korlátok és következő lépések
 
 Jelenleg még nincs véglegesen integrálva:
 
@@ -402,7 +425,7 @@ Jelenleg még nincs véglegesen integrálva:
 5. Whisper-alapú hangvezérlés;
 6. mobil-specifikus játéknézet.
 
-## 13. Fontos fejlesztési szabály
+## 14. Fontos fejlesztési szabály
 
 A játékszínpad pozícióit mindig a **1672 × 941-es alapképre** mérjük.
 
