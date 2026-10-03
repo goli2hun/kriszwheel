@@ -112,12 +112,28 @@ A megfejtés elküldésekor a beviteli dialog **azonnal bezár**.
 - a fordulóvégi dialog csak a felfedési animáció után jelenik meg;
 - Enter és a `Megfejtem` gomb ugyanazt a submit folyamatot használja.
 
+### Győzelmi képernyő
+
+Sikeres megfejtés után, a hiányzó betűk felfedése után teljes képernyős
+győzelmi overlay jelenik meg:
+
+- középen a győztes avatarja;
+- a győztes neve;
+- a megfejtett feladvány;
+- a forduló és az összesített nyeremény;
+- Phaserrel rajzolt tűzijáték.
+
+A gombok késleltetve jelennek meg:
+
+- `Következő feladvány` – új forduló;
+- `Játék vége` – közvetlen visszatérés a lobbyba.
+
 ### Játék vége és tesztfunkció
 
-- `Játék vége`: megerősítő dialog után visszatérés a lobbyba.
-- `Nem`: a játékállapot változatlan marad.
-- `Teszt`: dialogban mutatja az aktuális megfejtést.
-- A `Teszt` gomb konfigurációból elrejthető.
+- jobb felső `Játék vége`: megerősítő dialog után visszatérés a lobbyba;
+- győzelmi képernyő `Játék vége`: közvetlen visszatérés a lobbyba;
+- `Teszt`: dialogban mutatja az aktuális megfejtést;
+- a `Teszt` gomb konfigurációból elrejthető.
 
 ## Indítás
 
@@ -177,6 +193,7 @@ Fő csoportok:
 - `wheel`
 - `bot`
 - `audio`
+- `victory`
 - `debug`
 
 Részletes leírás:

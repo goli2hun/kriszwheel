@@ -210,7 +210,9 @@ Siker esetén:
 1. minden hiányzó betű felfedődik;
 2. a `roundMoney` hozzáadódik a `totalMoney` értékhez;
 3. a játék `roundEnd` állapotba kerül;
-4. megjelenik a forduló végi dialog.
+4. a felfedési animáció után megjelenik a győzelmi overlay;
+5. Phaser tűzijáték indul;
+6. késleltetve megjelenik a `Következő feladvány` és `Játék vége` gomb.
 
 ### Hibás megfejtés
 
@@ -230,7 +232,7 @@ Helyes válasznál:
 1. a beviteli dialog már zárva van;
 2. a hiányzó betűk sorban felfedődnek;
 3. a játék kivárja a legutolsó betű `stageLetterReveal` animációját;
-4. csak ezután nyílik meg a fordulóvégi dialog.
+4. csak ezután nyílik meg a győzelmi overlay.
 
 ## 8. Játékosváltási szünet
 
@@ -261,14 +263,30 @@ Az idő letelte után:
 3. frissül az avatar/pénz panel;
 4. Bot esetén elindul a Bot következő lépése.
 
-## 9. Következő feladvány
+## 9. Győzelmi képernyő
 
-A fordulóvégi dialog `Következő feladvány` gombja:
+A győzelmi overlay a teljes betűfelfedés után jelenik meg.
 
-1. a következő játékosra lépteti a kezdést;
-2. új feladványt választ;
-3. nullázza minden játékos `roundMoney` értékét;
-4. megtartja a `totalMoney` értékeket.
+Tartalma:
+
+- győztes profilképe;
+- győztes neve;
+- megfejtett feladvány;
+- forduló nyereménye;
+- összesített nyeremény;
+- Phaser tűzijáték.
+
+A gombok a `victory.buttonDelayMs` után válnak aktívvá.
+
+### Következő feladvány
+
+Bezárja a győzelmi overlayt, leállítja a tűzijátékot, majd új fordulót indít.
+
+### Játék vége
+
+A győzelmi képernyő `Játék vége` gombja megerősítés nélkül közvetlenül
+visszatér a lobbyba.
+
 
 ## 10. Bot
 

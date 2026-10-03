@@ -1479,3 +1479,176 @@ body.game-active .app-shell {
   margin-bottom: 6px;
   color: #c8d9f4;
 }
+
+
+/* --------------------------------------------------------------------------
+   Győzelmi képernyő + Phaser tűzijáték
+   -------------------------------------------------------------------------- */
+
+.victory-overlay {
+  position: absolute;
+  z-index: 92;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 50% 45%, rgba(23, 83, 171, .20), transparent 44%),
+    rgba(0, 5, 20, .77);
+  backdrop-filter: blur(5px);
+  transition:
+    opacity .28s ease,
+    visibility .28s ease;
+}
+
+.victory-overlay.open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.victory-fx {
+  position: absolute;
+  z-index: 1;
+  inset: 0;
+  pointer-events: none;
+}
+
+.victory-fx canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.victory-card {
+  position: relative;
+  z-index: 3;
+  width: min(38%, 620px);
+  min-width: 360px;
+  padding: 1.15cqw 1.65cqw 1.25cqw;
+  text-align: center;
+  border: .09cqw solid rgba(255, 220, 112, .58);
+  border-radius: 1.25cqw;
+  background:
+    linear-gradient(180deg, rgba(9, 46, 103, .94), rgba(3, 20, 56, .96));
+  box-shadow:
+    0 1.1cqw 2.8cqw rgba(0, 0, 0, .52),
+    0 0 1.6cqw rgba(255, 205, 61, .16),
+    inset 0 1px 0 rgba(255, 255, 255, .11);
+}
+
+.victory-kicker {
+  margin-bottom: .55cqw;
+  color: #9fc1ef;
+  font-size: .52cqw;
+  font-weight: 900;
+  letter-spacing: .16em;
+}
+
+.victory-avatar-ring {
+  width: 8.2cqw;
+  height: 8.2cqw;
+  margin: 0 auto .75cqw;
+  padding: .28cqw;
+  border-radius: 50%;
+  background:
+    conic-gradient(
+      from 0deg,
+      #fff3bd,
+      #d99117,
+      #69b6ff,
+      #254ca0,
+      #f5c34e,
+      #fff3bd
+    );
+  box-shadow:
+    0 0 .8cqw rgba(255, 235, 154, .74),
+    0 0 1.8cqw rgba(255, 190, 39, .33);
+}
+
+.victory-avatar-ring img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border: .12cqw solid #09245b;
+  border-radius: 50%;
+}
+
+.victory-card h2 {
+  margin: 0 0 .55cqw;
+  color: #fff0a5;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: 1.32cqw;
+  line-height: 1.08;
+  letter-spacing: .045em;
+  text-shadow:
+    0 .12cqw .25cqw rgba(0, 0, 0, .70),
+    0 0 .8cqw rgba(255, 210, 78, .20);
+}
+
+.victory-puzzle {
+  margin: 0 0 .8cqw;
+  color: #d6e6ff;
+  font-size: .66cqw;
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.victory-money-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .65cqw;
+  margin: 0 0 .95cqw;
+}
+
+.victory-money-grid > div {
+  padding: .58cqw .55cqw;
+  border: 1px solid rgba(255, 255, 255, .10);
+  border-radius: .72cqw;
+  background: rgba(255, 255, 255, .045);
+}
+
+.victory-money-grid span {
+  display: block;
+  margin-bottom: .18cqw;
+  color: #8fadd7;
+  font-size: .42cqw;
+  font-weight: 900;
+  letter-spacing: .08em;
+}
+
+.victory-money-grid strong {
+  display: block;
+  color: #ffffff;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: .86cqw;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.victory-actions {
+  display: flex;
+  justify-content: center;
+  gap: .65cqw;
+  opacity: 0;
+  transform: translateY(.4cqw);
+  pointer-events: none;
+  transition:
+    opacity .24s ease,
+    transform .24s ease;
+}
+
+.victory-actions.ready {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.victory-actions .btn {
+  min-width: 9.8cqw;
+}
+

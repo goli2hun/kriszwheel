@@ -95,6 +95,26 @@ window.KRISZWHEEL_CONFIG = {
     }
   },
 
+  victory: {
+    // Phaser tűzijáték a győzelmi képernyő mögött.
+    fireworks: true,
+    fireworksDurationMs: 3500,
+    burstIntervalMs: 480,
+    particlesPerBurst: 28,
+
+    // A győzelmi képernyő gombjai csak ennyi idő után válnak aktívvá.
+    buttonDelayMs: 1800,
+
+    colors: [
+      "#FFD85A",
+      "#FFF4C2",
+      "#64B5FF",
+      "#4BE0D1",
+      "#A98BFF",
+      "#FF7E9E"
+    ]
+  },
+
   debug: {
     // false esetén a Teszt gomb eltűnik a játékszínpadról.
     showTestButton: true

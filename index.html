@@ -183,6 +183,46 @@
           </div>
         </div>
 
+        <div id="victoryOverlay"
+             class="victory-overlay"
+             aria-hidden="true">
+          <div id="victoryFx" class="victory-fx" aria-hidden="true"></div>
+
+          <section class="victory-card" aria-label="Forduló győztese">
+            <div class="victory-kicker">FORDULÓ GYŐZTESE</div>
+
+            <div class="victory-avatar-ring">
+              <img id="victoryAvatar"
+                   src="assets/images/krisz.png"
+                   alt="Győztes profilképe" />
+            </div>
+
+            <h2 id="victoryTitle">GYŐZELEM!</h2>
+
+            <p id="victoryPuzzle" class="victory-puzzle"></p>
+
+            <div class="victory-money-grid">
+              <div>
+                <span>FORDULÓ NYEREMÉNYE</span>
+                <strong id="victoryRoundMoney">0 Ft</strong>
+              </div>
+              <div>
+                <span>ÖSSZES NYEREMÉNY</span>
+                <strong id="victoryTotalMoney">0 Ft</strong>
+              </div>
+            </div>
+
+            <div id="victoryActions" class="victory-actions">
+              <button id="nextRoundBtn"
+                      type="button"
+                      class="btn btn-primary">Következő feladvány</button>
+              <button id="victoryEndGameBtn"
+                      type="button"
+                      class="btn btn-danger">Játék vége</button>
+            </div>
+          </section>
+        </div>
+
         <div class="stage-logic-bridge" aria-hidden="true">
           <div id="playersList"></div>
           <strong id="activePlayerText">–</strong>
@@ -221,16 +261,6 @@
       <p id="testAnswerDialogText" class="test-dialog-answer">–</p>
       <div class="dialog-actions">
         <button value="close" class="btn btn-primary">Bezárás</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="roundDialog">
-    <form method="dialog">
-      <h3 id="roundTitle">Forduló vége</h3>
-      <p id="roundText"></p>
-      <div class="dialog-actions">
-        <button id="nextRoundBtn" value="default" class="btn btn-primary">Következő feladvány</button>
       </div>
     </form>
   </dialog>

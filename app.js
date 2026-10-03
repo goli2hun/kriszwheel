@@ -6,6 +6,7 @@
   const WHEEL_CONFIG = CONFIG.wheel ?? {};
   const BOT_CONFIG = CONFIG.bot ?? {};
   const AUDIO_CONFIG = CONFIG.audio ?? {};
+  const VICTORY_CONFIG = CONFIG.victory ?? {};
   const DEBUG_CONFIG = CONFIG.debug ?? {};
 
   const VOWELS = new Set(["A", "Á", "E", "É", "I", "Í", "O", "Ó", "Ö", "Ő", "U", "Ú", "Ü", "Ű"]);
@@ -138,6 +139,7 @@
     wheelConfirmTimer: null,
     playerTransitionTimer: null,
     roundEndTimer: null,
+    victoryButtonTimer: null,
     feedbackTimer: null,
     roundNumber: 0,
     justRevealed: new Set(),
@@ -173,10 +175,16 @@
     solveForm: document.getElementById("solveForm"),
     solveInput: document.getElementById("solveInput"),
     solveConfirmBtn: document.getElementById("solveConfirmBtn"),
-    roundDialog: document.getElementById("roundDialog"),
-    roundTitle: document.getElementById("roundTitle"),
-    roundText: document.getElementById("roundText"),
+    victoryOverlay: document.getElementById("victoryOverlay"),
+    victoryFx: document.getElementById("victoryFx"),
+    victoryAvatar: document.getElementById("victoryAvatar"),
+    victoryTitle: document.getElementById("victoryTitle"),
+    victoryPuzzle: document.getElementById("victoryPuzzle"),
+    victoryRoundMoney: document.getElementById("victoryRoundMoney"),
+    victoryTotalMoney: document.getElementById("victoryTotalMoney"),
+    victoryActions: document.getElementById("victoryActions"),
     nextRoundBtn: document.getElementById("nextRoundBtn"),
+    victoryEndGameBtn: document.getElementById("victoryEndGameBtn"),
     endGameBtn: document.getElementById("endGameBtn"),
     endGameDialog: document.getElementById("endGameDialog"),
     endGameCancelBtn: document.getElementById("endGameCancelBtn"),
@@ -242,7 +250,9 @@
     clearTimeout(state.botTimer);
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
+    clearTimeout(state.victoryButtonTimer);
     clearTimeout(state.feedbackTimer);
+    hideVictoryOverlay();
     hideStageFeedback();
     state.roundNumber += 1;
     state.puzzle = pickPuzzle();
@@ -670,19 +680,13 @@
     renderAll();
     updateControls();
 
-    el.roundTitle.textContent = `${winner.name} megfejtette!`;
-    el.roundText.textContent =
-      `Feladvány: ${state.puzzle.text}. ` +
-      `A forduló nyereménye: ${fmtMoney(winner.roundMoney)}. ` +
-      `Összes nyeremény: ${fmtMoney(winner.totalMoney)}.`;
-
     const revealDurationMs = hiddenLetterCount > 0
       ? ((hiddenLetterCount - 1) * LETTER_HIT_GAP_MS) + 720
       : 0;
 
     state.roundEndTimer = setTimeout(() => {
       if (state.phase !== "roundEnd") return;
-      el.roundDialog.showModal();
+      showVictoryOverlay(winner);
     }, revealDurationMs + 120);
   }
 
@@ -761,6 +765,171 @@
       .replaceAll(">", "&gt;")
       .replaceAll('"', "&quot;")
       .replaceAll("'", "&#039;");
+  }
+
+  class VictoryScene extends Phaser.Scene {
+    constructor() {
+      super("VictoryScene");
+      this.burstEvent = null;
+      this.stopEvent = null;
+      this.ready = false;
+    }
+
+    create() {
+      this.ready = true;
+    }
+
+    createBurst() {
+      const width = this.scale.width;
+      const height = this.scale.height;
+      const colors = Array.isArray(VICTORY_CONFIG.colors) &&
+        VICTORY_CONFIG.colors.length
+          ? VICTORY_CONFIG.colors
+          : ["#FFD85A", "#FFF4C2", "#64B5FF", "#4BE0D1"];
+
+      const cx = Phaser.Math.Between(
+        Math.round(width * .14),
+        Math.round(width * .86)
+      );
+      const cy = Phaser.Math.Between(
+        Math.round(height * .10),
+        Math.round(height * .50)
+      );
+      const count = Math.max(
+        8,
+        Math.floor(Number(VICTORY_CONFIG.particlesPerBurst ?? 28))
+      );
+
+      for (let i = 0; i < count; i += 1) {
+        const angle = Phaser.Math.FloatBetween(0, Math.PI * 2);
+        const distance = Phaser.Math.Between(90, 225);
+        const radius = Phaser.Math.FloatBetween(2.2, 5.4);
+        const colorHex = colors[i % colors.length];
+        const color = Phaser.Display.Color.HexStringToColor(colorHex).color;
+
+        const particle = this.add.circle(cx, cy, radius, color, 1);
+        const targetX = cx + Math.cos(angle) * distance;
+        const targetY =
+          cy + Math.sin(angle) * distance + Phaser.Math.Between(12, 80);
+
+        this.tweens.add({
+          targets: particle,
+          x: targetX,
+          y: targetY,
+          alpha: 0,
+          scale: .2,
+          duration: Phaser.Math.Between(760, 1320),
+          ease: "Cubic.easeOut",
+          onComplete: () => particle.destroy()
+        });
+      }
+    }
+
+    startCelebration() {
+      this.stopCelebration();
+
+      if (VICTORY_CONFIG.fireworks === false) return;
+
+      const burstIntervalMs = Math.max(
+        180,
+        Number(VICTORY_CONFIG.burstIntervalMs ?? 480)
+      );
+      const durationMs = Math.max(
+        burstIntervalMs,
+        Number(VICTORY_CONFIG.fireworksDurationMs ?? 3500)
+      );
+
+      this.createBurst();
+      this.time.delayedCall(180, () => this.createBurst());
+
+      this.burstEvent = this.time.addEvent({
+        delay: burstIntervalMs,
+        loop: true,
+        callback: () => this.createBurst()
+      });
+
+      this.stopEvent = this.time.delayedCall(durationMs, () => {
+        if (this.burstEvent) {
+          this.burstEvent.remove(false);
+          this.burstEvent = null;
+        }
+        this.stopEvent = null;
+      });
+    }
+
+    stopCelebration() {
+      if (this.burstEvent) {
+        this.burstEvent.remove(false);
+        this.burstEvent = null;
+      }
+
+      if (this.stopEvent) {
+        this.stopEvent.remove(false);
+        this.stopEvent = null;
+      }
+
+      this.tweens.killAll();
+
+      [...this.children.list].forEach(child => child.destroy());
+    }
+  }
+
+  const victoryGame = new Phaser.Game({
+    type: Phaser.AUTO,
+    parent: "victoryFx",
+    width: 1000,
+    height: 600,
+    transparent: true,
+    scene: [VictoryScene],
+    scale: {
+      mode: Phaser.Scale.FIT,
+      autoCenter: Phaser.Scale.CENTER_BOTH
+    },
+    render: {
+      antialias: true,
+      transparent: true
+    }
+  });
+
+  function getVictoryScene() {
+    return victoryGame.scene.getScene("VictoryScene");
+  }
+
+  function showVictoryOverlay(winner) {
+    clearTimeout(state.victoryButtonTimer);
+
+    el.victoryAvatar.src =
+      PLAYER_IMAGES[winner.name] ?? PLAYER_IMAGES.Bot;
+    el.victoryAvatar.alt = `${winner.name} profilképe`;
+    el.victoryTitle.textContent =
+      `${winner.name} MEGFEJTETTE!`.toLocaleUpperCase("hu-HU");
+    el.victoryPuzzle.textContent = state.puzzle.text;
+    el.victoryRoundMoney.textContent = fmtMoney(winner.roundMoney);
+    el.victoryTotalMoney.textContent = fmtMoney(winner.totalMoney);
+
+    el.victoryActions.classList.remove("ready");
+    el.victoryOverlay.classList.add("open");
+    el.victoryOverlay.setAttribute("aria-hidden", "false");
+
+    getVictoryScene()?.startCelebration();
+
+    const buttonDelayMs = Math.max(
+      0,
+      Number(VICTORY_CONFIG.buttonDelayMs ?? 1800)
+    );
+
+    state.victoryButtonTimer = setTimeout(() => {
+      if (state.phase !== "roundEnd") return;
+      el.victoryActions.classList.add("ready");
+    }, buttonDelayMs);
+  }
+
+  function hideVictoryOverlay() {
+    clearTimeout(state.victoryButtonTimer);
+    el.victoryActions.classList.remove("ready");
+    el.victoryOverlay.classList.remove("open");
+    el.victoryOverlay.setAttribute("aria-hidden", "true");
+    getVictoryScene()?.stopCelebration();
   }
 
   class WheelScene extends Phaser.Scene {
@@ -1106,8 +1275,14 @@
   });
 
   el.nextRoundBtn.addEventListener("click", () => {
+    hideVictoryOverlay();
     state.currentIndex = (state.currentIndex + 1) % state.players.length;
     setTimeout(newRound, 0);
+  });
+
+  el.victoryEndGameBtn.addEventListener("click", () => {
+    hideVictoryOverlay();
+    returnToLobby();
   });
 
   function returnToLobby() {
@@ -1115,7 +1290,9 @@
     clearTimeout(state.wheelConfirmTimer);
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
+    clearTimeout(state.victoryButtonTimer);
     clearTimeout(state.feedbackTimer);
+    hideVictoryOverlay();
     hideStageFeedback();
     state.pendingWheelSegment = null;
     state.pendingWheelFromBot = false;

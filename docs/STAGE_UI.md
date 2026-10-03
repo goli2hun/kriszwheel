@@ -357,7 +357,31 @@ kell még animálni. A fordulóvégi dialog időzítése:
 
 Így a fordulóvégi dialog nem takarja el a betűfelfedést.
 
-## 15. Teszt gomb
+## 15. Győzelmi overlay
+
+A győzelmi képernyő a teljes stage fölé kerül.
+
+DOM:
+
+- `#victoryOverlay`
+- `#victoryFx`
+- `#victoryAvatar`
+- `#victoryTitle`
+- `#victoryPuzzle`
+- `#victoryRoundMoney`
+- `#victoryTotalMoney`
+- `#victoryActions`
+- `#nextRoundBtn`
+- `#victoryEndGameBtn`
+
+A `VictoryScene` Phaser kör-részecskékkel rajzol tűzijátékot. A háttér
+sötétítve/blurözve marad, a nyertes avatarja és pénzei középen jelennek meg.
+
+A gombok `victory.buttonDelayMs` késleltetéssel válnak aktívvá.
+
+A `Játék vége` ezen a képernyőn közvetlenül a lobbyba visz.
+
+## 16. Teszt gomb
 
 DOM:
 
@@ -371,7 +395,7 @@ Konfiguráció:
 
 `false` esetén a gomb `hidden` osztályt kap.
 
-## 16. Játék vége
+## 17. Játék vége
 
 DOM:
 
@@ -391,14 +415,14 @@ DOM:
 - `setup` state;
 - visszatérés a lobbyhoz.
 
-## 17. Hangok
+## 18. Hangok
 
 A hangok forrása és hangerői a konfigurációban vannak.
 
 A találati hang minden előfordulásnál külön `Audio.cloneNode()` példányból
 indul, így a hangok nem vágják le egymást.
 
-## 18. Reszponzivitás
+## 19. Reszponzivitás
 
 A játékszínpad a 1672:941 képarányt tartja.
 
@@ -408,7 +432,7 @@ A Phaser wheel overlay saját négyzetes területet használ.
 
 A mobil-specifikus végleges layout még nincs kész.
 
-## 19. Háttérkép cseréje
+## 20. Háttérkép cseréje
 
 Ha a `studo_jatekszinpad.png` képet lecseréljük, ellenőrizni kell:
 

@@ -68,9 +68,14 @@ Módosítás után érdemes végigpróbálni:
 13. helytelen megfejtés látható visszajelzést ad;
 14. helyes megfejtésnél a betűk a fordulóvégi dialog előtt fedődnek fel;
 15. játékosváltás előtt lefut a konfigurált szünet;
-16. forduló vége működik;
-17. Játék vége visszavisz a lobbyba;
-18. Teszt gomb csak akkor látszik, ha engedélyezett.
+16. győzelmi overlay megjelenik;
+17. győztes avatar/pénzek helyesek;
+18. Phaser tűzijáték fut;
+19. a két győzelmi gomb késleltetve válik aktívvá;
+20. Következő feladvány új fordulót indít;
+21. győzelmi Játék vége közvetlenül a lobbyba visz;
+22. felső Játék vége továbbra is megerősítést kér;
+23. Teszt gomb csak akkor látszik, ha engedélyezett.
 
 ## 4. Konfiguráció módosítása
 

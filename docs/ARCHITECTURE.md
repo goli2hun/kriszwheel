@@ -161,7 +161,7 @@ színpadi feedbackként látszik.
 #### roundEnd
 
 A feladvány megoldódott. Előbb lefut a hiányzó betűk felfedése, majd
-megjelenik a fordulóvégi dialog.
+megjelenik a győzelmi overlay és elindulhat a Phaser tűzijáték.
 
 ## 5. Fő állapotátmenetek
 
@@ -194,7 +194,17 @@ trySolve()
   fail → nextPlayer() → playerTransition → spin
 ```
 
-## 6. Phaser kerék
+## 6. Phaser scene-ek
+
+A projekt két külön Phaser játékot használ:
+
+- `WheelScene` – szerencsekerék;
+- `VictoryScene` – győzelmi tűzijáték.
+
+A `VictoryScene` külön canvasban fut a `#victoryFx` elemben, ezért a
+keréktől függetlenül indítható és leállítható.
+
+## 7. Phaser kerék
 
 ### WheelScene
 
@@ -223,7 +233,7 @@ A számítás figyelembe veszi:
 Ez biztosítja, hogy a kiválasztott logikai mező és a mutatónál megálló képi
 cikkely egyezzen.
 
-## 7. Wheel segment modell
+## 8. Wheel segment modell
 
 Egy mező:
 
@@ -253,7 +263,7 @@ A jelenlegi kerék:
 12 × 2 = 24
 ```
 
-## 8. Feladványtábla
+## 9. Feladványtábla
 
 A tábla SVG-alapú.
 
@@ -267,7 +277,7 @@ A `renderPuzzle()`:
 - felfedi a punctuation karaktereket;
 - a felfedett betűket SVG `text` elemekként rajzolja.
 
-## 9. Billentyűkezelés
+## 10. Billentyűkezelés
 
 A dokumentumszintű `keydown` listener kezeli a betűket.
 
@@ -282,7 +292,7 @@ Nem dolgozik fel billentyűt, ha:
 
 Így a Megfejtés mező biztonságosan gépelhető.
 
-## 10. Hangrendszer
+## 11. Hangrendszer
 
 A hangfájlok induláskor `Audio` objektumként cache-be kerülnek.
 
@@ -297,7 +307,7 @@ példányt használ.
 Ennek előnye, hogy egymást gyorsan követő találati hangok nem vágják le
 egymást.
 
-## 11. Bot
+## 12. Bot
 
 A Bot timer-alapú.
 
@@ -311,7 +321,7 @@ Fő döntési sorrend:
 
 Pénzmező után külön timer választ mássalhangzót.
 
-## 12. UI rétegek
+## 13. UI rétegek
 
 A játékszínpad rétegrendje leegyszerűsítve:
 
@@ -329,7 +339,7 @@ debug / game end controls
 wheel overlay
 ```
 
-## 13. Kompatibilitási réteg
+## 14. Kompatibilitási réteg
 
 A `.stage-logic-bridge` továbbra is tartalmaz néhány korábbi DOM elemet:
 
@@ -342,7 +352,7 @@ még használja őket.
 
 Későbbi refaktorban eltávolíthatók.
 
-## 14. Invariánsok
+## 15. Invariánsok
 
 A fejlesztés során ezeket érdemes megtartani:
 

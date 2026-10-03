@@ -346,7 +346,53 @@ files: {
 
 A fájlutak a repo gyökeréhez képest értendők.
 
-## 6. debug
+## 6. victory
+
+### victory.fireworks
+
+```js
+fireworks: true
+```
+
+Kapcsolja a Phaser tűzijátékot.
+
+### victory.fireworksDurationMs
+
+```js
+fireworksDurationMs: 3500
+```
+
+Ennyi ideig indulnak új burstök.
+
+### victory.burstIntervalMs
+
+```js
+burstIntervalMs: 480
+```
+
+A burstök közötti idő.
+
+### victory.particlesPerBurst
+
+```js
+particlesPerBurst: 28
+```
+
+Egy burst Phaser-részecskéinek száma.
+
+### victory.buttonDelayMs
+
+```js
+buttonDelayMs: 1800
+```
+
+Ennyi idő után jelenik meg és válik aktívvá a két győzelmi gomb.
+
+### victory.colors
+
+A tűzijáték hex színpalettája.
+
+## 7. debug
 
 ### debug.showTestButton
 
@@ -357,7 +403,7 @@ showTestButton: true
 - `true`: látszik a Teszt gomb;
 - `false`: a gomb `hidden` osztályt kap.
 
-## 7. Példák
+## 8. Példák
 
 ### Lassabb kerék
 
@@ -385,7 +431,7 @@ vowelPrice: 8000
 showTestButton: false
 ```
 
-## 8. Módosítás után
+## 9. Módosítás után
 
 Nincs build lépés.
 
@@ -397,7 +443,7 @@ Ha cache miatt nem látszik:
 Ctrl+F5
 ```
 
-## 9. Amit ne tegyél
+## 10. Amit ne tegyél
 
 Ne változtasd úgy a `segments` / `segmentRepeat` kombinációt, hogy ne
 egyezzen a wheel asset tényleges cikkelyszámával.
