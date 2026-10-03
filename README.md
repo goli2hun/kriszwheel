@@ -29,6 +29,7 @@ Natív mérete: **1672 × 941 px**.
 A kép fölött külön HTML/SVG/Phaser rétegek működnek:
 
 - 15 × 4-es feladványtábla;
+- közép–közép feladványelrendezés: vízszintes és függőleges középre igazítás;
 - kategória;
 - használt betűk;
 - aktuális játékos avatarja, neve és fordulópénze;

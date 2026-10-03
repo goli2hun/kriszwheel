@@ -63,6 +63,25 @@ A `layoutPuzzleRows()`:
 - kiegyensúlyozott elrendezést keres;
 - minden sort vízszintesen középre igazít.
 
+A `renderPuzzle()` ezután a teljes sorblokkot **függőlegesen is középre**
+helyezi a 4 soros táblán:
+
+```js
+startRow = Math.floor((STAGE_GRID.rows - rows.length) / 2)
+```
+
+Példák:
+
+```text
+1 sor  → 2. képi sor
+2 sor  → 2–3. képi sor
+3 sor  → 1–3. képi sor
+4 sor  → 1–4. képi sor
+```
+
+Így a feladvány alapelve **közép–közép**: a sorokon belül vízszintesen,
+a teljes feladványblokknál pedig függőlegesen középre rendezünk.
+
 Ha nincs jó szavas tördelés, fallback darabolást használ.
 
 ## 5. Cellák

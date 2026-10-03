@@ -371,9 +371,18 @@
     el.puzzleBoard.innerHTML = "";
 
     const rows = layoutPuzzleRows(state.puzzle.text);
+
+    // A teljes feladványblokk függőlegesen is középre kerül a 4 soros
+    // táblán. Például 2 sor → a 2. és 3. képi sor.
+    const startRow = Math.max(
+      0,
+      Math.floor((STAGE_GRID.rows - rows.length) / 2)
+    );
+
     let revealSequenceIndex = 0;
 
     rows.forEach((rowText, rowIndex) => {
+      const gridRowIndex = startRow + rowIndex;
       const chars = [...rowText];
       const startCol = Math.max(
         0,
@@ -386,14 +395,19 @@
         const colIndex = startCol + charIndex;
         if (colIndex < 0 || colIndex >= STAGE_GRID.cols) return;
 
+        if (
+          gridRowIndex < 0 ||
+          gridRowIndex >= STAGE_GRID.rows
+        ) return;
+
         const x = STAGE_GRID.x[colIndex];
-        const y = STAGE_GRID.y[rowIndex];
+        const y = STAGE_GRID.y[gridRowIndex];
         const width = STAGE_GRID.width[colIndex];
-        const height = STAGE_GRID.height[rowIndex];
+        const height = STAGE_GRID.height[gridRowIndex];
 
         const group = createSvgElement("g", {
           class: "stage-puzzle-cell",
-          "data-row": rowIndex,
+          "data-row": gridRowIndex,
           "data-col": colIndex
         });
 
