@@ -998,3 +998,88 @@ body.game-active .app-shell {
     transition: none;
   }
 }
+
+
+/* --------------------------------------------------------------------------
+   Ideiglenes BASIC pörgetés – tesztelhető játékmenet vizuális kerék nélkül
+   -------------------------------------------------------------------------- */
+
+.stage-basic-spin-result {
+  position: absolute;
+  z-index: 24;
+  left: 43.25%;
+  top: 81.15%;
+  width: 13.5%;
+  height: 3.35%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  color: #fff5c4;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: .82cqw;
+  font-weight: 900;
+  letter-spacing: .04em;
+  line-height: 1;
+  text-align: center;
+  text-shadow:
+    0 2px 3px rgba(0, 0, 0, .72),
+    0 0 8px rgba(255, 217, 86, .20);
+  transition:
+    color .18s ease,
+    text-shadow .18s ease,
+    transform .18s ease;
+}
+
+.stage-basic-spin-result.spinning {
+  color: #d9edff;
+  text-shadow:
+    0 0 6px rgba(255, 255, 255, .74),
+    0 0 14px rgba(92, 171, 255, .55);
+  animation: basicSpinPulse .42s ease-in-out infinite alternate;
+}
+
+.stage-basic-spin-result.money {
+  color: #fff1a1;
+}
+
+.stage-basic-spin-result.bankrupt,
+.stage-basic-spin-result.skip {
+  color: #ffb6bd;
+}
+
+@keyframes basicSpinPulse {
+  from { transform: scale(.96); opacity: .72; }
+  to { transform: scale(1.04); opacity: 1; }
+}
+
+/* Teszt-segédfelirat a három gomb alatt. Később eltávolítható. */
+.stage-test-answer {
+  position: absolute;
+  z-index: 22;
+  left: 20%;
+  right: 20%;
+  top: 94.15%;
+  min-height: 2.8%;
+  overflow: hidden;
+  pointer-events: none;
+  color: rgba(255, 255, 255, .72);
+  font-size: .54cqw;
+  font-weight: 600;
+  letter-spacing: .035em;
+  line-height: 1.15;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, .72);
+}
+
+.stage-test-answer strong {
+  color: #ffffff;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-basic-spin-result.spinning {
+    animation: none;
+  }
+}

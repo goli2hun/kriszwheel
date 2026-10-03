@@ -126,6 +126,8 @@
           <strong id="usedLetters">–</strong>
         </div>
 
+        <div id="wheelResult" class="stage-basic-spin-result" aria-live="polite">–</div>
+
         <button id="spinBtn"
                 type="button"
                 class="stage-image-hotspot stage-spin-hotspot"
@@ -139,12 +141,15 @@
                 class="stage-image-hotspot stage-solve-hotspot"
                 aria-label="Megfejtés"></button>
 
+        <div class="stage-test-answer" aria-label="Teszt megfejtés">
+          TESZT: <strong id="testAnswerText">–</strong>
+        </div>
+
         <div class="stage-logic-bridge" aria-hidden="true">
           <div id="playersList"></div>
           <strong id="activePlayerText">–</strong>
           <button id="vowelBtn" type="button" tabindex="-1">Magánhangzó</button>
           <div id="wheelGame"></div>
-          <div id="wheelResult">–</div>
           <p id="message"></p>
         </div>
       </div>

@@ -191,7 +191,19 @@ width: 15.85%;
 height: 7.01%;
 ```
 
-A meglévő `spinWheel(false)` logikát indítja.
+A `spinWheel(false)` logikát indítja.
+
+Jelenleg ez szándékosan **BASIC tesztmód**: nem használja a Phaser
+kerékanimációt. A kattintás után:
+
+1. a státusz `Pörög…` értékre vált;
+2. 850 ms múlva véletlen `WHEEL_SEGMENTS` elem kerül kiválasztásra;
+3. pénzmezőnél aktiválódik a Mássalhangzó gomb;
+4. CSŐD esetén a fordulópénz nullázódik;
+5. KIMARADSZ esetén a kör a következő játékosra kerül.
+
+Az eredmény kis szöveges státuszként a gombok fölött jelenik meg.
+Ez átmeneti megoldás addig, amíg az új vizuális kerék elkészül.
 
 ### 7.2 Mássalhangzó
 
@@ -240,7 +252,25 @@ Hover/fókusz esetén:
 
 A felirat továbbra is a PNG része.
 
-## 8. Találati hang
+## 8. Teszt megfejtés
+
+Fejlesztési segítségként a teljes aktuális megfejtés kis fehér betűkkel
+megjelenik a három fő gomb alatt.
+
+DOM:
+
+`#testAnswerText`
+
+Az érték minden új fordulóban:
+
+```js
+el.testAnswerText.textContent = state.puzzle.text;
+```
+
+Ez kizárólag tesztfunkció, a végleges játékban el kell távolítani vagy
+debug kapcsolóhoz kell kötni.
+
+## 9. Találati hang
 
 Fájl:
 
@@ -270,7 +300,7 @@ További SFX:
 - `solve_success.wav` – sikeres megfejtés;
 - `solve_fail.wav` – hibás megfejtés.
 
-## 9. Rejtett kompatibilitási réteg
+## 10. Rejtett kompatibilitási réteg
 
 A jelenlegi prototípus még tartalmaz olyan korábbi logikai elemeket, amelyek
 vizuálisan nem részei az új színpadnak.
@@ -289,7 +319,7 @@ játékmenet ne törjön el.
 Ez átmeneti megoldás. A későbbi refaktorban ezeket külön állapot/UI
 komponensekre érdemes bontani.
 
-## 10. Jelenlegi korlátok és következő lépések
+## 11. Jelenlegi korlátok és következő lépések
 
 Jelenleg még nincs véglegesen integrálva:
 
@@ -301,7 +331,7 @@ Jelenleg még nincs véglegesen integrálva:
 6. Whisper-alapú hangvezérlés;
 7. mobil-specifikus játéknézet.
 
-## 11. Fontos fejlesztési szabály
+## 12. Fontos fejlesztési szabály
 
 A játékszínpad pozícióit mindig a **1672 × 941-es alapképre** mérjük.
 

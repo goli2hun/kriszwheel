@@ -129,6 +129,7 @@
     letterBtn: document.getElementById("letterBtn"),
     message: document.getElementById("message"),
     wheelResult: document.getElementById("wheelResult"),
+    testAnswerText: document.getElementById("testAnswerText"),
     consonantDialog: document.getElementById("consonantDialog"),
     solveDialog: document.getElementById("solveDialog"),
     solveForm: document.getElementById("solveForm"),
@@ -215,7 +216,9 @@
 
     state.currentIndex = (state.roundNumber === 1) ? 0 : state.currentIndex;
     el.categoryText.textContent = state.puzzle.category;
+    el.testAnswerText.textContent = state.puzzle.text;
     el.wheelResult.textContent = "–";
+    el.wheelResult.classList.remove("spinning", "bankrupt", "skip", "money");
     setMessage(`${currentPlayer().name} következik. Pörgess!`);
     renderAll();
     updateControls();
@@ -739,17 +742,25 @@
 
     state.phase = "spinning";
     state.wheelValue = null;
+
     el.wheelResult.textContent = "Pörög…";
+    el.wheelResult.classList.remove("bankrupt", "skip", "money");
+    el.wheelResult.classList.add("spinning");
+    setMessage("Pörög a kerék…");
     updateControls();
 
     const index = Math.floor(Math.random() * WHEEL_SEGMENTS.length);
     const segment = WHEEL_SEGMENTS[index];
-    const scene = getWheelScene();
 
-    scene.spinTo(index, () => {
-      el.wheelResult.textContent = segment.label;
+    // Ideiglenes, stabil játékmód: nincs vizuális Phaser-pörgetés.
+    // Rövid késleltetés után ugyanazt a játékszabályt alkalmazzuk,
+    // mint a teljes keréknél.
+    setTimeout(() => {
+      el.wheelResult.classList.remove("spinning");
 
       if (segment.type === "bankrupt") {
+        el.wheelResult.textContent = "CSŐD";
+        el.wheelResult.classList.add("bankrupt");
         currentPlayer().roundMoney = 0;
         renderAll();
         nextPlayer("CSŐD! A fordulópénz elveszett.");
@@ -757,15 +768,21 @@
       }
 
       if (segment.type === "skip") {
+        el.wheelResult.textContent = "KIMARADSZ";
+        el.wheelResult.classList.add("skip");
         nextPlayer("KIMARADSZ!");
         return;
       }
 
       state.wheelValue = segment.value;
       state.phase = "letter";
+      el.wheelResult.textContent = `${segment.label} Ft`;
+      el.wheelResult.classList.add("money");
+
       setMessage(
         `${segment.label} Ft. Mondj egy még nem használt mássalhangzót.`
       );
+
       renderAll();
       updateControls();
 
@@ -778,11 +795,9 @@
           }
           setMessage(`Bot betűje: ${consonant}`);
           setTimeout(() => handleConsonant(consonant, true), 550);
-        }, 650);
-      } else {
-        setTimeout(() => el.letterInput.focus(), 0);
+        }, 450);
       }
-    });
+    }, 850);
   }
 
   el.startGameBtn.addEventListener("click", startGame);

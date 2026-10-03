@@ -12,6 +12,8 @@ Első játszható böngészős prototípus.
 - Alapértelmezés: Krisz + Bot
 - Végtelen számú feladvány/forduló
 - Pörgetés
+  - jelenleg stabil, ideiglenes BASIC sorsolás vizuális kerék nélkül
+  - rövid „Pörög…” állapot után pénz / CSŐD / KIMARADSZ eredmény
 - Pénzmezők
 - CSŐD
 - KIMARADSZ
@@ -31,6 +33,7 @@ Első játszható böngészős prototípus.
   - felül a kategória/feladványtípus jelenik meg
   - a gombok feletti kék sávban a már használt betűk látszanak
   - a képen lévő Pörgetés / Mássalhangzó / Megfejtés gombok kattinthatók és hoverre kivilágosodnak
+  - teszteléshez a megfejtés kis fehér szöveggel megjelenik a három gomb alatt
 - Alap SFX hangok a `assets/sound/sfx/` könyvtárból
   - minden betűtalálatnál annyi rövid, game-show jellegű csippanás szól, ahányszor a betű szerepel
   - külön hang nulla találatra
