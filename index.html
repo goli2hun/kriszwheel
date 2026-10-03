@@ -1,0 +1,136 @@
+<!doctype html>
+<html lang="hu">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Szerencsekerék – Basic Prototype</title>
+  <link rel="stylesheet" href="styles.css" />
+  <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
+</head>
+<body>
+  <main class="app-shell">
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">KÍSÉRLETI LABOR</p>
+        <h1>Szerencsekerék</h1>
+      </div>
+      <button id="endGameBtn" class="btn btn-danger">Játék vége</button>
+    </header>
+
+    <section id="setupScreen" class="panel setup-panel">
+      <h2>Játékosok</h2>
+      <p>Legalább két játékost válassz. Alapértelmezés: Krisz + Bot.</p>
+
+      <div class="player-picker">
+        <label class="player-option">
+          <input type="checkbox" value="Krisz" checked />
+          <span class="avatar">K</span>
+          <strong>Krisz</strong>
+        </label>
+        <label class="player-option">
+          <input type="checkbox" value="Adri" />
+          <span class="avatar">A</span>
+          <strong>Adri</strong>
+        </label>
+        <label class="player-option">
+          <input type="checkbox" value="Aliz" />
+          <span class="avatar">Á</span>
+          <strong>Aliz</strong>
+        </label>
+        <label class="player-option">
+          <input type="checkbox" value="Bot" checked />
+          <span class="avatar bot">B</span>
+          <strong>Bot</strong>
+        </label>
+      </div>
+
+      <p id="setupError" class="error hidden">Legalább két játékos szükséges.</p>
+      <button id="startGameBtn" class="btn btn-primary">Játék indítása</button>
+    </section>
+
+    <section id="gameScreen" class="game-grid hidden">
+      <aside class="panel players-panel">
+        <h2>Játékosok</h2>
+        <div id="playersList"></div>
+      </aside>
+
+      <section class="center-column">
+        <section class="panel puzzle-panel">
+          <div class="category-row">
+            <span>Kategória</span>
+            <strong id="categoryText">–</strong>
+          </div>
+          <div id="puzzleBoard" class="puzzle-board" aria-label="Feladvány"></div>
+          <div class="used-row">
+            <span>Használt betűk:</span>
+            <strong id="usedLetters">–</strong>
+          </div>
+        </section>
+
+        <section class="panel controls-panel">
+          <div class="turn-status">
+            <span>Aktív játékos</span>
+            <strong id="activePlayerText">–</strong>
+          </div>
+
+          <div class="action-row">
+            <button id="spinBtn" class="btn btn-primary">Pörgetés</button>
+            <button id="vowelBtn" class="btn">Magánhangzó – 5 000 Ft</button>
+            <button id="solveBtn" class="btn">Megfejtés</button>
+          </div>
+
+          <div id="letterArea" class="letter-area hidden">
+            <label for="letterInput">Mássalhangzó:</label>
+            <input id="letterInput" maxlength="1" autocomplete="off" />
+            <button id="letterBtn" class="btn btn-small">Betű beküldése</button>
+          </div>
+
+          <p id="message" class="message">Pörgess a kezdéshez!</p>
+        </section>
+      </section>
+
+      <aside class="panel wheel-panel">
+        <h2>Kerék</h2>
+        <div id="wheelGame"></div>
+        <div id="wheelResult" class="wheel-result">–</div>
+      </aside>
+    </section>
+  </main>
+
+  <dialog id="solveDialog">
+    <form method="dialog" id="solveForm">
+      <h3>Megfejtés</h3>
+      <p>Írd be a teljes feladványt.</p>
+      <input id="solveInput" autocomplete="off" />
+      <div class="dialog-actions">
+        <button value="cancel" class="btn">Mégse</button>
+        <button value="default" id="solveConfirmBtn" class="btn btn-primary">Megfejtem</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="vowelDialog">
+    <form method="dialog" id="vowelForm">
+      <h3>Magánhangzó vásárlása</h3>
+      <p>Ár: 5 000 Ft</p>
+      <input id="vowelInput" maxlength="1" autocomplete="off" />
+      <div class="dialog-actions">
+        <button value="cancel" class="btn">Mégse</button>
+        <button value="default" id="vowelConfirmBtn" class="btn btn-primary">Megveszem</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="roundDialog">
+    <form method="dialog">
+      <h3 id="roundTitle">Forduló vége</h3>
+      <p id="roundText"></p>
+      <div class="dialog-actions">
+        <button id="nextRoundBtn" value="default" class="btn btn-primary">Következő feladvány</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="app.js"></script>
+</body>
+</html>
