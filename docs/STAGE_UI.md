@@ -205,6 +205,10 @@ A normál betűbevitel már nem dialogon és nem ezen a gombon keresztül tört�
 hanem közvetlenül a billentyűzetről. A hotspot jelenleg csak segédüzenetet
 képes kiírni, ha a játék `letter` állapotban van.
 
+A háttérképen látható `Magánhangzó` gomb hover-effektje akkor is aktív,
+amikor a DOM gomb logikailag `disabled` állapotban van. Ez kizárólag
+vizuális visszajelzés; a játékszabály szerinti engedélyezés nem változik.
+
 A későbbi UI-refaktorban érdemes az azonosítót és a képi funkciót egységesíteni.
 
 ### Megfejtés

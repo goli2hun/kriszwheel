@@ -935,7 +935,8 @@ body.game-active .app-shell {
 }
 
 .stage-image-hotspot:hover:not(:disabled),
-.stage-image-hotspot:focus-visible:not(:disabled) {
+.stage-image-hotspot:focus-visible:not(:disabled),
+.stage-consonant-hotspot:hover {
   background:
     radial-gradient(
       ellipse at 50% 45%,
