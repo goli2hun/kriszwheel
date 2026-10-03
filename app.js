@@ -5,6 +5,54 @@
   const ALPHABET = "AÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVWXYZ".split("");
   const VOWEL_PRICE = 5000;
 
+  const SFX = {
+    letterHit: "assets/sound/sfx/letter_hit.wav",
+    letterMiss: "assets/sound/sfx/letter_miss.wav",
+    solveSuccess: "assets/sound/sfx/solve_success.wav",
+    solveFail: "assets/sound/sfx/solve_fail.wav"
+  };
+
+  const sfxCache = Object.fromEntries(
+    Object.entries(SFX).map(([name, src]) => {
+      const audio = new Audio(src);
+      audio.preload = "auto";
+      return [name, audio];
+    })
+  );
+
+  function playSfx(name, volume = 0.7) {
+    const source = sfxCache[name];
+    if (!source) return;
+
+    const sound = source.cloneNode();
+    sound.volume = volume;
+    sound.play().catch(() => {
+      // A böngésző blokkolhatja a hangot, amíg nincs felhasználói interakció.
+    });
+  }
+
+  function playHitSequence(count) {
+    for (let i = 0; i < count; i += 1) {
+      setTimeout(() => playSfx("letterHit", 0.62), i * 150);
+    }
+  }
+
+  function unlockSfx() {
+    Object.values(sfxCache).forEach(audio => {
+      const previousVolume = audio.volume;
+      audio.volume = 0;
+      audio.play()
+        .then(() => {
+          audio.pause();
+          audio.currentTime = 0;
+          audio.volume = previousVolume;
+        })
+        .catch(() => {
+          audio.volume = previousVolume;
+        });
+    });
+  }
+
   const PUZZLES = [
     { category: "Mondás", text: "A KOCKA EL VAN VETVE" },
     { category: "Budapest", text: "SZÉCHENYI LÁNCHÍD" },
@@ -97,6 +145,8 @@
   }
 
   function startGame() {
+    unlockSfx();
+
     const selected = [...document.querySelectorAll('.player-option input:checked')]
       .map(input => input.value);
 
@@ -251,6 +301,7 @@
 
     const hits = countLetter(letter);
     if (hits > 0) {
+      playHitSequence(hits);
       const award = hits * state.wheelValue;
       currentPlayer().roundMoney += award;
       setMessage(
@@ -263,6 +314,7 @@
       checkAutoSolved();
       maybeRunBot();
     } else {
+      playSfx("letterMiss");
       renderAll();
       nextPlayer(`${letter} nincs a feladványban.`);
     }
@@ -297,12 +349,14 @@
     renderAll();
 
     if (hits > 0) {
+      playHitSequence(hits);
       state.phase = "spin";
       setMessage(`${letter}: ${hits} találat. A magánhangzó ára levonva.`);
       updateControls();
       checkAutoSolved();
       maybeRunBot();
     } else {
+      playSfx("letterMiss");
       nextPlayer(`${letter} nincs a feladványban.`);
     }
 
@@ -311,9 +365,12 @@
 
   function trySolve(answer, fromBot = false) {
     if (normalize(answer) === state.puzzle.text) {
+      playSfx("solveSuccess", 0.75);
       finishRound(currentPlayer());
       return true;
     }
+
+    playSfx("solveFail", 0.72);
 
     if (!fromBot) {
       nextPlayer("Hibás megfejtés.");

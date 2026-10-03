@@ -20,6 +20,10 @@ Első játszható böngészős prototípus.
 - Egyszerű automatikus Bot
 - Phaser 3 kerékanimáció
 - Reszponzív alap UI
+- Alap SFX hangok a `assets/sound/sfx/` könyvtárból
+  - minden betűtalálatnál annyi rövid hang, ahányszor a betű szerepel
+  - külön hang nulla találatra
+  - külön hang sikeres és sikertelen megfejtésre
 
 ## Indítás
 
@@ -42,7 +46,11 @@ A Phaser 3 jelenleg CDN-ről töltődik be, ezért az első betöltéshez intern
 
 - `index.html` – UI szerkezet
 - `styles.css` – megjelenés
-- `app.js` – játékszabályok, állapotgép, Bot, Phaser kerék
+- `app.js` – játékszabályok, állapotgép, Bot, Phaser kerék, SFX vezérlés
+- `assets/sound/sfx/letter_hit.wav` – betűtalálat
+- `assets/sound/sfx/letter_miss.wav` – nincs ilyen betű
+- `assets/sound/sfx/solve_success.wav` – sikeres megfejtés
+- `assets/sound/sfx/solve_fail.wav` – sikertelen megfejtés
 
 Ez még kizárólag frontend prototípus. FastAPI, SQLite és Whisper nincs bekötve.
 
