@@ -51,17 +51,39 @@ Első játszható böngészős prototípus.
 
 ## Indítás
 
-A legegyszerűbb lokális indítás:
+### Windows – ajánlott
 
-```powershell
-cd kriszwheel
-python -m http.server 8080
+A repository gyökerében található:
+
+```text
+start.bat
 ```
 
-Majd böngészőben:
+Dupla kattintásra vagy terminálból futtatva:
+
+1. a script a saját könyvtárára vált;
+2. lefuttatja a `git pull --ff-only origin main` parancsot;
+3. sikeres frissítés után elindítja a lokális webszervert a `8080` porton;
+4. először a `python`, szükség esetén a `py -3` parancsot próbálja.
+
+A játék ezután itt érhető el:
 
 ```text
 http://localhost:8080
+```
+
+A szerver leállítása: `Ctrl+C`.
+
+A script szándékosan nem használ `git reset --hard` parancsot, ezért nem
+törli automatikusan a helyi módosításokat. Ha a repository nem frissíthető
+fast-forward módon, hibaüzenettel megáll.
+
+### Kézi indítás
+
+```powershell
+cd kriszwheel
+git pull --ff-only origin main
+python -m http.server 8080
 ```
 
 A Phaser 3 jelenleg CDN-ről töltődik be, ezért az első betöltéshez internetkapcsolat kell.
