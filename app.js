@@ -17,6 +17,13 @@
   };
   const SVG_NS = "http://www.w3.org/2000/svg";
 
+  const PLAYER_IMAGES = {
+    Krisz: "assets/images/krisz.png",
+    Adri: "assets/images/adri.png",
+    Aliz: "assets/images/lizus.png",
+    Bot: "assets/images/bot.png"
+  };
+
   const SFX = {
     letterHit: "assets/sound/sfx/letter_hit.wav",
     letterMiss: "assets/sound/sfx/letter_miss.wav",
@@ -120,6 +127,9 @@
     puzzleBoard: document.getElementById("puzzleBoard"),
     usedLetters: document.getElementById("usedLetters"),
     activePlayerText: document.getElementById("activePlayerText"),
+    stageCurrentAvatar: document.getElementById("stageCurrentAvatar"),
+    stageCurrentPlayerName: document.getElementById("stageCurrentPlayerName"),
+    stageCurrentMoney: document.getElementById("stageCurrentMoney"),
     spinBtn: document.getElementById("spinBtn"),
     consonantStageBtn: document.getElementById("consonantStageBtn"),
     vowelBtn: document.getElementById("vowelBtn"),
@@ -229,7 +239,21 @@
     renderPlayers();
     renderPuzzle();
     renderUsedLetters();
-    el.activePlayerText.textContent = currentPlayer()?.name ?? "–";
+
+    const active = currentPlayer();
+    el.activePlayerText.textContent = active?.name ?? "–";
+
+    if (active) {
+      el.stageCurrentPlayerName.textContent = active.name;
+      el.stageCurrentMoney.textContent = fmtMoney(active.roundMoney);
+      el.stageCurrentAvatar.src = PLAYER_IMAGES[active.name] ?? PLAYER_IMAGES.Bot;
+      el.stageCurrentAvatar.alt = `${active.name} profilképe`;
+    } else {
+      el.stageCurrentPlayerName.textContent = "–";
+      el.stageCurrentMoney.textContent = fmtMoney(0);
+      el.stageCurrentAvatar.src = PLAYER_IMAGES.Bot;
+      el.stageCurrentAvatar.alt = "Nincs aktív játékos";
+    }
   }
 
   function renderPlayers() {

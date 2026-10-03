@@ -252,7 +252,46 @@ Hover/fókusz esetén:
 
 A felirat továbbra is a PNG része.
 
-## 8. Teszt megfejtés
+## 8. Aktuális játékos panel
+
+A színpad jobb alsó részén külön státuszpanel mutatja az éppen soron lévő
+játékost.
+
+Megjelenített adatok:
+
+- játékos profilképe;
+- játékos neve;
+- aktuális fordulópénz.
+
+Kép-hozzárendelés:
+
+```js
+const PLAYER_IMAGES = {
+  Krisz: "assets/images/krisz.png",
+  Adri: "assets/images/adri.png",
+  Aliz: "assets/images/lizus.png",
+  Bot: "assets/images/bot.png"
+};
+```
+
+DOM elemek:
+
+- `#stageCurrentAvatar`
+- `#stageCurrentPlayerName`
+- `#stageCurrentMoney`
+
+A panel frissítését a `renderAll()` végzi, ezért automatikusan változik:
+
+- játékosváltáskor;
+- találat után;
+- CSŐD után;
+- új forduló indításakor.
+
+A pénzmező a játékos `roundMoney` értékét mutatja, tehát az adott
+fordulóban aktuálisan megszerzett összeget, nem a teljes játék összesített
+nyereményét.
+
+## 9. Teszt megfejtés
 
 Fejlesztési segítségként a teljes aktuális megfejtés kis fehér betűkkel
 megjelenik a három fő gomb alatt.
@@ -270,7 +309,7 @@ el.testAnswerText.textContent = state.puzzle.text;
 Ez kizárólag tesztfunkció, a végleges játékban el kell távolítani vagy
 debug kapcsolóhoz kell kötni.
 
-## 9. Találati hang
+## 10. Találati hang
 
 Fájl:
 
@@ -300,7 +339,7 @@ További SFX:
 - `solve_success.wav` – sikeres megfejtés;
 - `solve_fail.wav` – hibás megfejtés.
 
-## 10. Rejtett kompatibilitási réteg
+## 11. Rejtett kompatibilitási réteg
 
 A jelenlegi prototípus még tartalmaz olyan korábbi logikai elemeket, amelyek
 vizuálisan nem részei az új színpadnak.
@@ -319,19 +358,18 @@ játékmenet ne törjön el.
 Ez átmeneti megoldás. A későbbi refaktorban ezeket külön állapot/UI
 komponensekre érdemes bontani.
 
-## 11. Jelenlegi korlátok és következő lépések
+## 12. Jelenlegi korlátok és következő lépések
 
 Jelenleg még nincs véglegesen integrálva:
 
 1. a látványos szerencsekerék az új színpadba;
-2. a játékosok / aktív játékos avatarjainak új színpadi megjelenítése;
-3. a játékosok pénzének végleges scoreboardja;
-4. a magánhangzó-vásárlás új képi vezérlése;
-5. a feladványok külső JSON/SQLite adatforrása;
-6. Whisper-alapú hangvezérlés;
-7. mobil-specifikus játéknézet.
+2. a teljes játékos-scoreboard véglegesítése (az aktuális játékos panel már működik);
+3. a magánhangzó-vásárlás új képi vezérlése;
+4. a feladványok külső JSON/SQLite adatforrása;
+5. Whisper-alapú hangvezérlés;
+6. mobil-specifikus játéknézet.
 
-## 12. Fontos fejlesztési szabály
+## 13. Fontos fejlesztési szabály
 
 A játékszínpad pozícióit mindig a **1672 × 941-es alapképre** mérjük.
 

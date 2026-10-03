@@ -34,6 +34,8 @@ Első játszható böngészős prototípus.
   - a gombok feletti kék sávban a már használt betűk látszanak
   - a képen lévő Pörgetés / Mássalhangzó / Megfejtés gombok kattinthatók és hoverre kivilágosodnak
   - teszteléshez a megfejtés kis fehér szöveggel megjelenik a három gomb alatt
+  - jobb alul az aktuális játékos profilképe, neve és fordulópénze látszik
+  - a panel játékosváltáskor és pénzváltozáskor automatikusan frissül
 - Alap SFX hangok a `assets/sound/sfx/` könyvtárból
   - minden betűtalálatnál annyi rövid, game-show jellegű csippanás szól, ahányszor a betű szerepel
   - külön hang nulla találatra
