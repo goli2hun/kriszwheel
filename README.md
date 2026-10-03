@@ -32,7 +32,7 @@ Első játszható böngészős prototípus.
   - a gombok feletti kék sávban a már használt betűk látszanak
   - a képen lévő Pörgetés / Mássalhangzó / Megfejtés gombok kattinthatók és hoverre kivilágosodnak
 - Alap SFX hangok a `assets/sound/sfx/` könyvtárból
-  - minden betűtalálatnál annyi rövid hang, ahányszor a betű szerepel
+  - minden betűtalálatnál annyi rövid, game-show jellegű csippanás szól, ahányszor a betű szerepel
   - külön hang nulla találatra
   - külön hang sikeres és sikertelen megfejtésre
 

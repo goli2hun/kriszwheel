@@ -43,9 +43,16 @@
     });
   }
 
+  const LETTER_HIT_GAP_MS = 180;
+
   function playHitSequence(count) {
-    for (let i = 0; i < count; i += 1) {
-      setTimeout(() => playSfx("letterHit", 0.62), i * 150);
+    const safeCount = Math.max(0, Number(count) || 0);
+
+    for (let i = 0; i < safeCount; i += 1) {
+      setTimeout(
+        () => playSfx("letterHit", 0.72),
+        i * LETTER_HIT_GAP_MS
+      );
     }
   }
 
