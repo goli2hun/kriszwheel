@@ -165,6 +165,7 @@
     state.currentIndex = 0;
     state.roundNumber = 0;
 
+    document.body.classList.remove("lobby-active");
     el.setupScreen.classList.add("hidden");
     el.gameScreen.classList.remove("hidden");
 
@@ -693,6 +694,7 @@
   el.endGameBtn.addEventListener("click", () => {
     clearTimeout(state.botTimer);
     state.phase = "setup";
+    document.body.classList.add("lobby-active");
     el.gameScreen.classList.add("hidden");
     el.setupScreen.classList.remove("hidden");
     el.message.textContent = "";

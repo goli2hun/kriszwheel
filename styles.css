@@ -395,6 +395,161 @@ dialog input {
   display: none !important;
 }
 
+
+/* --------------------------------------------------------------------------
+   Lobby / játékosválasztó
+   -------------------------------------------------------------------------- */
+
+.app-shell {
+  position: relative;
+  z-index: 1;
+}
+
+body.lobby-active {
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(2, 10, 28, .03), rgba(2, 10, 28, .16)),
+    url("assets/images/studio_lobby.png") center center / cover no-repeat fixed;
+}
+
+body.lobby-active .topbar {
+  display: none;
+}
+
+body.lobby-active .app-shell {
+  width: 100%;
+  min-height: 100vh;
+  padding: 0 3vw 3vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+}
+
+body.lobby-active .setup-panel {
+  width: min(760px, 92vw);
+  max-width: 760px;
+  margin: clamp(185px, 23vh, 230px) auto 3vh;
+  padding: 26px 30px 28px;
+  background:
+    linear-gradient(180deg, rgba(8, 25, 55, .82), rgba(5, 16, 38, .90));
+  border: 1px solid rgba(255, 211, 105, .45);
+  box-shadow:
+    0 28px 80px rgba(0, 0, 0, .42),
+    inset 0 1px 0 rgba(255, 255, 255, .08),
+    0 0 30px rgba(32, 116, 255, .10);
+  backdrop-filter: blur(14px);
+}
+
+body.lobby-active .setup-panel h2 {
+  margin-bottom: 8px;
+  color: #ffd96a;
+  font-size: 1.08rem;
+  letter-spacing: .12em;
+}
+
+body.lobby-active .setup-panel > p:not(.error) {
+  margin-bottom: 0;
+  color: #d7e6ff;
+}
+
+body.lobby-active .player-picker {
+  margin: 20px 0;
+}
+
+body.lobby-active .player-option {
+  min-height: 116px;
+  border-color: rgba(255, 218, 112, .18);
+  background: linear-gradient(180deg, rgba(23, 61, 116, .42), rgba(8, 29, 66, .52));
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    background .16s ease,
+    box-shadow .16s ease;
+}
+
+body.lobby-active .player-option:hover {
+  transform: translateY(-2px);
+  border-color: rgba(255, 218, 112, .42);
+  background: linear-gradient(180deg, rgba(31, 76, 138, .52), rgba(10, 38, 82, .62));
+}
+
+body.lobby-active .player-option:has(input:checked) {
+  border-color: rgba(255, 218, 112, .92);
+  background: linear-gradient(180deg, rgba(51, 99, 164, .55), rgba(15, 48, 99, .70));
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 240, 174, .22),
+    0 0 20px rgba(255, 194, 58, .14);
+}
+
+body.lobby-active .avatar {
+  background: linear-gradient(135deg, #3e78df, #274d9e);
+  border: 2px solid rgba(255, 221, 126, .64);
+  box-shadow:
+    0 8px 20px rgba(13, 46, 110, .45),
+    0 0 16px rgba(255, 208, 82, .08);
+}
+
+body.lobby-active .avatar.bot {
+  background: linear-gradient(135deg, #2b9c9d, #185985);
+}
+
+body.lobby-active #startGameBtn {
+  min-width: 210px;
+  color: #171006;
+  background: linear-gradient(135deg, #fff0a1, #f2b63f 52%, #d78a1c);
+  box-shadow: 0 8px 25px rgba(236, 168, 41, .18);
+}
+
+.lobby-light-fx {
+  display: none;
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 0;
+  pointer-events: none;
+  overflow: visible;
+}
+
+body.lobby-active .lobby-light-fx {
+  display: block;
+}
+
+.lobby-bulb-dimmers circle {
+  fill: rgba(3, 10, 23, .47);
+}
+
+.lobby-bulb-glow {
+  fill: #fff7c7;
+  filter: url(#lobbyBulbGlow);
+  animation: lobbyBulbAlternate 1.05s steps(1, end) infinite;
+}
+
+.lobby-bulb-phase-a {
+  animation-delay: 0s;
+}
+
+.lobby-bulb-phase-b {
+  animation-delay: -.525s;
+}
+
+@keyframes lobbyBulbAlternate {
+  0%, 49.99% {
+    opacity: .09;
+  }
+
+  50%, 100% {
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lobby-bulb-glow {
+    animation: none;
+    opacity: .58;
+  }
+}
+
 @media (max-width: 1150px) {
   .game-grid {
     grid-template-columns: 200px minmax(0, 1fr);
@@ -413,6 +568,16 @@ dialog input {
 @media (max-width: 760px) {
   .app-shell {
     width: 94vw;
+  }
+
+  body.lobby-active .app-shell {
+    width: 100%;
+    padding-inline: 3vw;
+  }
+
+  body.lobby-active .setup-panel {
+    margin-top: clamp(145px, 20vh, 190px);
+    padding: 22px 18px 24px;
   }
 
   .player-picker {

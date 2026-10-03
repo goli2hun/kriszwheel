@@ -7,7 +7,48 @@
   <link rel="stylesheet" href="styles.css" />
   <script src="https://cdn.jsdelivr.net/npm/phaser@3.90.0/dist/phaser.min.js"></script>
 </head>
-<body>
+<body class="lobby-active">
+  <svg id="lobbyLightFx" class="lobby-light-fx"
+       viewBox="0 0 1672 941"
+       preserveAspectRatio="xMidYMid slice"
+       aria-hidden="true"
+       focusable="false">
+    <defs>
+      <filter id="lobbyBulbGlow" x="-250%" y="-250%" width="600%" height="600%">
+        <feGaussianBlur stdDeviation="7" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
+    </defs>
+
+    <!-- A háttérkép jobb oldali kerekének nagy izzói.
+         A sötétítő körök miatt a két fázis ténylegesen felváltva látszik. -->
+    <g class="lobby-bulb-dimmers">
+      <circle cx="1363" cy="13"  r="13" />
+      <circle cx="1311" cy="89"  r="13" />
+      <circle cx="1279" cy="174" r="13" />
+      <circle cx="1268" cy="269" r="13" />
+      <circle cx="1281" cy="359" r="13" />
+      <circle cx="1319" cy="444" r="13" />
+      <circle cx="1377" cy="516" r="13" />
+    </g>
+
+    <g class="lobby-bulb-glow lobby-bulb-phase-a">
+      <circle cx="1363" cy="13"  r="12" />
+      <circle cx="1279" cy="174" r="12" />
+      <circle cx="1281" cy="359" r="12" />
+      <circle cx="1377" cy="516" r="12" />
+    </g>
+
+    <g class="lobby-bulb-glow lobby-bulb-phase-b">
+      <circle cx="1311" cy="89"  r="12" />
+      <circle cx="1268" cy="269" r="12" />
+      <circle cx="1319" cy="444" r="12" />
+    </g>
+  </svg>
+
   <main class="app-shell">
     <header class="topbar">
       <div>

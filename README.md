@@ -20,6 +20,8 @@ Első játszható böngészős prototípus.
 - Egyszerű automatikus Bot
 - Phaser 3 kerékanimáció
 - Reszponzív alap UI
+- Stúdió lobby háttér: `assets/images/studio_lobby.png`
+- A jobb oldali kerék nagy izzóin reszponzív SVG/CSS váltott fényanimáció
 - Alap SFX hangok a `assets/sound/sfx/` könyvtárból
   - minden betűtalálatnál annyi rövid hang, ahányszor a betű szerepel
   - külön hang nulla találatra
@@ -45,7 +47,7 @@ A Phaser 3 jelenleg CDN-ről töltődik be, ezért az első betöltéshez intern
 ## Jelenlegi architektúra
 
 - `index.html` – UI szerkezet
-- `styles.css` – megjelenés
+- `styles.css` – megjelenés, lobby háttér és izzóanimáció
 - `app.js` – játékszabályok, állapotgép, Bot, Phaser kerék, SFX vezérlés
 - `assets/sound/sfx/letter_hit.wav` – betűtalálat
 - `assets/sound/sfx/letter_miss.wav` – nincs ilyen betű
