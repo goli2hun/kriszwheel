@@ -132,23 +132,14 @@
     stageCurrentMoney: document.getElementById("stageCurrentMoney"),
     spinBtn: document.getElementById("spinBtn"),
     consonantStageBtn: document.getElementById("consonantStageBtn"),
-    vowelBtn: document.getElementById("vowelBtn"),
     solveBtn: document.getElementById("solveBtn"),
-    letterArea: document.getElementById("letterArea"),
-    letterInput: document.getElementById("letterInput"),
-    letterBtn: document.getElementById("letterBtn"),
     message: document.getElementById("message"),
     wheelResult: document.getElementById("wheelResult"),
     testAnswerText: document.getElementById("testAnswerText"),
-    consonantDialog: document.getElementById("consonantDialog"),
     solveDialog: document.getElementById("solveDialog"),
     solveForm: document.getElementById("solveForm"),
     solveInput: document.getElementById("solveInput"),
     solveConfirmBtn: document.getElementById("solveConfirmBtn"),
-    vowelDialog: document.getElementById("vowelDialog"),
-    vowelForm: document.getElementById("vowelForm"),
-    vowelInput: document.getElementById("vowelInput"),
-    vowelConfirmBtn: document.getElementById("vowelConfirmBtn"),
     roundDialog: document.getElementById("roundDialog"),
     roundTitle: document.getElementById("roundTitle"),
     roundText: document.getElementById("roundText"),
@@ -215,9 +206,6 @@
     state.justRevealed.clear();
     state.wheelValue = null;
 
-    if (el.consonantDialog.open) {
-      el.consonantDialog.close();
-    }
     state.phase = "spin";
 
     for (const p of state.players) {
@@ -415,22 +403,13 @@
 
     const human = !p.isBot;
     el.spinBtn.disabled = !human || state.phase !== "spin";
-    el.vowelBtn.disabled =
-      !human ||
-      !["spin", "letter"].includes(state.phase) ||
-      p.roundMoney < VOWEL_PRICE;
     el.solveBtn.disabled =
       !human ||
       ["spinning", "roundEnd", "setup"].includes(state.phase);
 
-    const letterMode = human && state.phase === "letter";
-    el.letterArea.classList.toggle("hidden", !letterMode);
-    el.letterBtn.disabled = !letterMode;
-    el.consonantStageBtn.disabled = !letterMode;
-
-    if (!letterMode && el.consonantDialog.open) {
-      el.consonantDialog.close();
-    }
+    // A középső képi gomb csak jelzi, hogy most betűt várunk.
+    // A tényleges választás közvetlen billentyűleütéssel történik.
+    el.consonantStageBtn.disabled = !(human && state.phase === "letter");
   }
 
   function setMessage(msg) {
@@ -518,12 +497,12 @@
     state.revealed.add(letter);
 
     const hits = countLetter(letter);
-    renderAll();
 
     if (hits > 0) {
       state.justRevealed = new Set([letter]);
       playHitSequence(hits);
       state.phase = "spin";
+      renderAll();
       setMessage(`${letter}: ${hits} találat. A magánhangzó ára levonva.`);
       updateControls();
       checkAutoSolved();
@@ -815,7 +794,8 @@
       el.wheelResult.classList.add("money");
 
       setMessage(
-        `${segment.label} Ft. Mondj egy még nem használt mássalhangzót.`
+        `${segment.label} Ft. Nyomj le egy mássalhangzót a billentyűzeten. ` +
+        `Magánhangzó billentyűvel ${fmtMoney(VOWEL_PRICE)}-ért vásárolhatsz.`
       );
 
       renderAll();
@@ -838,42 +818,51 @@
   el.startGameBtn.addEventListener("click", startGame);
   el.spinBtn.addEventListener("click", () => spinWheel(false));
 
+  function isTextEntryTarget(target) {
+    return (
+      target instanceof HTMLInputElement ||
+      target instanceof HTMLTextAreaElement ||
+      target instanceof HTMLSelectElement ||
+      target?.isContentEditable
+    );
+  }
+
+  function handleDirectLetterKey(event) {
+    if (event.defaultPrevented || event.repeat) return;
+    if (event.ctrlKey || event.metaKey || event.altKey) return;
+    if (!document.body.classList.contains("game-active")) return;
+    if (isTextEntryTarget(event.target)) return;
+    if (document.querySelector("dialog[open]")) return;
+
+    const player = currentPlayer();
+    if (!player || player.isBot) return;
+
+    const letter = normalize(event.key);
+    if (letter.length !== 1 || !/\p{L}/u.test(letter)) return;
+
+    // Magánhangzó: közvetlen vásárlás egyetlen billentyűvel.
+    // Ez spin és letter fázisban is engedélyezett, ahogy a korábbi gombos
+    // megoldásnál is.
+    if (VOWELS.has(letter)) {
+      if (!["spin", "letter"].includes(state.phase)) return;
+
+      event.preventDefault();
+      buyVowel(letter, false);
+      return;
+    }
+
+    // Mássalhangzó csak sikeres pörgetés után adható meg.
+    if (state.phase !== "letter") return;
+
+    event.preventDefault();
+    handleConsonant(letter, false);
+  }
+
+  document.addEventListener("keydown", handleDirectLetterKey);
+
   el.consonantStageBtn.addEventListener("click", () => {
     if (el.consonantStageBtn.disabled) return;
-
-    el.letterInput.value = "";
-    el.consonantDialog.showModal();
-    setTimeout(() => el.letterInput.focus(), 0);
-  });
-
-  el.letterBtn.addEventListener("click", () => {
-    const value = el.letterInput.value;
-    if (handleConsonant(value, false)) {
-      el.letterInput.value = "";
-      if (el.consonantDialog.open) {
-        el.consonantDialog.close();
-      }
-    }
-  });
-
-  el.letterInput.addEventListener("keydown", e => {
-    if (e.key === "Enter") {
-      e.preventDefault();
-      el.letterBtn.click();
-    }
-  });
-
-  el.vowelBtn.addEventListener("click", () => {
-    el.vowelInput.value = "";
-    el.vowelDialog.showModal();
-    setTimeout(() => el.vowelInput.focus(), 0);
-  });
-
-  el.vowelConfirmBtn.addEventListener("click", e => {
-    e.preventDefault();
-    if (buyVowel(el.vowelInput.value, false)) {
-      el.vowelDialog.close();
-    }
+    setMessage("Nyomj le egy mássalhangzót a billentyűzeten.");
   });
 
   el.solveBtn.addEventListener("click", () => {

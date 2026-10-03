@@ -18,8 +18,12 @@ Első játszható böngészős prototípus.
 - CSŐD
 - KIMARADSZ
 - Mássalhangzó megadása
+  - sikeres pörgetés után közvetlenül a billentyűzeten
+  - nincs külön beviteli dialógus
 - Találatonkénti pénzjóváírás
 - Magánhangzó vásárlása 5 000 Ft-ért
+  - a kívánt magánhangzó billentyűjének lenyomásával
+  - nincs külön beviteli dialógus
 - Megfejtés
 - Hibás betű / hibás megfejtés után körváltás
 - Egyszerű automatikus Bot

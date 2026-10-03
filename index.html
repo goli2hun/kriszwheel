@@ -162,28 +162,12 @@
         <div class="stage-logic-bridge" aria-hidden="true">
           <div id="playersList"></div>
           <strong id="activePlayerText">–</strong>
-          <button id="vowelBtn" type="button" tabindex="-1">Magánhangzó</button>
           <div id="wheelGame"></div>
           <p id="message"></p>
         </div>
       </div>
     </section>
   </main>
-
-  <dialog id="consonantDialog">
-    <form method="dialog" id="consonantForm">
-      <h3>Mássalhangzó</h3>
-      <p>Add meg a választott mássalhangzót.</p>
-      <div id="letterArea" class="stage-dialog-letter hidden">
-        <label for="letterInput">Betű</label>
-        <input id="letterInput" maxlength="1" autocomplete="off" />
-        <button id="letterBtn" type="button" class="btn btn-primary">Mehet</button>
-      </div>
-      <div class="dialog-actions">
-        <button value="cancel" class="btn">Mégse</button>
-      </div>
-    </form>
-  </dialog>
 
   <dialog id="solveDialog">
     <form method="dialog" id="solveForm">
@@ -193,18 +177,6 @@
       <div class="dialog-actions">
         <button value="cancel" class="btn">Mégse</button>
         <button value="default" id="solveConfirmBtn" class="btn btn-primary">Megfejtem</button>
-      </div>
-    </form>
-  </dialog>
-
-  <dialog id="vowelDialog">
-    <form method="dialog" id="vowelForm">
-      <h3>Magánhangzó vásárlása</h3>
-      <p>Ár: 5 000 Ft</p>
-      <input id="vowelInput" maxlength="1" autocomplete="off" />
-      <div class="dialog-actions">
-        <button value="cancel" class="btn">Mégse</button>
-        <button value="default" id="vowelConfirmBtn" class="btn btn-primary">Megveszem</button>
       </div>
     </form>
   </dialog>

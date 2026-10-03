@@ -980,18 +980,6 @@ body.game-active .app-shell {
   min-height: 0;
 }
 
-.stage-dialog-letter {
-  display: grid;
-  grid-template-columns: auto 86px auto;
-  align-items: center;
-  gap: 10px;
-  margin: 14px 0 18px;
-}
-
-.stage-dialog-letter #letterInput {
-  width: 86px;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stage-puzzle-letter.new-reveal {
     animation: none;

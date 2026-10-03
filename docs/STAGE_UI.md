@@ -224,8 +224,19 @@ width: 18.42%;
 height: 7.01%;
 ```
 
-Csak akkor aktív, amikor a játék állapota `letter`. Kattintásra megnyitja
-a `#consonantDialog` ablakot, ahol egy karakter adható meg.
+Csak akkor aktív, amikor a játék állapota `letter`. A gomb maga már nem
+nyit beviteli ablakot: a felhasználó közvetlenül a fizikai billentyűzeten
+nyomja le a kívánt mássalhangzót.
+
+A globális `keydown` kezelés csak akkor fogadja el a karaktert, ha:
+
+- a játéknézet aktív;
+- emberi játékos van soron;
+- nincs nyitott dialog;
+- nem szövegbeviteli mezőben gépelünk;
+- a játék `letter` fázisban van.
+
+Ezért a Megfejtés mezőbe történő gépelést nem zavarja.
 
 ### 7.3 Megfejtés
 
@@ -255,6 +266,22 @@ Hover/fókusz esetén:
 - a háttérképen lévő eredeti gomb vizuálisan világosabbnak tűnik.
 
 A felirat továbbra is a PNG része.
+
+### 7.5 Közvetlen billentyűzetes betűbevitel
+
+A mássalhangzó- és magánhangzó-beviteli dialógusok megszűntek.
+
+Pénzmező kipörgetése után:
+
+- egy mássalhangzó billentyű közvetlenül meghívja a
+  `handleConsonant()` függvényt;
+- egy magánhangzó billentyű közvetlenül a `buyVowel()` függvényt hívja;
+- magánhangzó vásárlása csak elegendő fordulópénz esetén sikerül;
+- a magyar ékezetes magánhangzók is támogatottak:
+  `Á É Í Ó Ö Ő Ú Ü Ű`.
+
+A magánhangzó közvetlenül `spin` fázisban is vásárolható, így a korábbi
+játékszabály megmarad, csak a külön dialog tűnt el.
 
 ## 8. Aktuális játékos panel
 
@@ -353,7 +380,6 @@ A `.stage-logic-bridge` a viewporton kívül tartja többek között:
 - a Phaser kerék konténerét;
 - a játékoslista korábbi renderét;
 - az aktív játékos szövegét;
-- a magánhangzó-gombot;
 - a belső státuszüzenetet.
 
 Erre azért van szükség, hogy az új színpad fejlesztése közben a meglévő
@@ -368,7 +394,6 @@ Jelenleg még nincs véglegesen integrálva:
 
 1. a látványos szerencsekerék az új színpadba;
 2. a teljes játékos-scoreboard véglegesítése (az aktuális játékos panel már működik);
-3. a magánhangzó-vásárlás új képi vezérlése;
 4. a feladványok külső JSON/SQLite adatforrása;
 5. Whisper-alapú hangvezérlés;
 6. mobil-specifikus játéknézet.
