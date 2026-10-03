@@ -41,7 +41,7 @@ Első játszható böngészős prototípus.
 A legegyszerűbb lokális indítás:
 
 ```powershell
-cd szerencsekerek-basic
+cd kriszwheel
 python -m http.server 8080
 ```
 
@@ -52,6 +52,13 @@ http://localhost:8080
 ```
 
 A Phaser 3 jelenleg CDN-ről töltődik be, ezért az első betöltéshez internetkapcsolat kell.
+
+## Dokumentáció
+
+A játékszínpad pixelpontos felépítése, koordinátái, gomb-hotspotjai,
+betűfelfedése és hanglogikája külön dokumentumban található:
+
+- [Játékszínpad és overlay technikai leírás](docs/STAGE_UI.md)
 
 ## Jelenlegi architektúra
 
@@ -64,6 +71,9 @@ A Phaser 3 jelenleg CDN-ről töltődik be, ezért az első betöltéshez intern
 - `assets/sound/sfx/solve_fail.wav` – sikertelen megfejtés
 
 Ez még kizárólag frontend prototípus. FastAPI, SQLite és Whisper nincs bekötve.
+
+Fontos: a jelenlegi `studo_jatekszinpad.png` ténylegesen **15 × 4** kék cellát tartalmaz,
+ezért a mostani SVG overlay ehhez a geometriához igazodik.
 
 ## Következő fejlesztési fázis
 
