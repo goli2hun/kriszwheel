@@ -73,6 +73,10 @@ A normál betűbevitel közvetlenül a fizikai billentyűzetről történik.
 
 ### Pénz és fordulók
 
+Játékosváltáskor az új játékos nem azonnal válik aktívvá. Az alap
+átmeneti szünet **1000 ms**, a `gameplay.playerSwitchDelayMs`
+konfigurációval módosítható. Ezalatt látható visszajelzés jelenik meg.
+
 Mássalhangzó-találatnál:
 
 ```text
@@ -97,6 +101,15 @@ Jelenlegi SFX-ek:
 
 Többszörös betűtalálatnál a cellák felvillanása és a találati hang egymás után
 következik. Az alap időköz 500 ms, konfigurálható.
+
+### Megfejtés UI
+
+A megfejtés elküldésekor a beviteli dialog **azonnal bezár**.
+
+- helytelen megfejtésnél látható `HELYTELEN MEGFEJTÉS` visszajelzés jelenik meg;
+- helyes megfejtésnél előbb végigfut a hiányzó betűk felfedése;
+- a fordulóvégi dialog csak a felfedési animáció után jelenik meg;
+- Enter és a `Megfejtem` gomb ugyanazt a submit folyamatot használja.
 
 ### Játék vége és tesztfunkció
 

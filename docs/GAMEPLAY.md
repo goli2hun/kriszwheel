@@ -214,12 +214,54 @@ Siker esetén:
 
 ### Hibás megfejtés
 
+A megfejtés elküldésekor a beviteli dialog azonnal bezár.
+
 Hibás megfejtés esetén:
 
 - hibahang szól;
-- a kör a következő játékosra kerül.
+- a színpadon `HELYTELEN MEGFEJTÉS` visszajelzés jelenik meg;
+- lefut a konfigurált játékosváltási szünet;
+- ezután a kör a következő játékosra kerül.
 
-## 8. Következő feladvány
+### Helyes megfejtés UI-folyama
+
+Helyes válasznál:
+
+1. a beviteli dialog már zárva van;
+2. a hiányzó betűk sorban felfedődnek;
+3. a játék kivárja a legutolsó betű `stageLetterReveal` animációját;
+4. csak ezután nyílik meg a fordulóvégi dialog.
+
+## 8. Játékosváltási szünet
+
+A `nextPlayer()` nem vált azonnal játékost.
+
+Átmeneti állapot:
+
+`playerTransition`
+
+Alap késleltetés:
+
+`1000 ms`
+
+Konfiguráció:
+
+`gameplay.playerSwitchDelayMs`
+
+A késleltetés alatt:
+
+- a jelenlegi avatar még látható;
+- a játékgombok nem aktívak;
+- a váltás oka rövid, látható színpadi üzenetként megjelenik.
+
+Az idő letelte után:
+
+1. `currentIndex` a következő játékosra lép;
+2. `phase = "spin"`;
+3. frissül az avatar/pénz panel;
+4. Bot esetén elindul a Bot következő lépése.
+
+## 9. Következő feladvány
 
 A fordulóvégi dialog `Következő feladvány` gombja:
 
@@ -228,7 +270,7 @@ A fordulóvégi dialog `Következő feladvány` gombja:
 3. nullázza minden játékos `roundMoney` értékét;
 4. megtartja a `totalMoney` értékeket.
 
-## 9. Bot
+## 10. Bot
 
 A Bot ugyanazt az alap játékszabályt használja.
 
@@ -249,7 +291,7 @@ A Bot:
 
 A Bot döntései szándékosan egyszerűek; jelenleg nem használ nyelvi modellt.
 
-## 10. Játék vége
+## 11. Játék vége
 
 A jobb felső `Játék vége` gomb megerősítő dialogot nyit.
 
@@ -262,7 +304,7 @@ Vége a játéknak?
 - `Nem`: dialog bezár, állapot nem változik.
 - `Igen`: timer-ek leállnak, a kerék-overlay bezár, a játék visszatér a lobbyba.
 
-## 11. Teszt mód
+## 12. Teszt mód
 
 A `Teszt` gomb dialogban megmutatja az aktuális megfejtést.
 
@@ -276,7 +318,7 @@ debug: {
 
 `false` esetén a gomb nem látszik.
 
-## 12. Játékállapotok röviden
+## 13. Játékállapotok röviden
 
 ```text
 setup
@@ -289,7 +331,7 @@ wheelResult
   ↓
 letter
   ├─ találat → spin
-  └─ hiba → következő játékos → spin
+  └─ hiba → playerTransition → következő játékos → spin
 
 megfejtés sikeres
   ↓

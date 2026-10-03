@@ -136,6 +136,9 @@
     lastPuzzleIndex: -1,
     botTimer: null,
     wheelConfirmTimer: null,
+    playerTransitionTimer: null,
+    roundEndTimer: null,
+    feedbackTimer: null,
     roundNumber: 0,
     justRevealed: new Set(),
     pendingWheelSegment: null,
@@ -155,6 +158,7 @@
     stageCurrentAvatar: document.getElementById("stageCurrentAvatar"),
     stageCurrentPlayerName: document.getElementById("stageCurrentPlayerName"),
     stageCurrentMoney: document.getElementById("stageCurrentMoney"),
+    stageFeedback: document.getElementById("stageFeedback"),
     spinBtn: document.getElementById("spinBtn"),
     consonantStageBtn: document.getElementById("consonantStageBtn"),
     solveBtn: document.getElementById("solveBtn"),
@@ -236,6 +240,10 @@
 
   function newRound() {
     clearTimeout(state.botTimer);
+    clearTimeout(state.playerTransitionTimer);
+    clearTimeout(state.roundEndTimer);
+    clearTimeout(state.feedbackTimer);
+    hideStageFeedback();
     state.roundNumber += 1;
     state.puzzle = pickPuzzle();
     state.usedLetters.clear();
@@ -445,11 +453,32 @@
     el.spinBtn.disabled = !human || state.phase !== "spin";
     el.solveBtn.disabled =
       !human ||
-      ["spinning", "wheelResult", "roundEnd", "setup"].includes(state.phase);
+      ["spinning", "wheelResult", "playerTransition", "roundEnd", "setup"].includes(state.phase);
 
     // A középső képi gomb csak jelzi, hogy most betűt várunk.
     // A tényleges választás közvetlen billentyűleütéssel történik.
     el.consonantStageBtn.disabled = !(human && state.phase === "letter");
+  }
+
+  function hideStageFeedback() {
+    clearTimeout(state.feedbackTimer);
+    el.stageFeedback.className = "stage-feedback";
+    el.stageFeedback.textContent = "";
+  }
+
+  function showStageFeedback(message, type = "info", durationMs = 0) {
+    clearTimeout(state.feedbackTimer);
+
+    el.stageFeedback.textContent = String(message)
+      .toLocaleUpperCase("hu-HU");
+    el.stageFeedback.className = `stage-feedback show ${type}`;
+
+    if (durationMs > 0) {
+      state.feedbackTimer = setTimeout(
+        hideStageFeedback,
+        durationMs
+      );
+    }
   }
 
   function setMessage(msg) {
@@ -457,15 +486,43 @@
   }
 
   function nextPlayer(reason = "") {
-    state.currentIndex = (state.currentIndex + 1) % state.players.length;
-    state.phase = "spin";
-    state.wheelValue = null;
-    renderAll();
-    updateControls();
-    setMessage(
-      `${reason ? reason + " " : ""}${currentPlayer().name} következik. Pörgess!`
+    clearTimeout(state.playerTransitionTimer);
+    clearTimeout(state.botTimer);
+
+    const delayMs = Math.max(
+      0,
+      Number(GAMEPLAY_CONFIG.playerSwitchDelayMs ?? 1000)
     );
-    maybeRunBot();
+
+    state.phase = "playerTransition";
+    state.wheelValue = null;
+    updateControls();
+
+    showStageFeedback(
+      reason || "Játékosváltás…",
+      /helytelen|hibás/i.test(reason) ? "error" : "info",
+      delayMs
+    );
+
+    setMessage(
+      `${reason ? reason + " " : ""}Játékosváltás…`
+    );
+
+    state.playerTransitionTimer = setTimeout(() => {
+      state.currentIndex =
+        (state.currentIndex + 1) % state.players.length;
+      state.phase = "spin";
+
+      renderAll();
+      updateControls();
+      hideStageFeedback();
+
+      setMessage(
+        `${currentPlayer().name} következik. Pörgess!`
+      );
+
+      maybeRunBot();
+    }, delayMs);
   }
 
   function countLetter(letter) {
@@ -566,7 +623,7 @@
     playSfx("solveFail", Number(AUDIO_CONFIG.solveFailVolume ?? 0.72));
 
     if (!fromBot) {
-      nextPlayer("Hibás megfejtés.");
+      nextPlayer("Helytelen megfejtés.");
     } else {
       nextPlayer("A Bot megfejtése hibás volt.");
     }
@@ -575,6 +632,13 @@
 
   function finishRound(winner) {
     clearTimeout(state.botTimer);
+    clearTimeout(state.playerTransitionTimer);
+    clearTimeout(state.roundEndTimer);
+    hideStageFeedback();
+
+    const hiddenLetterCount = [...state.puzzle.text].filter(
+      ch => /\p{L}/u.test(ch) && !state.revealed.has(ch)
+    ).length;
 
     const newlyRevealed = [...new Set(
       [...state.puzzle.text].filter(
@@ -597,7 +661,15 @@
       `Feladvány: ${state.puzzle.text}. ` +
       `A forduló nyereménye: ${fmtMoney(winner.roundMoney)}. ` +
       `Összes nyeremény: ${fmtMoney(winner.totalMoney)}.`;
-    el.roundDialog.showModal();
+
+    const revealDurationMs = hiddenLetterCount > 0
+      ? ((hiddenLetterCount - 1) * LETTER_HIT_GAP_MS) + 720
+      : 0;
+
+    state.roundEndTimer = setTimeout(() => {
+      if (state.phase !== "roundEnd") return;
+      el.roundDialog.showModal();
+    }, revealDurationMs + 120);
   }
 
   function checkAutoSolved() {
@@ -1006,12 +1078,17 @@
     setTimeout(() => el.solveInput.focus(), 0);
   });
 
-  el.solveConfirmBtn.addEventListener("click", e => {
+  el.solveForm.addEventListener("submit", e => {
     e.preventDefault();
+
     const answer = el.solveInput.value;
     if (!answer.trim()) return;
+
     el.solveDialog.close();
-    trySolve(answer, false);
+
+    requestAnimationFrame(() => {
+      trySolve(answer, false);
+    });
   });
 
   el.nextRoundBtn.addEventListener("click", () => {
@@ -1022,6 +1099,10 @@
   function returnToLobby() {
     clearTimeout(state.botTimer);
     clearTimeout(state.wheelConfirmTimer);
+    clearTimeout(state.playerTransitionTimer);
+    clearTimeout(state.roundEndTimer);
+    clearTimeout(state.feedbackTimer);
+    hideStageFeedback();
     state.pendingWheelSegment = null;
     state.pendingWheelFromBot = false;
     closeWheelOverlay();

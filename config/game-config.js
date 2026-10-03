@@ -5,7 +5,11 @@ window.KRISZWHEEL_CONFIG = {
 
     // Több azonos betű esetén ennyi idő telik el az egyes
     // felvillanások és hangok között.
-    letterHitGapMs: 500
+    letterHitGapMs: 500,
+
+    // Játékosváltáskor ennyi ideig marad látható a visszajelzés,
+    // mielőtt a következő játékos aktívvá válik.
+    playerSwitchDelayMs: 1000
   },
 
   wheel: {

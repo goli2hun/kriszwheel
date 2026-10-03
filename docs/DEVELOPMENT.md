@@ -64,10 +64,13 @@ Módosítás után érdemes végigpróbálni:
 9. több találat sorban villan fel;
 10. pontozás helyes;
 11. magánhangzó ára levonódik;
-12. megfejtés dialog működik;
-13. forduló vége működik;
-14. Játék vége visszavisz a lobbyba;
-15. Teszt gomb csak akkor látszik, ha engedélyezett.
+12. megfejtés elküldésekor a dialog azonnal bezár;
+13. helytelen megfejtés látható visszajelzést ad;
+14. helyes megfejtésnél a betűk a fordulóvégi dialog előtt fedődnek fel;
+15. játékosváltás előtt lefut a konfigurált szünet;
+16. forduló vége működik;
+17. Játék vége visszavisz a lobbyba;
+18. Teszt gomb csak akkor látszik, ha engedélyezett.
 
 ## 4. Konfiguráció módosítása
 

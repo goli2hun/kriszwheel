@@ -122,6 +122,9 @@ wheelValue
 lastPuzzleIndex
 botTimer
 wheelConfirmTimer
+playerTransitionTimer
+roundEndTimer
+feedbackTimer
 roundNumber
 justRevealed
 pendingWheelSegment
@@ -150,9 +153,15 @@ A kerék megállt, az eredmény 1,5 másodpercig látható.
 
 Pénzmező után mássalhangzót várunk.
 
+#### playerTransition
+
+Konfigurálható szünet két játékos között. A vezérlés letiltott, a váltás oka
+színpadi feedbackként látszik.
+
 #### roundEnd
 
-A feladvány megoldódott, a fordulóvégi dialog aktív.
+A feladvány megoldódott. Előbb lefut a hiányzó betűk felfedése, majd
+megjelenik a fordulóvégi dialog.
 
 ## 5. Fő állapotátmenetek
 
@@ -174,15 +183,15 @@ applyPendingWheelResult()
 
 handleConsonant()
   hit → spin
-  miss → nextPlayer() → spin
+  miss → nextPlayer() → playerTransition → spin
 
 buyVowel()
   hit → spin
   miss → nextPlayer() → spin
 
 trySolve()
-  success → finishRound() → roundEnd
-  fail → nextPlayer() → spin
+  success → finishRound() → betűfelfedés → roundEnd dialog
+  fail → nextPlayer() → playerTransition → spin
 ```
 
 ## 6. Phaser kerék

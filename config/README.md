@@ -50,6 +50,22 @@ letterHitGapMs: 500
 Ha ugyanaz a betű többször szerepel, az egyes cellák felvillanása és a
 találati hang között ennyi idő telik el.
 
+### gameplay.playerSwitchDelayMs
+
+Típus: szám, ms.
+
+Alap:
+
+```js
+playerSwitchDelayMs: 1000
+```
+
+Játékosváltáskor ennyi ideig maradunk `playerTransition` állapotban,
+mielőtt a következő játékos aktív lesz.
+
+Ez alatt a színpad látható visszajelzést mutat, a játékgombok pedig nem
+fogadnak új akciót.
+
 ## 3. wheel
 
 ### wheel.image

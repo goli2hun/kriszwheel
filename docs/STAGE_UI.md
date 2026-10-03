@@ -298,7 +298,47 @@ Alap:
 
 `1500 ms`
 
-## 13. Teszt gomb
+## 13. Színpadi visszajelzés
+
+DOM:
+
+`#stageFeedback`
+
+A rövid overlay például játékosváltás vagy helytelen megfejtés esetén
+jelenik meg.
+
+Helytelen megfejtésnél piros `error` variánst használ.
+
+A játékosváltási visszajelzés hossza:
+
+`gameplay.playerSwitchDelayMs`
+
+Alap:
+
+`1000 ms`
+
+## 14. Megfejtés dialog és felfedés
+
+A `#solveForm` submit eseménye kezeli mind az Entert, mind a
+`Megfejtem` gombot.
+
+Érvényes, nem üres válasznál:
+
+1. a `#solveDialog` azonnal bezár;
+2. csak ezután történik a `trySolve()` kiértékelés.
+
+Helyes megfejtésnél a `finishRound()` kiszámolja, hány rejtett betűhelyet
+kell még animálni. A fordulóvégi dialog időzítése:
+
+```text
+(hiddenLetterCount - 1) × letterHitGapMs
++ 720 ms stageLetterReveal
++ 120 ms biztonsági ráhagyás
+```
+
+Így a fordulóvégi dialog nem takarja el a betűfelfedést.
+
+## 15. Teszt gomb
 
 DOM:
 
@@ -312,7 +352,7 @@ Konfiguráció:
 
 `false` esetén a gomb `hidden` osztályt kap.
 
-## 14. Játék vége
+## 16. Játék vége
 
 DOM:
 
@@ -332,14 +372,14 @@ DOM:
 - `setup` state;
 - visszatérés a lobbyhoz.
 
-## 15. Hangok
+## 17. Hangok
 
 A hangok forrása és hangerői a konfigurációban vannak.
 
 A találati hang minden előfordulásnál külön `Audio.cloneNode()` példányból
 indul, így a hangok nem vágják le egymást.
 
-## 16. Reszponzivitás
+## 18. Reszponzivitás
 
 A játékszínpad a 1672:941 képarányt tartja.
 
@@ -349,7 +389,7 @@ A Phaser wheel overlay saját négyzetes területet használ.
 
 A mobil-specifikus végleges layout még nincs kész.
 
-## 17. Háttérkép cseréje
+## 19. Háttérkép cseréje
 
 Ha a `studo_jatekszinpad.png` képet lecseréljük, ellenőrizni kell:
 

@@ -1045,6 +1045,54 @@ body.game-active .app-shell {
 
 
 /* --------------------------------------------------------------------------
+   Rövid játékmenet-visszajelzés / játékosváltási üzenet
+   -------------------------------------------------------------------------- */
+
+.stage-feedback {
+  position: absolute;
+  z-index: 58;
+  left: 50%;
+  top: 61.5%;
+  max-width: 54%;
+  padding: .62cqw 1.25cqw;
+  transform: translate(-50%, .45cqw) scale(.96);
+  opacity: 0;
+  pointer-events: none;
+  border: 1px solid rgba(164, 205, 255, .44);
+  border-radius: 999px;
+  color: #eef6ff;
+  background: rgba(4, 29, 72, .91);
+  box-shadow:
+    0 .35cqw .9cqw rgba(0, 0, 0, .36),
+    inset 0 1px 0 rgba(255, 255, 255, .10);
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: .78cqw;
+  font-weight: 900;
+  letter-spacing: .045em;
+  line-height: 1.1;
+  text-align: center;
+  text-shadow: 0 .08cqw .18cqw rgba(0, 0, 0, .68);
+  transition:
+    opacity .15s ease,
+    transform .15s ease;
+}
+
+.stage-feedback.show {
+  opacity: 1;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.stage-feedback.error {
+  color: #ffe7e9;
+  border-color: rgba(255, 133, 145, .74);
+  background: rgba(104, 20, 36, .94);
+  box-shadow:
+    0 0 .8cqw rgba(255, 78, 98, .20),
+    0 .35cqw .9cqw rgba(0, 0, 0, .38),
+    inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+/* --------------------------------------------------------------------------
    Aktuális játékos – jobb alsó stúdiópanel
    -------------------------------------------------------------------------- */
 
