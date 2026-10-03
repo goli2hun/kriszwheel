@@ -143,7 +143,7 @@
           </div>
         </aside>
 
-        <div id="wheelResult" class="stage-basic-spin-result" aria-live="polite">–</div>
+        <div id="wheelResult" class="stage-spin-result" aria-live="polite">–</div>
 
         <button id="spinBtn"
                 type="button"
@@ -163,10 +163,28 @@
                 class="stage-test-btn"
                 aria-label="Teszt megfejtés megjelenítése">Teszt</button>
 
+        <div id="wheelOverlay"
+             class="wheel-overlay"
+             aria-hidden="true"
+             aria-label="Szerencsekerék pörgetés">
+          <div class="wheel-overlay-card">
+            <div class="wheel-overlay-title">SZERENCSEKERÉK</div>
+            <div class="wheel-game-shell">
+              <div id="wheelGame"></div>
+            </div>
+            <div id="wheelOverlayResult"
+                 class="wheel-overlay-result"
+                 aria-live="polite">Pörög…</div>
+            <button id="wheelApproveBtn"
+                    type="button"
+                    class="wheel-approve-btn"
+                    disabled>Jóváhagyás</button>
+          </div>
+        </div>
+
         <div class="stage-logic-bridge" aria-hidden="true">
           <div id="playersList"></div>
           <strong id="activePlayerText">–</strong>
-          <div id="wheelGame"></div>
           <p id="message"></p>
         </div>
       </div>

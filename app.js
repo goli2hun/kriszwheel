@@ -88,19 +88,27 @@
     { category: "Étel", text: "TÚRÓS CSUSZA SZALONNÁVAL" }
   ];
 
+  const WHEEL_BASE_SEGMENTS = [
+    { label: "1 000", type: "money", value: 1000 },
+    { label: "1 500", type: "money", value: 1500 },
+    { label: "2 000", type: "money", value: 2000 },
+    { label: "2 500", type: "money", value: 2500 },
+    { label: "3 000", type: "money", value: 3000 },
+    { label: "4 000", type: "money", value: 4000 },
+    { label: "CSŐD", type: "bankrupt", value: 0 },
+    { label: "5 000", type: "money", value: 5000 },
+    { label: "6 000", type: "money", value: 6000 },
+    { label: "KIMARADSZ", type: "skip", value: 0 },
+    { label: "7 500", type: "money", value: 7500 },
+    { label: "10 000", type: "money", value: 10000 }
+  ];
+
+  // A feltöltött wheel.png 24 cikkelyes. A jelenlegi 12 mezős
+  // játékgazdaság kétszer fut körbe, így minden képi cikkelyhez tartozik
+  // egy valódi játékmező.
   const WHEEL_SEGMENTS = [
-    { label: "1 000", type: "money", value: 1000, color: 0x3f7cff },
-    { label: "1 500", type: "money", value: 1500, color: 0xff5e7a },
-    { label: "2 000", type: "money", value: 2000, color: 0x8b6cff },
-    { label: "2 500", type: "money", value: 2500, color: 0x24bfa4 },
-    { label: "3 000", type: "money", value: 3000, color: 0xf2a93b },
-    { label: "4 000", type: "money", value: 4000, color: 0x57a0ff },
-    { label: "CSŐD", type: "bankrupt", value: 0, color: 0x1a1a1a },
-    { label: "5 000", type: "money", value: 5000, color: 0xee657f },
-    { label: "6 000", type: "money", value: 6000, color: 0x5f65d9 },
-    { label: "KIMARADSZ", type: "skip", value: 0, color: 0x5c6470 },
-    { label: "7 500", type: "money", value: 7500, color: 0x2fb68d },
-    { label: "10 000", type: "money", value: 10000, color: 0xd79c2e }
+    ...WHEEL_BASE_SEGMENTS.map(segment => ({ ...segment })),
+    ...WHEEL_BASE_SEGMENTS.map(segment => ({ ...segment }))
   ];
 
   const state = {
@@ -113,8 +121,11 @@
     wheelValue: null,
     lastPuzzleIndex: -1,
     botTimer: null,
+    wheelConfirmTimer: null,
     roundNumber: 0,
-    justRevealed: new Set()
+    justRevealed: new Set(),
+    pendingWheelSegment: null,
+    pendingWheelFromBot: false
   };
 
   const el = {
@@ -135,6 +146,9 @@
     solveBtn: document.getElementById("solveBtn"),
     message: document.getElementById("message"),
     wheelResult: document.getElementById("wheelResult"),
+    wheelOverlay: document.getElementById("wheelOverlay"),
+    wheelOverlayResult: document.getElementById("wheelOverlayResult"),
+    wheelApproveBtn: document.getElementById("wheelApproveBtn"),
     testBtn: document.getElementById("testBtn"),
     testDialog: document.getElementById("testDialog"),
     testAnswerDialogText: document.getElementById("testAnswerDialogText"),
@@ -210,6 +224,10 @@
     state.revealed.clear();
     state.justRevealed.clear();
     state.wheelValue = null;
+    state.pendingWheelSegment = null;
+    state.pendingWheelFromBot = false;
+    clearTimeout(state.wheelConfirmTimer);
+    closeWheelOverlay();
 
     state.phase = "spin";
 
@@ -409,7 +427,7 @@
     el.spinBtn.disabled = !human || state.phase !== "spin";
     el.solveBtn.disabled =
       !human ||
-      ["spinning", "roundEnd", "setup"].includes(state.phase);
+      ["spinning", "wheelConfirm", "roundEnd", "setup"].includes(state.phase);
 
     // A középső képi gomb csak jelzi, hogy most betűt várunk.
     // A tényleges választás közvetlen billentyűleütéssel történik.
@@ -647,74 +665,75 @@
       this.wheelContainer = null;
       this.rotationDeg = 0;
       this.segmentAngle = 360 / WHEEL_SEGMENTS.length;
+      this.ready = false;
+    }
+
+    preload() {
+      this.load.image("wheel-face", "assets/images/wheel.png");
     }
 
     create() {
-      const cx = 250;
-      const cy = 250;
-      const radius = 205;
+      const cx = 300;
+      const cy = 300;
+      const wheelSize = 536;
+      const labelRadius = 188;
+      const startOffsetDeg = -90;
 
       this.wheelContainer = this.add.container(cx, cy);
-      const graphics = this.add.graphics();
-      this.wheelContainer.add(graphics);
 
-      const startOffset = -Math.PI / 2;
-      const angleRad = (Math.PI * 2) / WHEEL_SEGMENTS.length;
+      const wheel = this.add.image(0, 0, "wheel-face");
+      wheel.setDisplaySize(wheelSize, wheelSize);
+      this.wheelContainer.add(wheel);
 
-      WHEEL_SEGMENTS.forEach((segment, i) => {
-        const start = startOffset + i * angleRad;
-        const end = start + angleRad;
+      WHEEL_SEGMENTS.forEach((segment, index) => {
+        const midDeg =
+          startOffsetDeg +
+          (index + 0.5) * this.segmentAngle;
+        const midRad = Phaser.Math.DegToRad(midDeg);
 
-        graphics.fillStyle(segment.color, 1);
-        graphics.beginPath();
-        graphics.moveTo(0, 0);
-        graphics.arc(0, 0, radius, start, end, false);
-        graphics.closePath();
-        graphics.fillPath();
+        const x = Math.cos(midRad) * labelRadius;
+        const y = Math.sin(midRad) * labelRadius;
 
-        graphics.lineStyle(2, 0xffffff, .28);
-        graphics.beginPath();
-        graphics.moveTo(0, 0);
-        graphics.lineTo(Math.cos(start) * radius, Math.sin(start) * radius);
-        graphics.strokePath();
-
-        const mid = start + angleRad / 2;
-        const tx = Math.cos(mid) * radius * 0.66;
-        const ty = Math.sin(mid) * radius * 0.66;
-
-        const text = this.add.text(tx, ty, segment.label, {
-          fontFamily: "Arial",
+        const text = this.add.text(x, y, segment.label, {
+          fontFamily: "Arial Black, Arial, sans-serif",
           fontStyle: "bold",
-          fontSize: segment.label.length > 7 ? "14px" : "17px",
+          fontSize: segment.label.length > 7 ? "11px" : "15px",
           color: "#ffffff",
-          stroke: "#000000",
-          strokeThickness: 3
+          stroke: "#10152f",
+          strokeThickness: 4,
+          align: "center"
         }).setOrigin(.5);
 
-        text.setAngle(Phaser.Math.RadToDeg(mid) + 90);
+        // A felirat sugárirányban áll a cikkelyen és a kerékkel együtt forog.
+        text.setAngle(midDeg);
         this.wheelContainer.add(text);
       });
 
-      graphics.lineStyle(8, 0xf2f7ff, .95);
-      graphics.strokeCircle(0, 0, radius);
-
-      const hub = this.add.circle(0, 0, 28, 0x0b1930, 1);
-      hub.setStrokeStyle(5, 0xffffff, .8);
-      this.wheelContainer.add(hub);
+      // Fix mutató: nem része a forgó containernek.
+      const pointerShadow = this.add.triangle(
+        cx + 2, 36,
+        -21, -8,
+        21, -8,
+        0, 38,
+        0x061126, .72
+      );
 
       const pointer = this.add.triangle(
         cx, 31,
-        -18, -4,
-        18, -4,
-        0, 34,
-        0xffd85a, 1
+        -19, -9,
+        19, -9,
+        0, 35,
+        0xffd45f, 1
       );
-      pointer.setStrokeStyle(4, 0x07101f, 1);
+      pointer.setStrokeStyle(4, 0xffffff, .92);
 
+      this.ready = true;
       this.events.emit("wheel-ready");
     }
 
     spinTo(index, onComplete) {
+      if (!this.ready || !this.wheelContainer) return false;
+
       const localCenter = (index + 0.5) * this.segmentAngle;
       const desiredMod = (360 - localCenter) % 360;
       const currentMod = ((this.rotationDeg % 360) + 360) % 360;
@@ -722,24 +741,28 @@
       const fullTurns = Phaser.Math.Between(5, 7);
       const target = this.rotationDeg + fullTurns * 360 + delta;
 
+      this.tweens.killTweensOf(this.wheelContainer);
+
       this.tweens.add({
         targets: this.wheelContainer,
         angle: target,
-        duration: 4500,
+        duration: 5200,
         ease: "Cubic.easeOut",
         onComplete: () => {
           this.rotationDeg = target;
           onComplete?.();
         }
       });
+
+      return true;
     }
   }
 
   const phaserGame = new Phaser.Game({
     type: Phaser.AUTO,
     parent: "wheelGame",
-    width: 500,
-    height: 500,
+    width: 600,
+    height: 600,
     transparent: true,
     scene: [WheelScene],
     scale: {
@@ -747,7 +770,8 @@
       autoCenter: Phaser.Scale.CENTER_BOTH
     },
     render: {
-      antialias: true
+      antialias: true,
+      transparent: true
     }
   });
 
@@ -755,72 +779,142 @@
     return phaserGame.scene.getScene("WheelScene");
   }
 
+  function formatWheelResult(segment) {
+    return segment.type === "money"
+      ? `${segment.label} Ft`
+      : segment.label;
+  }
+
+  function openWheelOverlay() {
+    el.wheelOverlay.classList.add("open");
+    el.wheelOverlay.setAttribute("aria-hidden", "false");
+    el.wheelOverlayResult.textContent = "Pörög…";
+    el.wheelOverlayResult.className = "wheel-overlay-result spinning";
+    el.wheelApproveBtn.disabled = true;
+  }
+
+  function closeWheelOverlay() {
+    el.wheelOverlay.classList.remove("open");
+    el.wheelOverlay.setAttribute("aria-hidden", "true");
+    el.wheelApproveBtn.disabled = true;
+  }
+
+  function applyPendingWheelResult() {
+    const segment = state.pendingWheelSegment;
+    if (!segment) return;
+
+    const fromBot = state.pendingWheelFromBot;
+
+    clearTimeout(state.wheelConfirmTimer);
+    state.pendingWheelSegment = null;
+    state.pendingWheelFromBot = false;
+    closeWheelOverlay();
+
+    el.wheelResult.classList.remove("spinning", "bankrupt", "skip", "money");
+    el.wheelResult.textContent = formatWheelResult(segment);
+
+    if (segment.type === "bankrupt") {
+      el.wheelResult.classList.add("bankrupt");
+      currentPlayer().roundMoney = 0;
+      renderAll();
+      nextPlayer("CSŐD! A fordulópénz elveszett.");
+      return;
+    }
+
+    if (segment.type === "skip") {
+      el.wheelResult.classList.add("skip");
+      nextPlayer("KIMARADSZ!");
+      return;
+    }
+
+    el.wheelResult.classList.add("money");
+    state.wheelValue = segment.value;
+    state.phase = "letter";
+
+    setMessage(
+      `${segment.label} Ft. Nyomj le egy mássalhangzót a billentyűzeten. ` +
+      `Magánhangzó billentyűvel ${fmtMoney(VOWEL_PRICE)}-ért vásárolhatsz.`
+    );
+
+    renderAll();
+    updateControls();
+
+    if (fromBot) {
+      state.botTimer = setTimeout(() => {
+        const consonant = randomUnusedConsonant();
+        if (!consonant) {
+          nextPlayer("Nincs több választható mássalhangzó.");
+          return;
+        }
+        setMessage(`Bot betűje: ${consonant}`);
+        setTimeout(() => handleConsonant(consonant, true), 550);
+      }, 650);
+    }
+  }
+
   function spinWheel(fromBot = false) {
     if (state.phase !== "spin") return;
 
+    const scene = getWheelScene();
+    if (!scene?.ready || !scene.wheelContainer) {
+      setMessage("A kerék még betöltődik…");
+      state.botTimer = setTimeout(() => spinWheel(fromBot), 250);
+      return;
+    }
+
     state.phase = "spinning";
     state.wheelValue = null;
+    state.pendingWheelSegment = null;
+    state.pendingWheelFromBot = fromBot;
+
+    const index = Math.floor(Math.random() * WHEEL_SEGMENTS.length);
+    const segment = WHEEL_SEGMENTS[index];
 
     el.wheelResult.textContent = "Pörög…";
     el.wheelResult.classList.remove("bankrupt", "skip", "money");
     el.wheelResult.classList.add("spinning");
     setMessage("Pörög a kerék…");
+
+    openWheelOverlay();
     updateControls();
 
-    const index = Math.floor(Math.random() * WHEEL_SEGMENTS.length);
-    const segment = WHEEL_SEGMENTS[index];
+    const started = scene.spinTo(index, () => {
+      state.pendingWheelSegment = segment;
+      state.phase = "wheelConfirm";
 
-    // Ideiglenes, stabil játékmód: nincs vizuális Phaser-pörgetés.
-    // Rövid késleltetés után ugyanazt a játékszabályt alkalmazzuk,
-    // mint a teljes keréknél.
-    setTimeout(() => {
-      el.wheelResult.classList.remove("spinning");
-
-      if (segment.type === "bankrupt") {
-        el.wheelResult.textContent = "CSŐD";
-        el.wheelResult.classList.add("bankrupt");
-        currentPlayer().roundMoney = 0;
-        renderAll();
-        nextPlayer("CSŐD! A fordulópénz elveszett.");
-        return;
-      }
-
-      if (segment.type === "skip") {
-        el.wheelResult.textContent = "KIMARADSZ";
-        el.wheelResult.classList.add("skip");
-        nextPlayer("KIMARADSZ!");
-        return;
-      }
-
-      state.wheelValue = segment.value;
-      state.phase = "letter";
-      el.wheelResult.textContent = `${segment.label} Ft`;
-      el.wheelResult.classList.add("money");
+      el.wheelOverlayResult.textContent = formatWheelResult(segment);
+      el.wheelOverlayResult.className =
+        "wheel-overlay-result " + segment.type;
+      el.wheelApproveBtn.disabled = false;
 
       setMessage(
-        `${segment.label} Ft. Nyomj le egy mássalhangzót a billentyűzeten. ` +
-        `Magánhangzó billentyűvel ${fmtMoney(VOWEL_PRICE)}-ért vásárolhatsz.`
+        `A kerék eredménye: ${formatWheelResult(segment)}. ` +
+        (fromBot ? "Bot jóváhagyja…" : "Jóváhagyásra vár.")
       );
-
-      renderAll();
       updateControls();
 
       if (fromBot) {
-        setTimeout(() => {
-          const consonant = randomUnusedConsonant();
-          if (!consonant) {
-            nextPlayer("Nincs több választható mássalhangzó.");
-            return;
-          }
-          setMessage(`Bot betűje: ${consonant}`);
-          setTimeout(() => handleConsonant(consonant, true), 550);
-        }, 450);
+        state.wheelConfirmTimer = setTimeout(
+          applyPendingWheelResult,
+          900
+        );
       }
-    }, 850);
+    });
+
+    if (!started) {
+      state.phase = "spin";
+      closeWheelOverlay();
+      updateControls();
+      setMessage("A kerék nem áll készen. Próbáld újra.");
+    }
   }
 
   el.startGameBtn.addEventListener("click", startGame);
   el.spinBtn.addEventListener("click", () => spinWheel(false));
+  el.wheelApproveBtn.addEventListener("click", () => {
+    if (state.phase !== "wheelConfirm") return;
+    applyPendingWheelResult();
+  });
 
   function isTextEntryTarget(target) {
     return (
@@ -897,6 +991,10 @@
 
   function returnToLobby() {
     clearTimeout(state.botTimer);
+    clearTimeout(state.wheelConfirmTimer);
+    state.pendingWheelSegment = null;
+    state.pendingWheelFromBot = false;
+    closeWheelOverlay();
     state.phase = "setup";
     document.body.classList.remove("game-active");
     document.body.classList.add("lobby-active");

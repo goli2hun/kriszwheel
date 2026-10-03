@@ -197,17 +197,30 @@ height: 7.01%;
 
 A `spinWheel(false)` logikát indítja.
 
-Jelenleg ez szándékosan **BASIC tesztmód**: nem használja a Phaser
-kerékanimációt. A kattintás után:
+A pörgetés most valódi Phaser overlayt használ:
 
-1. a státusz `Pörög…` értékre vált;
-2. 850 ms múlva véletlen `WHEEL_SEGMENTS` elem kerül kiválasztásra;
-3. pénzmezőnél aktiválódik a Mássalhangzó gomb;
-4. CSŐD esetén a fordulópénz nullázódik;
-5. KIMARADSZ esetén a kör a következő játékosra kerül.
+- asset: `assets/images/wheel.png`;
+- a PNG 24 színes cikkelyt tartalmaz, felirat nélkül;
+- a jelenlegi 12 játékmező kétszer kerül körbe, így mind a 24 cikkelyhez
+  tartozik logikai eredmény;
+- a feliratokat Phaser `Text` objektumok rajzolják a megfelelő cikkelyre;
+- a PNG és a feliratok közös `wheelContainer` részei, ezért együtt forognak;
+- a mutató külön Phaser objektum, ezért fixen marad a kerék fölött.
 
-Az eredmény kis szöveges státuszként a gombok fölött jelenik meg.
-Ez átmeneti megoldás addig, amíg az új vizuális kerék elkészül.
+Pörgetéskor a játék előre kiválasztja a célcikkelyt, majd a kerék 5–7 teljes
+fordulat után kb. 5200 ms alatt `Cubic.easeOut` lassulással pontosan annak
+a cikkelynek a közepére áll.
+
+A megállás még nem alkalmazza rögtön az eredményt. Előbb
+`wheelConfirm` állapotba lépünk, az overlay megmutatja az eredményt, és
+engedélyezi a `Jóváhagyás` gombot.
+
+Jóváhagyás után:
+
+1. pénzmezőnél beáll `state.wheelValue`, majd a játék betűt vár;
+2. `CSŐD` esetén nullázódik a fordulópénz és játékosváltás történik;
+3. `KIMARADSZ` esetén azonnal játékosváltás történik;
+4. Bot esetén a jóváhagyás 900 ms után automatikus.
 
 ### 7.2 Mássalhangzó
 
@@ -404,7 +417,6 @@ vizuálisan nem részei az új színpadnak.
 
 A `.stage-logic-bridge` a viewporton kívül tartja többek között:
 
-- a Phaser kerék konténerét;
 - a játékoslista korábbi renderét;
 - az aktív játékos szövegét;
 - a belső státuszüzenetet.
@@ -419,11 +431,10 @@ komponensekre érdemes bontani.
 
 Jelenleg még nincs véglegesen integrálva:
 
-1. a látványos szerencsekerék az új színpadba;
-2. a teljes játékos-scoreboard véglegesítése (az aktuális játékos panel már működik);
-4. a feladványok külső JSON/SQLite adatforrása;
-5. Whisper-alapú hangvezérlés;
-6. mobil-specifikus játéknézet.
+1. a teljes játékos-scoreboard véglegesítése (az aktuális játékos panel már működik);
+2. a feladványok külső JSON/SQLite adatforrása;
+3. Whisper-alapú hangvezérlés;
+4. mobil-specifikus játéknézet.
 
 ## 14. Fontos fejlesztési szabály
 

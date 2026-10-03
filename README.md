@@ -12,8 +12,11 @@ Első játszható böngészős prototípus.
 - Alapértelmezés: Krisz + Bot
 - Végtelen számú feladvány/forduló
 - Pörgetés
-  - jelenleg stabil, ideiglenes BASIC sorsolás vizuális kerék nélkül
-  - rövid „Pörög…” állapot után pénz / CSŐD / KIMARADSZ eredmény
+  - a feltöltött `assets/images/wheel.png` képből Phaser 3 forgó kerék
+  - 24 képi cikkely; a jelenlegi 12 játékmező kétszer fut körbe
+  - az összegek / CSŐD / KIMARADSZ feliratokat Phaser rajzolja a képre
+  - 5–7 teljes fordulat, kb. 5,2 mp-es fokozatos lassulás
+  - megállás után külön `Jóváhagyás` gomb alkalmazza az eredményt
 - Pénzmezők
 - CSŐD
 - KIMARADSZ
@@ -27,7 +30,7 @@ Első játszható böngészős prototípus.
 - Megfejtés
 - Hibás betű / hibás megfejtés után körváltás
 - Egyszerű automatikus Bot
-- Phaser 3 kerékanimáció
+- Phaser 3 kerékanimáció a `wheel.png` sprite-tal és programozott feliratokkal
 - Reszponzív alap UI
 - Stúdió lobby háttér: `assets/images/studio_lobby.png`
 - A jobb oldali kerék nagy izzóin reszponzív SVG/CSS váltott fényanimáció
@@ -100,6 +103,7 @@ betűfelfedése és hanglogikája külön dokumentumban található:
 - `index.html` – UI szerkezet
 - `styles.css` – lobby, pixelpontos játékszínpad overlay, profilképek és fényanimációk
 - `app.js` – játékszabályok, állapotgép, Bot, Phaser kerék, SFX vezérlés
+- `assets/images/wheel.png` – 24 cikkelyes, szöveg nélküli Phaser kerék asset
 - `assets/sound/sfx/letter_hit.wav` – betűtalálat
 - `assets/sound/sfx/letter_miss.wav` – nincs ilyen betű
 - `assets/sound/sfx/solve_success.wav` – sikeres megfejtés

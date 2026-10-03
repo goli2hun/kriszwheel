@@ -974,12 +974,6 @@ body.game-active .app-shell {
   pointer-events: none;
 }
 
-.stage-logic-bridge #wheelGame {
-  width: 500px;
-  height: 500px;
-  min-height: 0;
-}
-
 @media (prefers-reduced-motion: reduce) {
   .stage-puzzle-letter.new-reveal {
     animation: none;
@@ -992,10 +986,10 @@ body.game-active .app-shell {
 
 
 /* --------------------------------------------------------------------------
-   Ideiglenes BASIC pörgetés – tesztelhető játékmenet vizuális kerék nélkül
+   Pörgetés eredménye a játékszínpadon
    -------------------------------------------------------------------------- */
 
-.stage-basic-spin-result {
+.stage-spin-result {
   position: absolute;
   z-index: 24;
   left: 43.25%;
@@ -1021,7 +1015,7 @@ body.game-active .app-shell {
     transform .18s ease;
 }
 
-.stage-basic-spin-result.spinning {
+.stage-spin-result.spinning {
   color: #d9edff;
   text-shadow:
     0 0 6px rgba(255, 255, 255, .74),
@@ -1029,12 +1023,12 @@ body.game-active .app-shell {
   animation: basicSpinPulse .42s ease-in-out infinite alternate;
 }
 
-.stage-basic-spin-result.money {
+.stage-spin-result.money {
   color: #fff1a1;
 }
 
-.stage-basic-spin-result.bankrupt,
-.stage-basic-spin-result.skip {
+.stage-spin-result.bankrupt,
+.stage-spin-result.skip {
   color: #ffb6bd;
 }
 
@@ -1044,7 +1038,7 @@ body.game-active .app-shell {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .stage-basic-spin-result.spinning {
+  .stage-spin-result.spinning {
     animation: none;
   }
 }
@@ -1166,6 +1160,146 @@ body.game-active .app-shell {
     0 0 .48cqw rgba(84, 168, 255, .28);
 }
 
+
+/* --------------------------------------------------------------------------
+   Phaser szerencsekerék overlay
+   -------------------------------------------------------------------------- */
+
+.wheel-overlay {
+  position: absolute;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  opacity: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(26, 72, 145, .20), transparent 42%),
+    rgba(0, 5, 20, .76);
+  backdrop-filter: blur(4px);
+  transition:
+    opacity .22s ease,
+    visibility .22s ease;
+}
+
+.wheel-overlay.open {
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.wheel-overlay-card {
+  width: 42%;
+  min-width: 340px;
+  max-width: 720px;
+  display: grid;
+  justify-items: center;
+  gap: .45cqw;
+  padding: .7cqw 1.2cqw .9cqw;
+}
+
+.wheel-overlay-title {
+  color: #fff1b0;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: 1.12cqw;
+  font-weight: 900;
+  letter-spacing: .11em;
+  text-shadow:
+    0 .12cqw .22cqw rgba(0, 0, 0, .72),
+    0 0 .8cqw rgba(255, 206, 74, .24);
+}
+
+.wheel-game-shell {
+  position: relative;
+  width: min(100%, 72vh);
+  aspect-ratio: 1;
+  filter:
+    drop-shadow(0 1.1cqw 1.5cqw rgba(0, 0, 0, .46))
+    drop-shadow(0 0 1.1cqw rgba(80, 151, 255, .13));
+}
+
+#wheelGame {
+  width: 100%;
+  height: 100%;
+}
+
+#wheelGame canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.wheel-overlay-result {
+  min-width: 42%;
+  padding: .48cqw 1.1cqw;
+  border: 1px solid rgba(255, 216, 103, .44);
+  border-radius: 999px;
+  color: #fff4bf;
+  background: rgba(4, 25, 65, .92);
+  box-shadow:
+    0 .3cqw .8cqw rgba(0, 0, 0, .34),
+    inset 0 1px 0 rgba(255, 255, 255, .09);
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: .95cqw;
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: .035em;
+  text-shadow: 0 .08cqw .18cqw rgba(0, 0, 0, .72);
+}
+
+.wheel-overlay-result.spinning {
+  color: #dceeff;
+  animation: wheelResultPulse .5s ease-in-out infinite alternate;
+}
+
+.wheel-overlay-result.bankrupt,
+.wheel-overlay-result.skip {
+  color: #ffbdc3;
+  border-color: rgba(255, 120, 132, .48);
+}
+
+.wheel-overlay-result.money {
+  color: #fff0a3;
+}
+
+@keyframes wheelResultPulse {
+  from { transform: scale(.97); opacity: .72; }
+  to { transform: scale(1.03); opacity: 1; }
+}
+
+.wheel-approve-btn {
+  min-width: 34%;
+  padding: .58cqw 1.2cqw;
+  border: 1px solid rgba(255, 221, 121, .72);
+  border-radius: 999px;
+  color: #fff6d0;
+  background:
+    linear-gradient(180deg, rgba(25, 91, 184, .96), rgba(7, 46, 111, .96));
+  box-shadow:
+    0 .28cqw .75cqw rgba(0, 0, 0, .34),
+    inset 0 1px 0 rgba(255, 255, 255, .15),
+    0 0 .75cqw rgba(255, 210, 76, .13);
+  font-size: .72cqw;
+  font-weight: 900;
+  letter-spacing: .045em;
+  cursor: pointer;
+}
+
+.wheel-approve-btn:hover:not(:disabled),
+.wheel-approve-btn:focus-visible:not(:disabled) {
+  border-color: #ffe8a0;
+  background:
+    linear-gradient(180deg, rgba(37, 114, 218, .98), rgba(9, 58, 139, .98));
+  box-shadow:
+    0 0 .85cqw rgba(255, 214, 88, .27),
+    0 .3cqw .82cqw rgba(0, 0, 0, .35),
+    inset 0 1px 0 rgba(255, 255, 255, .18);
+}
+
+.wheel-approve-btn:disabled {
+  opacity: .38;
+}
 
 /* --------------------------------------------------------------------------
    Teszt megfejtés – apró debug gomb a színpad legalján
