@@ -100,54 +100,71 @@
       <button id="startGameBtn" class="btn btn-primary">Játék indítása</button>
     </section>
 
-    <section id="gameScreen" class="game-grid hidden">
-      <aside class="panel players-panel">
-        <h2>Játékosok</h2>
-        <div id="playersList"></div>
-      </aside>
+    <section id="gameScreen" class="stage-screen hidden">
+      <div class="stage-canvas">
+        <svg class="stage-puzzle-overlay"
+             viewBox="0 0 1672 941"
+             preserveAspectRatio="xMidYMid meet"
+             aria-hidden="true"
+             focusable="false">
+          <defs>
+            <linearGradient id="stageTileGradient" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0%" stop-color="#ffffff" />
+              <stop offset="58%" stop-color="#f9f7fb" />
+              <stop offset="100%" stop-color="#e8e4ef" />
+            </linearGradient>
+          </defs>
+          <g id="puzzleBoard"></g>
+        </svg>
 
-      <section class="center-column">
-        <section class="panel puzzle-panel">
-          <div class="category-row">
-            <span>Kategória</span>
-            <strong id="categoryText">–</strong>
-          </div>
-          <div id="puzzleBoard" class="puzzle-board" aria-label="Feladvány"></div>
-          <div class="used-row">
-            <span>Használt betűk:</span>
-            <strong id="usedLetters">–</strong>
-          </div>
-        </section>
+        <div class="stage-category-display">
+          <strong id="categoryText">–</strong>
+        </div>
 
-        <section class="panel controls-panel">
-          <div class="turn-status">
-            <span>Aktív játékos</span>
-            <strong id="activePlayerText">–</strong>
-          </div>
+        <div class="stage-used-display">
+          <span>HASZNÁLT BETŰK</span>
+          <strong id="usedLetters">–</strong>
+        </div>
 
-          <div class="action-row">
-            <button id="spinBtn" class="btn btn-primary">Pörgetés</button>
-            <button id="vowelBtn" class="btn">Magánhangzó – 5 000 Ft</button>
-            <button id="solveBtn" class="btn">Megfejtés</button>
-          </div>
+        <button id="spinBtn"
+                type="button"
+                class="stage-image-hotspot stage-spin-hotspot"
+                aria-label="Pörgetés"></button>
+        <button id="consonantStageBtn"
+                type="button"
+                class="stage-image-hotspot stage-consonant-hotspot"
+                aria-label="Mássalhangzó"></button>
+        <button id="solveBtn"
+                type="button"
+                class="stage-image-hotspot stage-solve-hotspot"
+                aria-label="Megfejtés"></button>
 
-          <div id="letterArea" class="letter-area hidden">
-            <label for="letterInput">Mássalhangzó:</label>
-            <input id="letterInput" maxlength="1" autocomplete="off" />
-            <button id="letterBtn" class="btn btn-small">Betű beküldése</button>
-          </div>
-
-          <p id="message" class="message">Pörgess a kezdéshez!</p>
-        </section>
-      </section>
-
-      <aside class="panel wheel-panel">
-        <h2>Kerék</h2>
-        <div id="wheelGame"></div>
-        <div id="wheelResult" class="wheel-result">–</div>
-      </aside>
+        <div class="stage-logic-bridge" aria-hidden="true">
+          <div id="playersList"></div>
+          <strong id="activePlayerText">–</strong>
+          <button id="vowelBtn" type="button" tabindex="-1">Magánhangzó</button>
+          <div id="wheelGame"></div>
+          <div id="wheelResult">–</div>
+          <p id="message"></p>
+        </div>
+      </div>
     </section>
   </main>
+
+  <dialog id="consonantDialog">
+    <form method="dialog" id="consonantForm">
+      <h3>Mássalhangzó</h3>
+      <p>Add meg a választott mássalhangzót.</p>
+      <div id="letterArea" class="stage-dialog-letter hidden">
+        <label for="letterInput">Betű</label>
+        <input id="letterInput" maxlength="1" autocomplete="off" />
+        <button id="letterBtn" type="button" class="btn btn-primary">Mehet</button>
+      </div>
+      <div class="dialog-actions">
+        <button value="cancel" class="btn">Mégse</button>
+      </div>
+    </form>
+  </dialog>
 
   <dialog id="solveDialog">
     <form method="dialog" id="solveForm">

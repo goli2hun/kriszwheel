@@ -718,3 +718,283 @@ body.lobby-active .lobby-light-fx {
     font-size: 1.1rem;
   }
 }
+
+
+/* ==========================================================================
+   JÁTÉKSZÍNPAD – pixelpontos overlay a 1672 × 941-es háttérképre
+   ========================================================================== */
+
+body.game-active {
+  margin: 0;
+  min-height: 100vh;
+  overflow: hidden;
+  background: #020714;
+}
+
+body.game-active .topbar {
+  display: none;
+}
+
+body.game-active .app-shell {
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+.stage-screen {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  background: #020714;
+}
+
+.stage-canvas {
+  position: relative;
+  width: min(100vw, calc(100vh * 1672 / 941));
+  aspect-ratio: 1672 / 941;
+  max-height: 100vh;
+  overflow: hidden;
+  container-type: inline-size;
+  background:
+    url("assets/images/studo_jatekszinpad.png")
+    center center / 100% 100% no-repeat;
+  box-shadow: 0 0 80px rgba(0, 0, 0, .72);
+}
+
+.stage-puzzle-overlay {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+/* A fehér fedés csak a kék cellabelsőt takarja; az arany keret a képből megmarad. */
+.stage-puzzle-tile {
+  fill: url(#stageTileGradient);
+  stroke: rgba(255, 255, 255, .58);
+  stroke-width: .8;
+  filter: drop-shadow(0 2px 2px rgba(17, 21, 55, .20));
+}
+
+.stage-puzzle-letter {
+  fill: #17162d;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: 43px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: middle;
+  letter-spacing: -.6px;
+}
+
+.stage-puzzle-letter.new-reveal {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: stageLetterReveal .72s cubic-bezier(.18, .75, .25, 1);
+}
+
+@keyframes stageLetterReveal {
+  0% {
+    opacity: 0;
+    transform: scale(.68);
+    fill: #ffffff;
+    filter:
+      drop-shadow(0 0 4px rgba(255, 255, 255, 1))
+      drop-shadow(0 0 14px rgba(95, 190, 255, .95));
+  }
+
+  42% {
+    opacity: 1;
+    transform: scale(1.09);
+    fill: #252144;
+    filter:
+      drop-shadow(0 0 3px rgba(255, 255, 255, .86))
+      drop-shadow(0 0 10px rgba(92, 174, 255, .62));
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1);
+    fill: #17162d;
+    filter: none;
+  }
+}
+
+/* Felső, üres kék csík: a feladvány típusa / kategóriája. */
+.stage-category-display {
+  position: absolute;
+  left: 27.87%;
+  top: 7.65%;
+  width: 44.38%;
+  height: 6.91%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.stage-category-display strong {
+  max-width: 92%;
+  overflow: hidden;
+  color: #fff3c2;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: 1.62cqw;
+  font-weight: 900;
+  letter-spacing: .075em;
+  line-height: 1;
+  text-align: center;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-shadow:
+    0 2px 2px rgba(0, 0, 0, .58),
+    0 0 10px rgba(255, 213, 86, .22);
+}
+
+/* A gombok feletti kék mező: már felhasznált betűk. */
+.stage-used-display {
+  position: absolute;
+  left: 19.20%;
+  top: 73.22%;
+  width: 61.72%;
+  height: 6.91%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.0cqw;
+  padding: 0 1.3cqw;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.stage-used-display span {
+  color: rgba(220, 232, 255, .74);
+  font-size: .78cqw;
+  font-weight: 800;
+  letter-spacing: .07em;
+}
+
+.stage-used-display strong {
+  overflow: hidden;
+  color: #fff0b5;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: 1.18cqw;
+  font-weight: 900;
+  letter-spacing: .18em;
+  line-height: 1;
+  text-overflow: ellipsis;
+  text-shadow:
+    0 2px 2px rgba(0, 0, 0, .52),
+    0 0 8px rgba(255, 218, 100, .16);
+}
+
+/* A három képre generált gomb fölötti valódi, kattintható réteg.
+   Nincs saját felirat: a háttérkép eredeti felirata marad látható. */
+.stage-image-hotspot {
+  position: absolute;
+  z-index: 30;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 22px;
+  outline: 0;
+  color: transparent;
+  background: transparent;
+  cursor: pointer;
+  transition:
+    background .16s ease,
+    box-shadow .16s ease,
+    filter .16s ease;
+}
+
+.stage-spin-hotspot {
+  left: 22.73%;
+  top: 86.29%;
+  width: 15.85%;
+  height: 7.01%;
+}
+
+.stage-consonant-hotspot {
+  left: 40.79%;
+  top: 86.29%;
+  width: 18.42%;
+  height: 7.01%;
+}
+
+.stage-solve-hotspot {
+  left: 61.42%;
+  top: 86.29%;
+  width: 15.85%;
+  height: 7.01%;
+}
+
+.stage-image-hotspot:hover:not(:disabled),
+.stage-image-hotspot:focus-visible:not(:disabled) {
+  background:
+    radial-gradient(
+      ellipse at 50% 45%,
+      rgba(255, 255, 255, .24),
+      rgba(172, 213, 255, .10) 58%,
+      rgba(255, 255, 255, .02) 100%
+    );
+  box-shadow:
+    inset 0 0 18px rgba(255, 255, 255, .20),
+    0 0 10px rgba(255, 240, 178, .50),
+    0 0 22px rgba(255, 191, 45, .34);
+  backdrop-filter: brightness(1.16) saturate(1.04);
+}
+
+.stage-image-hotspot:active:not(:disabled) {
+  background: rgba(255, 255, 255, .08);
+  box-shadow:
+    inset 0 0 20px rgba(0, 23, 76, .30),
+    0 0 9px rgba(255, 211, 86, .30);
+}
+
+.stage-image-hotspot:disabled {
+  cursor: default;
+  opacity: 1;
+}
+
+/* A régi vezérlőlogika elemei működnek tovább, de nem rajzoljuk rá őket a stúdióra. */
+.stage-logic-bridge {
+  position: fixed;
+  left: -10000px;
+  top: 0;
+  width: 500px;
+  height: 500px;
+  overflow: hidden;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.stage-logic-bridge #wheelGame {
+  width: 500px;
+  height: 500px;
+  min-height: 0;
+}
+
+.stage-dialog-letter {
+  display: grid;
+  grid-template-columns: auto 86px auto;
+  align-items: center;
+  gap: 10px;
+  margin: 14px 0 18px;
+}
+
+.stage-dialog-letter #letterInput {
+  width: 86px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stage-puzzle-letter.new-reveal {
+    animation: none;
+  }
+
+  .stage-image-hotspot {
+    transition: none;
+  }
+}

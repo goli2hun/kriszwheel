@@ -5,6 +5,18 @@
   const ALPHABET = "AÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVWXYZ".split("");
   const VOWEL_PRICE = 5000;
 
+  // A feltöltött stúdiókép tényleges geometriája: 15 oszlop × 4 sor.
+  // Ezek a koordináták közvetlenül a 1672 × 941 px háttér kék celláinak belsejére mutatnak.
+  const STAGE_GRID = {
+    cols: 15,
+    rows: 4,
+    x: [311, 388, 465, 541, 618, 694, 771, 848, 924, 1001, 1078, 1155, 1233, 1310, 1386],
+    y: [192, 269, 345, 420],
+    width: [69, 69, 69, 70, 69, 70, 69, 69, 70, 70, 70, 70, 69, 68, 70],
+    height: [71, 69, 68, 71]
+  };
+  const SVG_NS = "http://www.w3.org/2000/svg";
+
   const SFX = {
     letterHit: "assets/sound/sfx/letter_hit.wav",
     letterMiss: "assets/sound/sfx/letter_miss.wav",
@@ -87,7 +99,8 @@
     wheelValue: null,
     lastPuzzleIndex: -1,
     botTimer: null,
-    roundNumber: 0
+    roundNumber: 0,
+    justRevealed: new Set()
   };
 
   const el = {
@@ -101,6 +114,7 @@
     usedLetters: document.getElementById("usedLetters"),
     activePlayerText: document.getElementById("activePlayerText"),
     spinBtn: document.getElementById("spinBtn"),
+    consonantStageBtn: document.getElementById("consonantStageBtn"),
     vowelBtn: document.getElementById("vowelBtn"),
     solveBtn: document.getElementById("solveBtn"),
     letterArea: document.getElementById("letterArea"),
@@ -108,6 +122,7 @@
     letterBtn: document.getElementById("letterBtn"),
     message: document.getElementById("message"),
     wheelResult: document.getElementById("wheelResult"),
+    consonantDialog: document.getElementById("consonantDialog"),
     solveDialog: document.getElementById("solveDialog"),
     solveForm: document.getElementById("solveForm"),
     solveInput: document.getElementById("solveInput"),
@@ -166,6 +181,7 @@
     state.roundNumber = 0;
 
     document.body.classList.remove("lobby-active");
+    document.body.classList.add("game-active");
     el.setupScreen.classList.add("hidden");
     el.gameScreen.classList.remove("hidden");
 
@@ -178,7 +194,12 @@
     state.puzzle = pickPuzzle();
     state.usedLetters.clear();
     state.revealed.clear();
+    state.justRevealed.clear();
     state.wheelValue = null;
+
+    if (el.consonantDialog.open) {
+      el.consonantDialog.close();
+    }
     state.phase = "spin";
 
     for (const p of state.players) {
@@ -218,26 +239,124 @@
     });
   }
 
+  function layoutPuzzleRows(text) {
+    const words = text.split(" ").filter(Boolean);
+    const candidates = [];
+
+    function search(wordIndex, rows) {
+      if (wordIndex >= words.length) {
+        candidates.push(rows);
+        return;
+      }
+
+      if (rows.length >= STAGE_GRID.rows) return;
+
+      let line = "";
+      for (let i = wordIndex; i < words.length; i += 1) {
+        const next = line ? `${line} ${words[i]}` : words[i];
+        if ([...next].length > STAGE_GRID.cols) break;
+        line = next;
+        search(i + 1, [...rows, line]);
+      }
+    }
+
+    search(0, []);
+
+    if (candidates.length) {
+      const minRows = Math.min(...candidates.map(rows => rows.length));
+      const best = candidates
+        .filter(rows => rows.length === minRows)
+        .sort((a, b) => {
+          const score = rows => {
+            const lengths = rows.map(row => [...row].length);
+            const avg = lengths.reduce((sum, n) => sum + n, 0) / lengths.length;
+            const variance = lengths.reduce((sum, n) => sum + ((n - avg) ** 2), 0);
+            const edgePenalty = lengths.reduce((sum, n) => sum + ((STAGE_GRID.cols - n) * .08), 0);
+            return variance + edgePenalty;
+          };
+          return score(a) - score(b);
+        })[0];
+
+      return best;
+    }
+
+    // Biztonsági fallback nagyon hosszú, szóköz nélkül érkező feladványhoz.
+    const chars = [...text];
+    const rows = [];
+    for (let i = 0; i < chars.length && rows.length < STAGE_GRID.rows; i += STAGE_GRID.cols) {
+      rows.push(chars.slice(i, i + STAGE_GRID.cols).join(""));
+    }
+    return rows;
+  }
+
+  function createSvgElement(name, attrs = {}) {
+    const node = document.createElementNS(SVG_NS, name);
+    for (const [key, value] of Object.entries(attrs)) {
+      node.setAttribute(key, String(value));
+    }
+    return node;
+  }
+
   function renderPuzzle() {
     el.puzzleBoard.innerHTML = "";
-    const words = state.puzzle.text.split(" ");
 
-    words.forEach(word => {
-      const wordEl = document.createElement("span");
-      wordEl.className = "word";
+    const rows = layoutPuzzleRows(state.puzzle.text);
 
-      [...word].forEach(char => {
-        const tile = document.createElement("span");
+    rows.forEach((rowText, rowIndex) => {
+      const chars = [...rowText];
+      const startCol = Math.max(
+        0,
+        Math.floor((STAGE_GRID.cols - chars.length) / 2)
+      );
+
+      chars.forEach((char, charIndex) => {
+        if (char === " ") return;
+
+        const colIndex = startCol + charIndex;
+        if (colIndex < 0 || colIndex >= STAGE_GRID.cols) return;
+
+        const x = STAGE_GRID.x[colIndex];
+        const y = STAGE_GRID.y[rowIndex];
+        const width = STAGE_GRID.width[colIndex];
+        const height = STAGE_GRID.height[rowIndex];
+
+        const group = createSvgElement("g", {
+          class: "stage-puzzle-cell",
+          "data-row": rowIndex,
+          "data-col": colIndex
+        });
+
+        const tile = createSvgElement("rect", {
+          x,
+          y,
+          width,
+          height,
+          rx: 7,
+          ry: 7,
+          class: "stage-puzzle-tile"
+        });
+        group.appendChild(tile);
+
         const isLetter = /\p{L}/u.test(char);
-        tile.className = "tile" + (isLetter ? "" : " punctuation");
-        tile.textContent = isLetter
-          ? (state.revealed.has(char) ? char : "")
-          : char;
-        wordEl.appendChild(tile);
-      });
+        const shouldShow = !isLetter || state.revealed.has(char);
 
-      el.puzzleBoard.appendChild(wordEl);
+        if (shouldShow) {
+          const letter = createSvgElement("text", {
+            x: x + width / 2,
+            y: y + height / 2 + 1,
+            class:
+              "stage-puzzle-letter" +
+              (state.justRevealed.has(char) ? " new-reveal" : "")
+          });
+          letter.textContent = char;
+          group.appendChild(letter);
+        }
+
+        el.puzzleBoard.appendChild(group);
+      });
     });
+
+    state.justRevealed.clear();
   }
 
   function renderUsedLetters() {
@@ -262,6 +381,11 @@
     const letterMode = human && state.phase === "letter";
     el.letterArea.classList.toggle("hidden", !letterMode);
     el.letterBtn.disabled = !letterMode;
+    el.consonantStageBtn.disabled = !letterMode;
+
+    if (!letterMode && el.consonantDialog.open) {
+      el.consonantDialog.close();
+    }
   }
 
   function setMessage(msg) {
@@ -302,6 +426,7 @@
 
     const hits = countLetter(letter);
     if (hits > 0) {
+      state.justRevealed = new Set([letter]);
       playHitSequence(hits);
       const award = hits * state.wheelValue;
       currentPlayer().roundMoney += award;
@@ -315,6 +440,7 @@
       checkAutoSolved();
       maybeRunBot();
     } else {
+      state.justRevealed.clear();
       playSfx("letterMiss");
       renderAll();
       nextPlayer(`${letter} nincs a feladványban.`);
@@ -350,6 +476,7 @@
     renderAll();
 
     if (hits > 0) {
+      state.justRevealed = new Set([letter]);
       playHitSequence(hits);
       state.phase = "spin";
       setMessage(`${letter}: ${hits} találat. A magánhangzó ára levonva.`);
@@ -357,6 +484,7 @@
       checkAutoSolved();
       maybeRunBot();
     } else {
+      state.justRevealed.clear();
       playSfx("letterMiss");
       nextPlayer(`${letter} nincs a feladványban.`);
     }
@@ -383,6 +511,14 @@
 
   function finishRound(winner) {
     clearTimeout(state.botTimer);
+
+    const newlyRevealed = [...new Set(
+      [...state.puzzle.text].filter(
+        ch => /\p{L}/u.test(ch) && !state.revealed.has(ch)
+      )
+    )];
+    state.justRevealed = new Set(newlyRevealed);
+
     [...state.puzzle.text].forEach(ch => {
       if (/\p{L}/u.test(ch)) state.revealed.add(ch);
     });
@@ -645,10 +781,21 @@
   el.startGameBtn.addEventListener("click", startGame);
   el.spinBtn.addEventListener("click", () => spinWheel(false));
 
+  el.consonantStageBtn.addEventListener("click", () => {
+    if (el.consonantStageBtn.disabled) return;
+
+    el.letterInput.value = "";
+    el.consonantDialog.showModal();
+    setTimeout(() => el.letterInput.focus(), 0);
+  });
+
   el.letterBtn.addEventListener("click", () => {
     const value = el.letterInput.value;
     if (handleConsonant(value, false)) {
       el.letterInput.value = "";
+      if (el.consonantDialog.open) {
+        el.consonantDialog.close();
+      }
     }
   });
 
@@ -694,6 +841,7 @@
   el.endGameBtn.addEventListener("click", () => {
     clearTimeout(state.botTimer);
     state.phase = "setup";
+    document.body.classList.remove("game-active");
     document.body.classList.add("lobby-active");
     el.gameScreen.classList.add("hidden");
     el.setupScreen.classList.remove("hidden");
