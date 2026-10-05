@@ -155,6 +155,10 @@ A jelenlegi játékhoz még nem szükséges.
 
 ## P3 – Hangvezérlés / Whisper
 
+A lobbyban már elkészült a **Hangfelismerés** beállítási szekció. Jelenleg
+placeholder, a vezérlők inaktívak. A Whisper-integráció során ezt kell
+funkcionálisan bekötni.
+
 Tervezett magyar parancsok:
 
 - „Pörgetek”

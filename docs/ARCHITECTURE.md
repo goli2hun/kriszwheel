@@ -41,15 +41,17 @@ Az `app.js` aliasai:
 
 ### index.html
 
-DOM, overlayek, dialogok, scriptbetöltés.
+DOM, lobby, Beállítások nézet, overlayek, dialogok, scriptbetöltés.
 
 ### styles.css
 
-Lobby, stage, hotspotok, puzzle, wheel overlay, feedback, victory overlay.
+Lobby, Beállítások UI, stage, hotspotok, puzzle, wheel overlay, feedback,
+victory overlay.
 
 ### app.js
 
-Játékszabály, state machine, render, Phaser scene-ek, Bot, hangok.
+Játékszabály, state machine, render, Phaser scene-ek, Bot, hangok és a
+böngészőben tárolt felhasználói beállítások kezelése.
 
 ### config/game-config.js
 
@@ -234,7 +236,35 @@ A `.stage-logic-bridge` még megtart néhány régi, offscreen DOM elemet:
 
 Későbbi refaktorban eltávolítható.
 
-## 16. Fontos invariánsok
+## 16. Felhasználói beállítások
+
+A statikus `config/game-config.js` és a felhasználói beállítások külön
+fogalmak.
+
+A felhasználói beállítások kulcsa:
+
+`kriszwheel.user-settings.v1`
+
+Jelenlegi mezők:
+
+```text
+soundsEnabled
+masterVolume
+```
+
+Betöltéskor az `app.js` biztonságos fallbacket használ, ha a
+`localStorage` nem érhető el vagy hibás adatot tartalmaz.
+
+A `playSfx()`:
+
+1. figyelembe veszi a `soundsEnabled` kapcsolót;
+2. az egyedi SFX hangerőt megszorozza a `masterVolume` értékkel;
+3. 0–1 tartományra clampeli az eredményt.
+
+A Hangfelismerés szekció DOM-ja már létezik, de a vezérlők egyelőre
+`disabled` állapotúak.
+
+## 17. Fontos invariánsok
 
 - config mindig az app előtt töltődjön;
 - wheel segment count egyezzen a PNG cikkelyszámmal;

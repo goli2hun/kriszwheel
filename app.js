@@ -9,6 +9,50 @@
   const VICTORY_CONFIG = CONFIG.victory ?? {};
   const DEBUG_CONFIG = CONFIG.debug ?? {};
 
+  const USER_SETTINGS_STORAGE_KEY = "kriszwheel.user-settings.v1";
+  const DEFAULT_USER_SETTINGS = Object.freeze({
+    soundsEnabled: true,
+    masterVolume: 1
+  });
+
+  const clamp01 = value =>
+    Math.min(1, Math.max(0, Number(value) || 0));
+
+  function loadUserSettings() {
+    try {
+      const stored = JSON.parse(
+        localStorage.getItem(USER_SETTINGS_STORAGE_KEY) || "{}"
+      );
+
+      return {
+        soundsEnabled:
+          typeof stored.soundsEnabled === "boolean"
+            ? stored.soundsEnabled
+            : DEFAULT_USER_SETTINGS.soundsEnabled,
+        masterVolume:
+          stored.masterVolume == null
+            ? DEFAULT_USER_SETTINGS.masterVolume
+            : clamp01(stored.masterVolume)
+      };
+    } catch {
+      return { ...DEFAULT_USER_SETTINGS };
+    }
+  }
+
+  function persistUserSettings(settings) {
+    try {
+      localStorage.setItem(
+        USER_SETTINGS_STORAGE_KEY,
+        JSON.stringify(settings)
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const userSettings = loadUserSettings();
+
   const VOWELS = new Set(["A", "Á", "E", "É", "I", "Í", "O", "Ó", "Ö", "Ő", "U", "Ú", "Ü", "Ű"]);
   const ALPHABET = "AÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVWXYZ".split("");
   const VOWEL_PRICE = Number(GAMEPLAY_CONFIG.vowelPrice ?? 5000);
@@ -48,11 +92,15 @@
   );
 
   function playSfx(name, volume = Number(AUDIO_CONFIG.defaultVolume ?? 0.7)) {
+    if (!userSettings.soundsEnabled) return;
+
     const source = sfxCache[name];
     if (!source) return;
 
     const sound = source.cloneNode();
-    sound.volume = volume;
+    sound.volume = clamp01(
+      Number(volume) * userSettings.masterVolume
+    );
     sound.play().catch(() => {
       // A böngésző blokkolhatja a hangot, amíg nincs felhasználói interakció.
     });
@@ -149,8 +197,18 @@
 
   const el = {
     setupScreen: document.getElementById("setupScreen"),
+    settingsScreen: document.getElementById("settingsScreen"),
     gameScreen: document.getElementById("gameScreen"),
     startGameBtn: document.getElementById("startGameBtn"),
+    settingsBtn: document.getElementById("settingsBtn"),
+    settingsBackBtn: document.getElementById("settingsBackBtn"),
+    settingsSaveBtn: document.getElementById("settingsSaveBtn"),
+    settingsSaveStatus: document.getElementById("settingsSaveStatus"),
+    soundsEnabledSetting: document.getElementById("soundsEnabledSetting"),
+    masterVolumeSetting: document.getElementById("masterVolumeSetting"),
+    masterVolumeValue: document.getElementById("masterVolumeValue"),
+    speechRecognitionEnabledSetting: document.getElementById("speechRecognitionEnabledSetting"),
+    speechLanguageSetting: document.getElementById("speechLanguageSetting"),
     setupError: document.getElementById("setupError"),
     playersList: document.getElementById("playersList"),
     categoryText: document.getElementById("categoryText"),
@@ -195,6 +253,52 @@
     "hidden",
     DEBUG_CONFIG.showTestButton === false
   );
+
+  function updateMasterVolumeLabel() {
+    el.masterVolumeValue.textContent =
+      `${Math.round(Number(el.masterVolumeSetting.value))}%`;
+  }
+
+  function populateSettingsForm() {
+    el.soundsEnabledSetting.checked = userSettings.soundsEnabled;
+    el.masterVolumeSetting.value =
+      String(Math.round(userSettings.masterVolume * 100));
+    updateMasterVolumeLabel();
+    el.settingsSaveStatus.textContent = "";
+  }
+
+  function showSettingsScreen() {
+    populateSettingsForm();
+    el.setupScreen.classList.add("hidden");
+    el.settingsScreen.classList.remove("hidden");
+    el.settingsSaveBtn.focus();
+  }
+
+  function showSetupScreen() {
+    el.settingsScreen.classList.add("hidden");
+    el.setupScreen.classList.remove("hidden");
+    el.settingsSaveStatus.textContent = "";
+    el.settingsBtn.focus();
+  }
+
+  function saveSettings() {
+    userSettings.soundsEnabled = el.soundsEnabledSetting.checked;
+    userSettings.masterVolume = clamp01(
+      Number(el.masterVolumeSetting.value) / 100
+    );
+
+    const persisted = persistUserSettings(userSettings);
+
+    el.settingsSaveStatus.textContent = persisted
+      ? "Beállítások elmentve."
+      : "A beállítások erre a munkamenetre érvényesek, de a böngésző nem engedte a tartós mentést.";
+
+    if (userSettings.soundsEnabled) {
+      unlockSfx();
+    }
+  }
+
+  populateSettingsForm();
 
   const normalize = (s) =>
     s.normalize("NFC")
@@ -1199,6 +1303,17 @@
   }
 
   el.startGameBtn.addEventListener("click", startGame);
+  el.settingsBtn.addEventListener("click", showSettingsScreen);
+  el.settingsBackBtn.addEventListener("click", () => {
+    populateSettingsForm();
+    showSetupScreen();
+  });
+  el.settingsSaveBtn.addEventListener("click", saveSettings);
+  el.masterVolumeSetting.addEventListener(
+    "input",
+    updateMasterVolumeLabel
+  );
+
   el.spinBtn.addEventListener("click", () => spinWheel(false));
 
   function isTextEntryTarget(target) {
@@ -1301,6 +1416,7 @@
     document.body.classList.remove("game-active");
     document.body.classList.add("lobby-active");
     el.gameScreen.classList.add("hidden");
+    el.settingsScreen.classList.add("hidden");
     el.setupScreen.classList.remove("hidden");
     el.message.textContent = "";
   }

@@ -32,33 +32,57 @@ Módosítás után:
 
 1. lobby betölt;
 2. játékosválasztás működik;
-3. játék indul;
-4. puzzle közép–közép;
-5. Pörgetés hover;
-6. Magánhangzó hover disabled állapotban is;
-7. Megfejtés hover;
-8. wheel overlay feljön;
-9. kerék célmezőre áll;
-10. eredmény automatikusan eltűnik;
-11. kis/nagybetű működik;
-12. ékezetes betű működik;
-13. több találat sorban villan;
-14. hangok sorban szólnak;
-15. magánhangzó ára levonódik;
-16. hibás solve dialog azonnal bezár;
-17. helytelen feedback látszik;
-18. játékosváltási szünet működik;
-19. helyes solve után teljes betűfelfedés lefut;
-20. victory overlay megjelenik;
-21. avatar és pénzek helyesek;
-22. tűzijáték fut;
-23. victory gombok késleltetve aktívak;
-24. Következő feladvány működik;
-25. victory Játék vége lobbyba visz;
-26. stage Játék vége megerősítést kér;
-27. Teszt gomb config szerint működik.
+3. Beállítások nézet megnyílik;
+4. hangok be/ki kapcsoló menthető;
+5. fő hangerő menthető és frissítés után is megmarad;
+6. Vissza gomb eldobja a nem mentett módosítást;
+7. Hangfelismerés szekció látható, de még inaktív;
+8. játék indul;
+9. puzzle közép–közép;
+10. Pörgetés hover;
+11. Magánhangzó hover disabled állapotban is;
+12. Megfejtés hover;
+13. wheel overlay feljön;
+14. kerék célmezőre áll;
+15. eredmény automatikusan eltűnik;
+16. kis/nagybetű működik;
+17. ékezetes betű működik;
+18. több találat sorban villan;
+19. hangok sorban szólnak;
+20. magánhangzó ára levonódik;
+21. hibás solve dialog azonnal bezár;
+22. helytelen feedback látszik;
+23. játékosváltási szünet működik;
+24. helyes solve után teljes betűfelfedés lefut;
+25. victory overlay megjelenik;
+26. avatar és pénzek helyesek;
+27. tűzijáték fut;
+28. victory gombok késleltetve aktívak;
+29. Következő feladvány működik;
+30. victory Játék vége lobbyba visz;
+31. stage Játék vége megerősítést kér;
+32. Teszt gomb config szerint működik.
 
-## 4. Config-first szabály
+## 4. Beállítások tesztelése
+
+A lobby Beállítások nézete nem a statikus configot módosítja.
+
+Ellenőrzés:
+
+1. kapcsold ki a hangokat, Mentés, indíts játékot;
+2. ellenőrizd, hogy nincs SFX;
+3. menj vissza a lobbyba, nyisd meg újra a Beállításokat;
+4. az állapot maradjon meg;
+5. állítsd a fő hangerőt például 25%-ra, Mentés;
+6. indíts játékot és ellenőrizd a halkabb SFX-et;
+7. módosíts értéket mentés nélkül, majd Vissza;
+8. újranyitva a legutóbb mentett érték jelenjen meg.
+
+Részletek:
+
+[SETTINGS.md](SETTINGS.md)
+
+## 5. Config-first szabály
 
 Hangolás előtt mindig nézd meg:
 
@@ -66,7 +90,7 @@ Hangolás előtt mindig nézd meg:
 
 Ne hardcode-olj olyan értéket az `app.js`-be, ami configból kezelhető.
 
-## 5. Kerék csere
+## 6. Kerék csere
 
 Új assetnél:
 
@@ -79,7 +103,7 @@ Ne hardcode-olj olyan értéket az `app.js`-be, ami configból kezelhető.
 7. `labelRadius`;
 8. több célmező tesztje.
 
-## 6. Stage háttér csere
+## 7. Stage háttér csere
 
 Újramérendő:
 
@@ -91,7 +115,7 @@ Ne hardcode-olj olyan értéket az `app.js`-be, ami configból kezelhető.
 - feedback;
 - debug/game-end.
 
-## 7. Új puzzle
+## 8. Új puzzle
 
 Jelenleg az `app.js` `PUZZLES` tömbjébe kerül.
 
@@ -101,7 +125,7 @@ Fontos:
 - hosszú szó esetén tördelést tesztelni;
 - kategóriát megadni.
 
-## 8. Új játékos
+## 9. Új játékos
 
 Módosítandó:
 
@@ -109,11 +133,11 @@ Módosítandó:
 - portré asset;
 - `PLAYER_IMAGES` mapping.
 
-## 9. Hangcsere
+## 10. Hangcsere
 
 A fájlutak és fontos hangerők configból állíthatók.
 
-## 10. Victory tuning
+## 11. Victory tuning
 
 Config:
 
@@ -124,13 +148,13 @@ Config:
 - buttonDelayMs;
 - colors.
 
-## 11. Debug
+## 12. Debug
 
 `debug.showTestButton`
 
 Release-jellegű tesztnél célszerű false.
 
-## 12. Gyakori hibák
+## 13. Gyakori hibák
 
 ### Rossz mezőn áll meg a kerék
 
@@ -153,7 +177,7 @@ Ellenőrizd a CDN-t és a console-t.
 
 A `--ff-only` szándékosan nem írja felül a helyi munkát.
 
-## 13. Dokumentációs szabály
+## 14. Dokumentációs szabály
 
 Funkciómódosításnál:
 
@@ -162,5 +186,6 @@ Funkciómódosításnál:
 - ARCHITECTURE – state / technika;
 - STAGE_UI – UI / koordináta;
 - DEVELOPMENT – fejlesztői workflow;
-- config/README – config kulcs;
+- SETTINGS – lobby és felhasználói beállítások;
+- config/README – statikus config kulcs;
 - ROADMAP – terv változás.

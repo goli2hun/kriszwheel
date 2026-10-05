@@ -22,6 +22,16 @@ Minimum két játékos szükséges. Alapértelmezett kijelölés: Krisz + Bot.
 
 A lobby saját stúdió-hátteret és játékosportrékat használ.
 
+A lobbyban külön **Beállítások** gomb található. A Beállítások nézet két
+szekcióból áll:
+
+- **Általános beállítások** – hangok be/ki és fő hangerő;
+- **Hangfelismerés** – előkészített hely a hamarosan érkező magyar
+  hangvezérléshez.
+
+Az általános felhasználói beállítások böngészőnként, `localStorage`-ban
+mentődnek. A hangfelismerés vezérlői az első verzióban még inaktívak.
+
 ### Játékszínpad
 
 Háttér:
@@ -216,6 +226,7 @@ Részletes referencia:
 - [Architektúra](docs/ARCHITECTURE.md)
 - [Játékszínpad és UI](docs/STAGE_UI.md)
 - [Fejlesztői útmutató](docs/DEVELOPMENT.md)
+- [Beállítások](docs/SETTINGS.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Konfigurációs referencia](config/README.md)
 
@@ -236,6 +247,7 @@ kriszwheel/
 │   ├── DEVELOPMENT.md
 │   ├── GAMEPLAY.md
 │   ├── ROADMAP.md
+│   ├── SETTINGS.md
 │   └── STAGE_UI.md
 └── assets/
     ├── images/

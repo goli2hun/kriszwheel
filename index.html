@@ -96,7 +96,118 @@
       </div>
 
       <p id="setupError" class="error hidden">Legalább két játékos szükséges.</p>
-      <button id="startGameBtn" class="btn btn-primary">Játék indítása</button>
+
+      <div class="lobby-actions">
+        <button id="startGameBtn"
+                type="button"
+                class="btn btn-primary">Játék indítása</button>
+        <button id="settingsBtn"
+                type="button"
+                class="btn btn-secondary">Beállítások</button>
+      </div>
+    </section>
+
+    <section id="settingsScreen"
+             class="panel settings-panel hidden"
+             aria-labelledby="settingsTitle">
+      <div class="settings-heading">
+        <div>
+          <p class="settings-eyebrow">KRISZWHEEL</p>
+          <h2 id="settingsTitle">Beállítások</h2>
+        </div>
+        <p>A játék helyi beállításai ezen a böngészőn kerülnek mentésre.</p>
+      </div>
+
+      <section class="settings-section" aria-labelledby="generalSettingsTitle">
+        <div class="settings-section-heading">
+          <div>
+            <span class="settings-section-kicker">ÁLTALÁNOS</span>
+            <h3 id="generalSettingsTitle">Általános beállítások</h3>
+          </div>
+        </div>
+
+        <label class="settings-toggle-row" for="soundsEnabledSetting">
+          <span>
+            <strong>Hangok engedélyezése</strong>
+            <small>Játék közbeni hanghatások ki- vagy bekapcsolása.</small>
+          </span>
+          <input id="soundsEnabledSetting" type="checkbox" />
+        </label>
+
+        <label class="settings-range-row" for="masterVolumeSetting">
+          <span>
+            <strong>Fő hangerő</strong>
+            <small>Minden játékhang közös hangerőszorzója.</small>
+          </span>
+          <span class="settings-range-control">
+            <input id="masterVolumeSetting"
+                   type="range"
+                   min="0"
+                   max="100"
+                   step="5"
+                   value="100" />
+            <output id="masterVolumeValue"
+                    for="masterVolumeSetting">100%</output>
+          </span>
+        </label>
+      </section>
+
+      <section class="settings-section speech-settings-section"
+               aria-labelledby="speechSettingsTitle">
+        <div class="settings-section-heading">
+          <div>
+            <span class="settings-section-kicker">HAMAROSAN</span>
+            <h3 id="speechSettingsTitle">Hangfelismerés</h3>
+          </div>
+          <span class="settings-status-badge">Előkészítve</span>
+        </div>
+
+        <p class="settings-section-copy">
+          Ez a szekció a készülő magyar hangvezérlés beállításainak helye.
+          A vezérlők most még inaktívak; a Whisper-integráció érkezésekor
+          innen lesz konfigurálható.
+        </p>
+
+        <label class="settings-toggle-row is-disabled"
+               for="speechRecognitionEnabledSetting">
+          <span>
+            <strong>Hangfelismerés engedélyezése</strong>
+            <small>Pörgetés, betűmondás és megfejtés hangparancsokkal.</small>
+          </span>
+          <input id="speechRecognitionEnabledSetting"
+                 type="checkbox"
+                 disabled />
+        </label>
+
+        <label class="settings-select-row is-disabled"
+               for="speechLanguageSetting">
+          <span>
+            <strong>Felismerés nyelve</strong>
+            <small>Az első támogatott nyelv a magyar lesz.</small>
+          </span>
+          <select id="speechLanguageSetting" disabled>
+            <option value="hu-HU">Magyar (hu-HU)</option>
+          </select>
+        </label>
+
+        <div class="speech-settings-future">
+          <strong>Tervezett opciók</strong>
+          <span>Mikrofon · felismerési motor · érzékenység · parancsok · betűkivételek</span>
+        </div>
+      </section>
+
+      <p id="settingsSaveStatus"
+         class="settings-save-status"
+         aria-live="polite"></p>
+
+      <div class="settings-actions">
+        <button id="settingsBackBtn"
+                type="button"
+                class="btn btn-secondary">Vissza</button>
+        <button id="settingsSaveBtn"
+                type="button"
+                class="btn btn-primary">Mentés</button>
+      </div>
     </section>
 
     <section id="gameScreen" class="stage-screen hidden">
