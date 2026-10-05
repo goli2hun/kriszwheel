@@ -167,19 +167,11 @@ category,puzzle
 "Állat","PIROS KATICA"
 ```
 
-### puzzles.expectedCountPerDifficulty
+### puzzles
 
-```js
-expectedCountPerDifficulty: 100
-```
+A `puzzles.files` mapping adja meg a négy nehézségi szint CSV-fájlját.
 
-Éles játék indításakor a betöltött lista legalább ennyi érvényes sort kell,
-hogy tartalmazzon. Ha a fájl nem érhető el vagy rövidebb, a játék a lobbyban
-hibát jelez és nem indul el.
-
-A jelenlegi négy lista egyenként 100 egyedi feladványból áll.
-
-## 5. wheel
+Nincs fix elemszám-követelmény. Az egyetlen runtime feltétel, hogy a kiválasztott CSV legalább 1 érvényes feladványt tartalmazzon.
 
 ### wheel.image
 
