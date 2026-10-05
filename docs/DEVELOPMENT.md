@@ -111,9 +111,8 @@ A hibás feladványsorok automatikus törléséhez:
 python tools/validate_puzzles.py --javitas
 ```
 
-A javító mód után mindig nézd meg az elemszámot is: a törölt sorokat új,
-érvényes feladványokkal pótolni kell, hogy minden éles lista ismét elérje a
-100 elemet.
+A javító mód után nézd meg, hogy maradt-e legalább egy érvényes feladvány az
+adott CSV-ben. A listáknak nem kell 100 eleműnek lenniük.
 
 A script magyar kimenetet ad. A `[HIBA]` jelölések javítandók; ezeknél a
 folyamat exit kódja 1. A szintek közötti ismétlések
@@ -147,7 +146,7 @@ Fontos:
 - ne legyen duplikált feladvány ugyanabban a listában;
 - férjen el 15 × 4 cellán;
 - hosszú szó esetén tördelést tesztelni;
-- a lista érje el a `puzzles.expectedCountPerDifficulty` minimumot.
+- a lista tartalmazzon legalább 1 érvényes feladványt.
 
 ## 10. Új játékos
 
