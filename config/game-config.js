@@ -7,9 +7,13 @@ window.KRISZWHEEL_CONFIG = {
     // felvillanások és hangok között.
     letterHitGapMs: 500,
 
-    // Játékosváltáskor ennyi ideig marad látható a visszajelzés,
-    // mielőtt a következő játékos aktívvá válik.
+    // Játékosváltáskor ennyi ideig marad látható az előző kör visszajelzése,
+    // mielőtt a következő játékos neve megjelenik.
     playerSwitchDelayMs: 1000,
+
+    // Miután a következő játékos már megjelent, még ennyi ideig várunk,
+    // mielőtt a spin fázis és az automatizmusok ténylegesen aktívak lesznek.
+    turnReadyDelayMs: 1000,
 
     // Bekapcsolt Auto pörgetésnél ennyit várunk, mielőtt egy emberi
     // játékos spin fázisában automatikusan elindul a kerék.

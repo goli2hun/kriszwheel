@@ -186,6 +186,12 @@ Első körben támogatott:
 
 A mikrofon nem indul automatikusan a játék indításakor.
 
+Bekapcsoláskor a mikrofon az aktuális emberi játékoshoz kötődik. Ha másik
+játékos következik, automatikusan leáll. Amikor a tulajdonos köre újra eljön,
+a mikrofon nem azonnal, hanem **a pörgetés után** kapcsol vissza.
+
+A pörgetés alatt a mikrofon szintén automatikusan szünetel.
+
 Alap ritmus:
 
 `500 ms`

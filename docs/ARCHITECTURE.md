@@ -310,6 +310,9 @@ voiceMediaStream
 voiceActive
 voiceStartPending
 voiceEngineState
+voiceArmed
+voiceOwnerName
+voiceSessionToken
 voiceInputMode
 voiceIgnoreNextFinal
 voiceSolveDialogOwned
@@ -329,6 +332,16 @@ fallbackje lép életbe.
 
 A mikrofon gomb runtime kapcsoló, a lobby
 `speechRecognitionEnabled` értéke pedig master engedély.
+
+Voice owner modell:
+
+- manuális bekapcsoláskor `voiceOwnerName` az aktuális emberi játékos;
+- `voiceArmed` megőrzi a tulajdonost akkor is, amikor a listening szünetel;
+- `nextPlayer()` és `spinWheel()` preserve-arm leállítást végez;
+- pénzmező után `resumeVoiceAfterWheel()` csak owner + `letter` fázisban
+  indítja vissza a VoiceEngine-et;
+- `voiceSessionToken` megakadályozza, hogy egy későn visszatérő async
+  `getUserMedia()` hívás rossz körben újraindítsa a mikrofont.
 
 ## 18. Fontos invariánsok
 

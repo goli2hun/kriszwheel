@@ -228,6 +228,7 @@
     victoryButtonTimer: null,
     feedbackTimer: null,
     autoSpinTimer: null,
+    turnReadyTimer: null,
     roundNumber: 0,
     justRevealed: new Set(),
     pendingWheelSegment: null,
@@ -240,6 +241,9 @@
     voiceActive: false,
     voiceStartPending: false,
     voiceEngineState: "idle",
+    voiceArmed: false,
+    voiceOwnerName: null,
+    voiceSessionToken: 0,
     voiceInputMode: null,
     voiceIgnoreNextFinal: false,
     voiceSolveDialogOwned: false
@@ -624,7 +628,9 @@
     state.voiceIgnoreNextFinal = false;
     clearTimeout(state.botTimer);
     clearTimeout(state.autoSpinTimer);
+    clearTimeout(state.turnReadyTimer);
     state.autoSpinTimer = null;
+    state.turnReadyTimer = null;
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
     clearTimeout(state.victoryButtonTimer);
@@ -906,6 +912,31 @@
     el.voiceDebugEvent.textContent = String(text || "–");
   }
 
+  function voiceOwnerIsCurrentPlayer() {
+    const player = currentPlayer();
+    return Boolean(
+      player &&
+      !player.isBot &&
+      state.voiceOwnerName &&
+      player.name === state.voiceOwnerName
+    );
+  }
+
+  function voiceRuntimeCanStart() {
+    return Boolean(
+      document.body.classList.contains("game-active") &&
+      voiceOwnerIsCurrentPlayer() &&
+      ![
+        "spinning",
+        "wheelResult",
+        "playerTransition",
+        "turnReady",
+        "roundEnd",
+        "setup"
+      ].includes(state.phase)
+    );
+  }
+
   function updateVoiceRuntimeUi() {
     const apiSupported =
       speechRecognitionSupported() &&
@@ -913,12 +944,28 @@
     const enabled =
       Boolean(userSettings.speechRecognitionEnabled) &&
       apiSupported;
+    const player = currentPlayer();
+    const currentHuman = Boolean(player && !player.isBot);
+    const ownerIsCurrent = voiceOwnerIsCurrentPlayer();
     const listening =
       state.voiceActive &&
       state.voiceEngineState === "listening";
+    const temporarilyBlocked = [
+      "spinning",
+      "wheelResult",
+      "playerTransition",
+      "turnReady",
+      "roundEnd",
+      "setup"
+    ].includes(state.phase);
 
     el.voiceMicBtn.disabled =
-      !enabled || state.voiceStartPending;
+      !enabled ||
+      state.voiceStartPending ||
+      !currentHuman ||
+      temporarilyBlocked ||
+      (state.voiceArmed && !ownerIsCurrent);
+
     el.voiceMicBtn.classList.toggle(
       "is-active",
       state.voiceActive
@@ -937,16 +984,29 @@
       "aria-pressed",
       state.voiceActive ? "true" : "false"
     );
-    el.voiceMicBtnLabel.textContent =
-      state.voiceActive ? "BE" : "KI";
 
-    const title = !userSettings.speechRecognitionEnabled
-      ? "Hangfelismerés kikapcsolva a Beállításokban"
-      : !apiSupported
-        ? "A böngésző nem támogatja a hangfelismerést"
-        : state.voiceActive
-          ? "Hangvezérlés kikapcsolása"
-          : "Hangvezérlés bekapcsolása";
+    el.voiceMicBtnLabel.textContent =
+      state.voiceActive
+        ? "BE"
+        : state.voiceArmed
+          ? "VÁR"
+          : "KI";
+
+    let title;
+
+    if (!userSettings.speechRecognitionEnabled) {
+      title = "Hangfelismerés kikapcsolva a Beállításokban";
+    } else if (!apiSupported) {
+      title = "A böngésző nem támogatja a hangfelismerést";
+    } else if (state.voiceActive) {
+      title = "Hangvezérlés kikapcsolása";
+    } else if (state.voiceArmed && !ownerIsCurrent) {
+      title = `${state.voiceOwnerName} mikrofonja a saját körére vár`;
+    } else if (state.voiceArmed && ownerIsCurrent) {
+      title = "A mikrofon a pörgetés utáni visszakapcsolásra vár";
+    } else {
+      title = "Hangvezérlés bekapcsolása";
+    }
 
     el.voiceMicBtn.title = title;
     el.voiceMicBtn.setAttribute("aria-label", title);
@@ -966,6 +1026,9 @@
         state.voiceEngineState === "restarting"
           ? "ÚJRAINDUL"
           : "AKTÍV";
+    } else if (state.voiceArmed) {
+      panelState = "active";
+      stateLabel = "VÁR";
     }
 
     el.voiceDebugPanel.dataset.state = panelState;
@@ -996,7 +1059,11 @@
     el.solveInput.placeholder = "";
   }
 
-  function stopVoiceListening({ abort = false } = {}) {
+  function stopVoiceListening({
+    abort = false,
+    preserveArm = false
+  } = {}) {
+    state.voiceSessionToken += 1;
     closeVoiceSolveMode();
 
     try {
@@ -1013,13 +1080,50 @@
     state.voiceActive = false;
     state.voiceStartPending = false;
     state.voiceEngineState = "stopped";
+
+    if (!preserveArm) {
+      state.voiceArmed = false;
+      state.voiceOwnerName = null;
+    }
+
+    updateVoiceRuntimeUi();
+  }
+
+  function suspendVoiceListening(message = "") {
+    if (
+      state.voiceActive ||
+      state.voiceStartPending
+    ) {
+      stopVoiceListening({
+        abort: true,
+        preserveArm: true
+      });
+    }
+
+    if (state.voiceArmed && message) {
+      setVoiceDebugText(message);
+    }
+
     updateVoiceRuntimeUi();
   }
 
   function handleVoiceEngineState(nextState) {
     state.voiceEngineState = String(nextState || "idle");
 
-    if (state.voiceEngineState === "stopped" && !state.voiceStartPending) {
+    if (
+      ["starting", "listening", "restarting"].includes(
+        state.voiceEngineState
+      ) &&
+      state.voiceArmed &&
+      voiceOwnerIsCurrentPlayer()
+    ) {
+      state.voiceActive = true;
+    }
+
+    if (
+      state.voiceEngineState === "stopped" &&
+      !state.voiceStartPending
+    ) {
       state.voiceActive = false;
       stopVoiceMediaStream();
     }
@@ -1039,7 +1143,10 @@
     el.voiceDebugPanel.dataset.state = "error";
 
     if (error?.fatal) {
+      state.voiceSessionToken += 1;
       state.voiceActive = false;
+      state.voiceArmed = false;
+      state.voiceOwnerName = null;
       state.voiceInputMode = null;
       stopVoiceMediaStream();
       updateVoiceRuntimeUi();
@@ -1072,6 +1179,16 @@
       return false;
     }
 
+    if (
+      !state.voiceOwnerName ||
+      player.name !== state.voiceOwnerName
+    ) {
+      setVoiceDebugEvent(
+        "VÁRAKOZÁS · NEM A MIKROFON TULAJDONOSÁNAK KÖRE"
+      );
+      return false;
+    }
+
     return true;
   }
 
@@ -1080,6 +1197,7 @@
       "spinning",
       "wheelResult",
       "playerTransition",
+      "turnReady",
       "roundEnd",
       "setup"
     ].includes(state.phase);
@@ -1384,8 +1502,22 @@
     return stream.getAudioTracks()[0] ?? null;
   }
 
-  async function startVoiceListening() {
+  async function startVoiceListening({
+    automatic = false
+  } = {}) {
     if (state.voiceActive || state.voiceStartPending) {
+      return;
+    }
+
+    if (!state.voiceArmed || !voiceOwnerIsCurrentPlayer()) {
+      return;
+    }
+
+    if (automatic && state.phase !== "letter") {
+      return;
+    }
+
+    if (!automatic && !voiceRuntimeCanStart()) {
       return;
     }
 
@@ -1408,9 +1540,14 @@
       return;
     }
 
+    const sessionToken = ++state.voiceSessionToken;
     state.voiceStartPending = true;
     state.voiceEngineState = "starting";
-    setVoiceDebugText("Mikrofon indítása…");
+    setVoiceDebugText(
+      automatic
+        ? "Mikrofon automatikus visszakapcsolása…"
+        : "Mikrofon indítása…"
+    );
     setVoiceDebugEvent("–");
     updateVoiceRuntimeUi();
 
@@ -1425,10 +1562,29 @@
 
       const track = await createVoiceAudioTrack();
 
+      if (
+        sessionToken !== state.voiceSessionToken ||
+        !state.voiceArmed ||
+        !voiceOwnerIsCurrentPlayer() ||
+        (automatic && state.phase !== "letter")
+      ) {
+        stopVoiceMediaStream();
+        return;
+      }
+
       state.voiceActive = true;
       engine.start(track);
+      setVoiceDebugEvent(
+        automatic
+          ? "MIKROFON · VISSZAKAPCSOLVA"
+          : "MIKROFON · BEKAPCSOLVA"
+      );
       updateVoiceRuntimeUi();
     } catch (error) {
+      if (sessionToken !== state.voiceSessionToken) {
+        return;
+      }
+
       state.voiceActive = false;
       state.voiceEngineState = "error";
       stopVoiceMediaStream();
@@ -1442,26 +1598,64 @@
         "error"
       );
     } finally {
-      state.voiceStartPending = false;
-      updateVoiceRuntimeUi();
+      if (sessionToken === state.voiceSessionToken) {
+        state.voiceStartPending = false;
+        updateVoiceRuntimeUi();
+      }
     }
   }
 
+  async function resumeVoiceAfterWheel() {
+    if (
+      !state.voiceArmed ||
+      !voiceOwnerIsCurrentPlayer() ||
+      state.phase !== "letter"
+    ) {
+      updateVoiceRuntimeUi();
+      return;
+    }
+
+    await startVoiceListening({ automatic: true });
+  }
+
   async function toggleVoiceListening() {
+    const player = currentPlayer();
+
+    if (!player || player.isBot) {
+      return;
+    }
+
     if (state.voiceActive) {
-      stopVoiceListening();
+      stopVoiceListening({ abort: true });
       setVoiceDebugText("Mikrofon kikapcsolva.");
       setVoiceDebugEvent("–");
       return;
     }
 
-    await startVoiceListening();
+    if (
+      state.voiceArmed &&
+      state.voiceOwnerName === player.name
+    ) {
+      await startVoiceListening({ automatic: false });
+      return;
+    }
+
+    stopVoiceListening({ abort: true });
+    state.voiceArmed = true;
+    state.voiceOwnerName = player.name;
+    setVoiceDebugText(
+      `${player.name} mikrofonja bekapcsolásra kész.`
+    );
+    await startVoiceListening({ automatic: false });
   }
 
   function resetVoiceRuntimeForGame() {
     stopVoiceListening({ abort: true });
     state.voiceEngine = null;
     state.voiceEngineState = "idle";
+    state.voiceArmed = false;
+    state.voiceOwnerName = null;
+    state.voiceSessionToken += 1;
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
     state.voiceSolveDialogOwned = false;
@@ -1479,13 +1673,23 @@
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
     clearTimeout(state.playerTransitionTimer);
+    clearTimeout(state.turnReadyTimer);
     clearTimeout(state.botTimer);
     clearTimeout(state.autoSpinTimer);
     state.autoSpinTimer = null;
+    state.turnReadyTimer = null;
+
+    suspendVoiceListening(
+      "Mikrofon szünetel a következő saját körig."
+    );
 
     const delayMs = Math.max(
       0,
       Number(GAMEPLAY_CONFIG.playerSwitchDelayMs ?? 1000)
+    );
+    const readyDelayMs = Math.max(
+      0,
+      Number(GAMEPLAY_CONFIG.turnReadyDelayMs ?? 1000)
     );
 
     state.phase = "playerTransition";
@@ -1505,17 +1709,54 @@
     state.playerTransitionTimer = setTimeout(() => {
       state.currentIndex =
         (state.currentIndex + 1) % state.players.length;
-      state.phase = "spin";
+      state.phase = "turnReady";
 
       renderAll();
       updateControls();
-      hideStageFeedback();
 
+      const nextName = currentPlayer().name;
+      showStageFeedback(
+        `${nextName} következik.`,
+        "info",
+        readyDelayMs
+      );
       setMessage(
-        `${currentPlayer().name} következik. Pörgess!`
+        `${nextName} következik. Egy pillanat…`
       );
 
-      maybeRunTurnAutomation();
+      if (
+        state.voiceArmed &&
+        state.voiceOwnerName !== nextName
+      ) {
+        setVoiceDebugEvent(
+          `VÁR · ${state.voiceOwnerName} KÖRÉRE`
+        );
+      } else if (
+        state.voiceArmed &&
+        state.voiceOwnerName === nextName
+      ) {
+        setVoiceDebugEvent(
+          "VÁR · PÖRGETÉS UTÁN VISSZAKAPCSOL"
+        );
+      }
+
+      state.turnReadyTimer = setTimeout(() => {
+        state.turnReadyTimer = null;
+
+        if (state.phase !== "turnReady") return;
+
+        state.phase = "spin";
+        hideStageFeedback();
+        updateControls();
+
+        setMessage(
+          `${currentPlayer().name} következik. Pörgess!`
+        );
+
+        // Szándékosan nem indítjuk vissza itt a mikrofont.
+        // A voice owner körében is csak a pörgetés UTÁN aktiválódik.
+        maybeRunTurnAutomation();
+      }, readyDelayMs);
     }, delayMs);
   }
 
@@ -1626,7 +1867,12 @@
   function finishRound(winner) {
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
+    suspendVoiceListening(
+      "Forduló vége. Mikrofon szünetel."
+    );
     clearTimeout(state.botTimer);
+    clearTimeout(state.turnReadyTimer);
+    state.turnReadyTimer = null;
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
     hideStageFeedback();
@@ -2197,6 +2443,10 @@
     renderAll();
     updateControls();
 
+    if (!fromBot) {
+      void resumeVoiceAfterWheel();
+    }
+
     if (fromBot) {
       state.botTimer = setTimeout(() => {
         const consonant = randomUnusedConsonant();
@@ -2218,6 +2468,13 @@
 
     clearTimeout(state.autoSpinTimer);
     state.autoSpinTimer = null;
+
+    if (!fromBot) {
+      suspendVoiceListening(
+        "Pörgetés alatt a mikrofon automatikusan kikapcsolt."
+      );
+    }
+
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
 
@@ -2272,6 +2529,14 @@
       closeWheelOverlay();
       updateControls();
       setMessage("A kerék nem áll készen. Próbáld újra.");
+
+      if (
+        !fromBot &&
+        state.voiceArmed &&
+        voiceOwnerIsCurrentPlayer()
+      ) {
+        void startVoiceListening({ automatic: false });
+      }
     }
   }
 
@@ -2418,7 +2683,9 @@
     state.voiceEngine = null;
     clearTimeout(state.botTimer);
     clearTimeout(state.autoSpinTimer);
+    clearTimeout(state.turnReadyTimer);
     state.autoSpinTimer = null;
+    state.turnReadyTimer = null;
     clearTimeout(state.wheelConfirmTimer);
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);

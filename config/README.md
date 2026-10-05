@@ -71,6 +71,20 @@ mielőtt a következő játékos aktív lesz.
 Ez alatt a színpad látható visszajelzést mutat, a játékgombok pedig nem
 fogadnak új akciót.
 
+### gameplay.turnReadyDelayMs
+
+Típus: szám, ms.
+
+Alap:
+
+```js
+turnReadyDelayMs: 1000
+```
+
+Miután a következő játékos neve már megjelent, ennyi ideig maradunk
+`turnReady` állapotban. Ez alatt még nincs kézi input, Bot-akció vagy Auto
+pörgetés.
+
 ### gameplay.autoSpinDelayMs
 
 Típus: szám, ms.

@@ -57,13 +57,29 @@ Bekapcsoláskor:
 3. a kiválasztott audio track átadásra kerül a providernek;
 4. a VoiceEngine callbacks aktívvá válnak.
 
-Kikapcsoláskor:
+Kézi kikapcsoláskor:
 
 - provider stop/abort;
 - audio trackek stop;
+- voice owner törlődik;
 - függő voice input mód törlődik.
 
-Lobbyba visszalépéskor a voice runtime teljesen leáll.
+Automatikus szüneteltetéskor a provider és az audio track leáll, de a
+`voiceOwnerName` és a `voiceArmed` megmarad.
+
+Automatikus szünet történik:
+
+- játékosváltáskor;
+- pörgetés indulásakor;
+- forduló végén.
+
+Pénzmezős pörgetés után, `letter` fázisban a VoiceEngine automatikusan
+visszaindul, ha az aktuális játékos megegyezik a voice ownerrel.
+
+Ha az owner köre később visszatér, a mikrofon csak **az új pörgetés után**
+kapcsol vissza, nem már a kör elején.
+
+Lobbyba visszalépéskor a voice runtime és a voice owner teljesen leáll.
 
 ## COMMAND események
 

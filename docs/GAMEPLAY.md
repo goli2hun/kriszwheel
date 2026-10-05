@@ -165,9 +165,9 @@ A válasz normalizálása:
 
 ## 8. Játékosváltás
 
-Állapot:
+A váltás két külön fázisból áll.
 
-`playerTransition`
+### 1. playerTransition
 
 Idő:
 
@@ -179,11 +179,31 @@ Alap:
 
 Ez alatt:
 
-- az aktuális játékos még látható;
+- az előző játékos még látható;
 - új akció nem adható;
 - a váltás oka színpadi üzenetként látszik.
 
-Az idő végén lép tovább a `currentIndex`.
+### 2. turnReady
+
+Ezután lép tovább a `currentIndex`, megjelenik az új játékos, de még rövid
+ideig nincs aktív játék.
+
+Idő:
+
+`gameplay.turnReadyDelayMs`
+
+Alap:
+
+`1000 ms`
+
+A `turnReady` alatt:
+
+- az új játékos már látható;
+- kézi input még nem fogadható;
+- Bot és Auto pörgetés még nem indul;
+- a mikrofon nem indul automatikusan vissza.
+
+Csak a várakozás után lépünk `spin` fázisba.
 
 ## 9. Győzelmi képernyő
 
@@ -276,9 +296,24 @@ Feltétel:
 
 Az aktuális játékos avatárja fölött található.
 
-- `KI` → VoiceEngine nem hallgat;
-- `BE` → VoiceEngine aktív;
-- `HALLGAT` → a provider ténylegesen listening állapotban van.
+- `KI` → nincs aktív voice owner;
+- `BE` / `HALLGAT` → a voice owner mikrofonja aktív;
+- `VÁR` → az owner megmaradt, de a listening szünetel.
+
+Automatikus szünet:
+
+- játékosváltáskor;
+- másik játékos körében;
+- a pörgetés teljes ideje alatt;
+- forduló végén.
+
+Automatikus visszakapcsolás:
+
+- csak a voice owner körében;
+- csak pénzmezős pörgetés után, amikor `phase = letter`.
+
+Ha a voice owner köre később visszatér, a mikrofon **nem** kapcsol be már a
+`spin` fázis elején; előbb pörgetni kell.
 
 ### Pörgetés
 
@@ -367,11 +402,13 @@ wheelResult
   ↓
 letter
   ├─ találat → spin
-  └─ hiba → playerTransition → spin
+  └─ hiba → playerTransition → turnReady → spin
 
 hibás megfejtés
   ↓
 playerTransition
+  ↓
+turnReady
   ↓
 spin
 

@@ -218,6 +218,10 @@ listening állapotot.
 
 A mikrofon nem indul automatikusan.
 
+Bekapcsoláskor az aktuális emberi játékos lesz a **voice owner**. Játékosváltás
+és pörgetés alatt a listening leáll, de az owner megmarad. Ha újra az owner
+köre jön, a mikrofon csak a pörgetés eredményének lezárása után indul vissza.
+
 Runtime részletek:
 
 [VOICE_RECOGNITION.md](VOICE_RECOGNITION.md)
