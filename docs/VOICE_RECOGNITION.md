@@ -65,7 +65,7 @@ Kézi kikapcsoláskor:
 - függő voice input mód törlődik.
 
 Automatikus szüneteltetéskor a provider és az audio track leáll, de a
-`voiceOwnerName` és a `voiceArmed` megmarad.
+globális `voiceArmed` állapot megmarad.
 
 Automatikus szünet történik:
 
@@ -74,8 +74,9 @@ Automatikus szünet történik:
 - forduló végén.
 
 A Phaser kerék tween befejezésekor, tehát **a kerék fizikai megállásának
-pillanatában**, a VoiceEngine automatikusan visszaindul, ha az aktuális
-játékos a voice owner. Ekkor a phase még `wheelResult` lehet.
+pillanatában**, a VoiceEngine automatikusan visszaindul, ha a globális
+mikrofon be van kapcsolva és emberi játékos van soron. Ekkor a phase még
+`wheelResult` lehet.
 
 A mikrofon nem várja meg a `wheel.resultDisplayMs` leteltét. A
 játékműveletek ettől függetlenül továbbra is saját phase-validációt használnak.
