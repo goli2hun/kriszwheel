@@ -1599,6 +1599,48 @@
     el.usedLetters.textContent = letters.length ? letters.join(" ") : "–";
   }
 
+  function hasHiddenConsonants() {
+    return [...state.puzzle.text].some(
+      ch =>
+        /\p{L}/u.test(ch) &&
+        !VOWELS.has(ch) &&
+        !state.revealed.has(ch)
+    );
+  }
+
+  function enterSolveOnlyMode() {
+    clearTimeout(state.autoSpinTimer);
+    clearTimeout(state.botTimer);
+    state.autoSpinTimer = null;
+    state.botTimer = null;
+    state.wheelValue = null;
+    state.phase = "solveOnly";
+
+    const message =
+      "Nincs több mássalhangzó a feladványban. Pörgetni már nem lehet – fejtsd meg, vagy vásárolj magánhangzót.";
+
+    setMessage(message);
+    showStageFeedback(
+      "NINCS TÖBB MÁSSALHANGZÓ · FEJTSD MEG!",
+      "info"
+    );
+    updateControls();
+
+    if (currentPlayer()?.isBot) {
+      state.botTimer = setTimeout(
+        () => {
+          if (
+            state.phase === "solveOnly" &&
+            currentPlayer()?.isBot
+          ) {
+            trySolve(state.puzzle.text, true);
+          }
+        },
+        Number(BOT_CONFIG.solveDelayMs ?? 700)
+      );
+    }
+  }
+
   function updateControls() {
     const p = currentPlayer();
     if (!p) return;
@@ -2575,6 +2617,11 @@
 
         if (state.phase !== "letterReveal") return;
 
+        if (!hasHiddenConsonants()) {
+          enterSolveOnlyMode();
+          return;
+        }
+
         state.phase = "spin";
         setMessage(
           `${letter}: ${hits} találat. Nyeremény: ${fmtMoney(award)}. Pörgethetsz újra.`
@@ -2743,6 +2790,13 @@
     clearTimeout(state.autoSpinTimer);
     state.autoSpinTimer = null;
 
+    if (!hasHiddenConsonants()) {
+      if (state.phase === "spin") {
+        enterSolveOnlyMode();
+      }
+      return;
+    }
+
     if (!userSettings.autoSpinEnabled) return;
     if (!document.body.classList.contains("game-active")) return;
 
@@ -2808,6 +2862,11 @@
       }
 
       if (state.phase === "spin") {
+        if (!hasHiddenConsonants()) {
+          enterSolveOnlyMode();
+          return;
+        }
+
         setMessage("Bot pörget…");
         spinWheel(true);
       }
@@ -2890,8 +2949,13 @@
         180,
         Number(VICTORY_CONFIG.burstIntervalMs ?? 480)
       );
+      const minimumCelebrationMs = Math.max(
+        0,
+        Number(VICTORY_CONFIG.minimumCelebrationMs ?? 3000)
+      );
       const durationMs = Math.max(
         burstIntervalMs,
+        minimumCelebrationMs,
         Number(VICTORY_CONFIG.fireworksDurationMs ?? 3500)
       );
 
@@ -3021,8 +3085,12 @@
 
     getVictoryScene()?.startCelebration();
 
-    const buttonDelayMs = Math.max(
+    const minimumCelebrationMs = Math.max(
       0,
+      Number(VICTORY_CONFIG.minimumCelebrationMs ?? 3000)
+    );
+    const buttonDelayMs = Math.max(
+      minimumCelebrationMs,
       Number(VICTORY_CONFIG.buttonDelayMs ?? 1800)
     );
 
@@ -3254,6 +3322,11 @@
   function spinWheel(fromBot = false) {
     if (state.phase !== "spin") return;
 
+    if (!hasHiddenConsonants()) {
+      enterSolveOnlyMode();
+      return;
+    }
+
     clearTimeout(state.autoSpinTimer);
     state.autoSpinTimer = null;
 
@@ -3429,10 +3502,10 @@
     if (letter.length !== 1 || !/\p{L}/u.test(letter)) return;
 
     // Magánhangzó: közvetlen vásárlás egyetlen billentyűvel.
-    // Ez spin és letter fázisban is engedélyezett, ahogy a korábbi gombos
-    // megoldásnál is.
+    // Solve-only módban is engedélyezett, mert ilyenkor már csak
+    // magánhangzók lehetnek rejtve.
     if (VOWELS.has(letter)) {
-      if (!["spin", "letter"].includes(state.phase)) return;
+      if (!["spin", "letter", "solveOnly"].includes(state.phase)) return;
 
       event.preventDefault();
       buyVowel(letter, false);
