@@ -377,6 +377,27 @@
     })
   );
 
+  function unlockMusicTracks() {
+    Object.values(musicTracks).forEach(audio => {
+      const previousVolume = audio.volume;
+      audio.volume = 0;
+
+      audio.play()
+        .then(() => {
+          audio.pause();
+          try {
+            audio.currentTime = 0;
+          } catch {
+            // Betöltés előtt a seek nem minden böngészőben elérhető.
+          }
+          audio.volume = previousVolume;
+        })
+        .catch(() => {
+          audio.volume = previousVolume;
+        });
+    });
+  }
+
   const musicFadeFrames = Object.create(null);
 
   function cancelMusicFade(name) {
@@ -986,6 +1007,7 @@
     if (firstAudioGestureHandled) return;
     firstAudioGestureHandled = true;
     unlockSfx();
+    unlockMusicTracks();
     syncMusicForCurrentScreen();
   };
 
@@ -2864,10 +2886,15 @@
   function finishRound(winner) {
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
+    state.phase = "roundEnd";
+    state.gameMusicDucked = false;
+
     suspendVoiceListening(
       "Forduló vége. Mikrofon szünetel."
     );
+    stopWheelSpinSound();
     startWinnerMusic();
+
     clearTimeout(state.botTimer);
     clearTimeout(state.turnReadyTimer);
     clearTimeout(state.letterRevealTimer);
@@ -2893,7 +2920,6 @@
     });
 
     winner.totalMoney += winner.roundMoney;
-    state.phase = "roundEnd";
 
     // Helyes megfejtésnél nincs külön sikerhang.
     // A hátralévő betűk ugyanabban a ritmusban kapják a letter_hit SFX-et,
