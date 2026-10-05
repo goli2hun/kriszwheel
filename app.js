@@ -78,6 +78,18 @@
     "Vendég 2": "assets/images/guest2.png"
   };
 
+  const GUEST_PLAYERS = new Set(["Vendég 1", "Vendég 2"]);
+
+  function setPlayerAvatar(imageElement, playerName, altText = null) {
+    const safeName = PLAYER_IMAGES[playerName] ? playerName : "Bot";
+    imageElement.src = PLAYER_IMAGES[safeName];
+    imageElement.alt = altText ?? `${playerName} profilképe`;
+    imageElement.classList.toggle(
+      "is-guest-avatar",
+      GUEST_PLAYERS.has(safeName)
+    );
+  }
+
   const SFX = {
     letterHit: AUDIO_CONFIG.files?.letterHit ?? "assets/sound/sfx/letter_hit.wav",
     letterMiss: AUDIO_CONFIG.files?.letterMiss ?? "assets/sound/sfx/letter_miss.mp3",
@@ -398,13 +410,15 @@
     if (active) {
       el.stageCurrentPlayerName.textContent = active.name;
       el.stageCurrentMoney.textContent = fmtMoney(active.roundMoney);
-      el.stageCurrentAvatar.src = PLAYER_IMAGES[active.name] ?? PLAYER_IMAGES.Bot;
-      el.stageCurrentAvatar.alt = `${active.name} profilképe`;
+      setPlayerAvatar(el.stageCurrentAvatar, active.name);
     } else {
       el.stageCurrentPlayerName.textContent = "–";
       el.stageCurrentMoney.textContent = fmtMoney(0);
-      el.stageCurrentAvatar.src = PLAYER_IMAGES.Bot;
-      el.stageCurrentAvatar.alt = "Nincs aktív játékos";
+      setPlayerAvatar(
+        el.stageCurrentAvatar,
+        "Bot",
+        "Nincs aktív játékos"
+      );
     }
   }
 
@@ -1004,9 +1018,7 @@
   function showVictoryOverlay(winner) {
     clearTimeout(state.victoryButtonTimer);
 
-    el.victoryAvatar.src =
-      PLAYER_IMAGES[winner.name] ?? PLAYER_IMAGES.Bot;
-    el.victoryAvatar.alt = `${winner.name} profilképe`;
+    setPlayerAvatar(el.victoryAvatar, winner.name);
     el.victoryTitle.textContent =
       `${winner.name} MEGFEJTETTE!`.toLocaleUpperCase("hu-HU");
     el.victoryPuzzle.textContent = state.puzzle.text;

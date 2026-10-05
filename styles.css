@@ -176,6 +176,32 @@ h2 {
     box-shadow .2s ease;
 }
 
+/* A Vendég PNG-kben nagyobb a képen belüli margó. A crop réteg megtartja
+   ugyanazt a külső avatar-méretet, miközben csak a portrét nagyítja. */
+.guest-avatar-clip {
+  position: absolute;
+  inset: 0;
+  display: block;
+  overflow: hidden;
+  border-radius: 50%;
+}
+
+.guest-avatar-clip .avatar-photo {
+  transform: scale(1.28);
+}
+
+.player-option:hover .guest-avatar-clip .avatar-photo {
+  transform: scale(1.31);
+}
+
+/* A stage/victory képeknél nincs külön crop wrapper, ezért a clip-path
+   tartja meg az eredeti körméretet a belső nagyítás mellett. */
+.stage-current-avatar-ring img.is-guest-avatar,
+.victory-avatar-ring img.is-guest-avatar {
+  transform: scale(1.28);
+  clip-path: circle(39.1% at 50% 50%);
+}
+
 .player-option strong {
   color: #dbe8ff;
   font-size: 1rem;
