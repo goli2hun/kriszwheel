@@ -142,10 +142,10 @@ A jelenlegi játékosok:
 - Vendég 1
 - Vendég 2
 
-A két vendég semleges SVG avatart használ:
+A két vendég PNG avatart használ:
 
-- `assets/images/guest1.svg`
-- `assets/images/guest2.svg`
+- `assets/images/guest1.png`
+- `assets/images/guest2.png`
 
 A Bot felismerése továbbra is:
 

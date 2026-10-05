@@ -255,8 +255,8 @@ kriszwheel/
     ├── images/
     │   ├── adri.png
     │   ├── bot.png
-    │   ├── guest1.svg
-    │   ├── guest2.svg
+    │   ├── guest1.png
+    │   ├── guest2.png
     │   ├── krisz.png
     │   ├── lizus.png
     │   ├── studio_lobby.png

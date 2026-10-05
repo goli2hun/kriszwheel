@@ -74,8 +74,8 @@
     Adri: "assets/images/adri.png",
     Aliz: "assets/images/lizus.png",
     Bot: "assets/images/bot.png",
-    "Vendég 1": "assets/images/guest1.svg",
-    "Vendég 2": "assets/images/guest2.svg"
+    "Vendég 1": "assets/images/guest1.png",
+    "Vendég 2": "assets/images/guest2.png"
   };
 
   const SFX = {
