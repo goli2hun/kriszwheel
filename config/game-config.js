@@ -24,6 +24,11 @@ window.KRISZWHEEL_CONFIG = {
     // Grafika és Phaser canvas.
     image: "assets/images/wheel.png",
     canvasSize: 600,
+
+    // A teljes kerék (grafika + feliratok) méretszorzója.
+    // 1.00 = eredeti méret, 1.10 = 10%-kal nagyobb.
+    scale: 1.10,
+
     wheelSize: 536,
     labelRadius: 188,
 
