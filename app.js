@@ -15,6 +15,10 @@
 
   const USER_SETTINGS_STORAGE_KEY = "kriszwheel.user-settings.v1";
   const PUZZLE_HISTORY_STORAGE_KEY = "kriszwheel.puzzle-history.v1";
+  const PUZZLE_HISTORY_RESET_STORAGE_KEY =
+    "kriszwheel.puzzle-history-reset.v1";
+  const PUZZLE_HISTORY_RESET_MARKER =
+    "data/puzzle-history-reset.json";
   const DEFAULT_USER_SETTINGS = Object.freeze({
     soundsEnabled: true,
     masterVolume: 1,
@@ -199,7 +203,50 @@
     }
   }
 
-  const puzzleHistory = loadPuzzleHistory();
+  let puzzleHistory = loadPuzzleHistory();
+
+  async function syncPuzzleHistoryResetMarker() {
+    try {
+      const response = await fetch(
+        PUZZLE_HISTORY_RESET_MARKER,
+        { cache: "no-store" }
+      );
+      if (!response.ok) return false;
+
+      const marker = await response.json();
+      const resetId =
+        typeof marker?.resetId === "string"
+          ? marker.resetId.trim()
+          : "";
+
+      if (!resetId) return false;
+
+      const appliedResetId =
+        localStorage.getItem(PUZZLE_HISTORY_RESET_STORAGE_KEY) || "";
+
+      if (appliedResetId === resetId) {
+        return false;
+      }
+
+      localStorage.removeItem(PUZZLE_HISTORY_STORAGE_KEY);
+      puzzleHistory = emptyPuzzleHistory();
+      localStorage.setItem(
+        PUZZLE_HISTORY_RESET_STORAGE_KEY,
+        resetId
+      );
+
+      console.info(
+        "KriszWheel: puzzle előzmény törölve a reset marker alapján."
+      );
+      return true;
+    } catch (error) {
+      console.warn(
+        "A puzzle-history reset marker ellenőrzése nem sikerült.",
+        error
+      );
+      return false;
+    }
+  }
 
   const VOWELS = new Set(["A", "Á", "E", "É", "I", "Í", "O", "Ó", "Ö", "Ő", "U", "Ú", "Ü", "Ű"]);
   const ALPHABET = "AÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVWXYZ".split("");
@@ -1436,6 +1483,8 @@
     el.startGameBtn.disabled = true;
 
     try {
+      await syncPuzzleHistoryResetMarker();
+
       if (userSettings.puzzleMode === "live") {
         el.startGameBtn.textContent = "Feladványok betöltése…";
         await loadLivePuzzles();
