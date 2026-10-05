@@ -24,9 +24,13 @@ A lobby nehézségválasztója:
 
 Alapérték: `Könnyű` (`easy`).
 
-A `puzzleDifficulty` most csak mentődik. A jelenlegi teszt
-`pickPuzzle()` logika **nem olvassa**. Később éles feladványmódban fogjuk
-felhasználni.
+Teszt módban a nehézség nem módosítja a beépített mintalistát. Éles módban
+a `puzzleDifficulty` közvetlenül meghatározza a betöltött CSV-t:
+
+- Gyerek → `data/child.csv`
+- Könnyű → `data/low.csv`
+- Közepes → `data/med.csv`
+- Nehéz → `data/high.csv`
 
 A játék indulásakor:
 
@@ -47,7 +51,8 @@ A feladvány:
 }
 ```
 
-A készlet jelenleg az `app.js` fájlban van.
+Teszt módban a készlet az `app.js` fájlban van. Éles módban a kiválasztott
+nehézséghez tartozó CSV-ből töltődik, jelenleg 100 feladvány/lista.
 
 Új fordulónál törlődik:
 
@@ -106,7 +111,10 @@ Találat:
 roundMoney += találatok × wheelValue
 ```
 
-Találat után ugyanaz a játékos újra pörget.
+Találat után ugyanaz a játékos újra pörget, de **nem azonnal**. A játék
+`letterReveal` fázisba lép, kivárja az összes találat felfedését, majd még
+`gameplay.letterRevealPostDelayMs` időt. Csak ezután tér vissza `spin`
+fázisba és indulhat kézi, Bot- vagy Auto pörgetés.
 
 Nincs találat esetén játékosváltás következik.
 
@@ -123,6 +131,12 @@ Alap:
 `500 ms`
 
 A találati hang ugyanebben a ritmusban szól.
+
+Egy betű saját animációs ideje:
+`gameplay.letterRevealAnimationMs` (alap: 720 ms).
+
+Az utolsó felfedés után további várakozás:
+`gameplay.letterRevealPostDelayMs` (alap: 1000 ms).
 
 ## 6. Magánhangzó
 
@@ -276,8 +290,8 @@ hangparancs esetén a timer törlődik, ezért nem indul második pörgetés.
 A Botot az Auto pörgetés nem kezeli; arra továbbra is a Bot saját automatája
 felel.
 
-A `puzzleMode` beállítás jelenleg még **nem része a gameplay puzzle
-választásának**.
+A `puzzleMode` része a puzzle-választásnak: `test` esetén a beépített
+lista, `live` esetén a nehézséghez tartozó CSV-készlet használódik.
 
 ## 11. Bot
 
@@ -427,7 +441,7 @@ spinning
 wheelResult
   ↓
 letter
-  ├─ találat → spin
+  ├─ találat → letterReveal → spin
   └─ hiba → playerTransition → turnReady → spin
 
 hibás megfejtés
@@ -448,3 +462,14 @@ victory overlay
   ├─ következő feladvány → spin
   └─ játék vége → setup
 ```
+
+
+## 16. Éles feladványforrás
+
+Éles játék indításakor a CSV betöltése még a lobby elhagyása előtt történik.
+A játék ellenőrzi, hogy legalább `puzzles.expectedCountPerDifficulty`
+érvényes sor van-e. Ha a fájl nem érhető el vagy hiányos, hibaüzenet marad a
+lobbyban és a játék nem indul el.
+
+A véletlen választás ugyanazon játékfolyamon belül nem engedi, hogy közvetlenül
+egymás után ugyanaz az index következzen.
