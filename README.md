@@ -42,6 +42,12 @@ ez választja ki a betöltött CSV-adatforrást:
 
 Mind a négy éles lista jelenleg 100 egyedi feladványt tartalmaz.
 
+Az éles feladványokhoz tartós kijátszási előzmény tartozik. Ha egy feladvány
+egyszer már megjelent, ugyanazon böngészőben többé nem kerül újra kiválasztásra.
+Az előzmény nehézségenként külön tárolódik, és az index mellett a normalizált
+feladványszöveget is megőrzi, így CSV-átrendezés után sem tér vissza egy már
+látott feladvány.
+
 A lobby saját stúdió-hátteret és játékosportrékat használ.
 
 A lobby jobb alsó sarkában build-információ látszik, például:
