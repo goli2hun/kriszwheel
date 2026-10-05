@@ -531,6 +531,16 @@ fireworks: true
 
 Kapcsolja a Phaser tűzijátékot.
 
+### victory.minimumCelebrationMs
+
+```js
+minimumCelebrationMs: 3000
+```
+
+A sikeres megfejtés utáni ünneplés garantált minimum ideje. A tűzijáték
+generálása legalább eddig tart, és a victory gombok sem válhatnak aktívvá
+korábban.
+
 ### victory.fireworksDurationMs
 
 ```js
@@ -561,7 +571,8 @@ Egy burst Phaser-részecskéinek száma.
 buttonDelayMs: 1800
 ```
 
-Ennyi idő után jelenik meg és válik aktívvá a két győzelmi gomb.
+A két győzelmi gomb nominális késleltetése. A tényleges késleltetés a
+`buttonDelayMs` és a `minimumCelebrationMs` közül a nagyobb érték.
 
 ### victory.colors
 
