@@ -156,10 +156,12 @@ A válasz normalizálása:
 
 1. a dialog már zárva van;
 2. a rejtett betűk sorban felfedődnek;
-3. `roundMoney` hozzáadódik a `totalMoney` értékhez;
-4. `phase = roundEnd`;
-5. a játék kivárja a felfedési animáció végét;
-6. megjelenik a győzelmi overlay.
+3. minden felfedett betűvel szinkronban a `letter_hit` hang szól;
+4. külön megfejtés-sikerhang nincs;
+5. `roundMoney` hozzáadódik a `totalMoney` értékhez;
+6. `phase = roundEnd`;
+7. a játék kivárja a felfedési animáció végét;
+8. megjelenik a győzelmi overlay.
 
 ## 8. Játékosváltás
 

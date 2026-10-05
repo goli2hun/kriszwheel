@@ -332,9 +332,11 @@ defaultVolume: 0.70
 
 ```js
 letterHitVolume: 0.72,
-solveSuccessVolume: 0.75,
 solveFailVolume: 0.72
 ```
+
+Helyes megfejtéshez nincs külön siker-SFX. A fennmaradó betűk felfedésekor a
+`letterHitVolume` és a `letter_hit.wav` használódik.
 
 0–1 tartomány ajánlott.
 
@@ -344,7 +346,6 @@ solveFailVolume: 0.72
 files: {
   letterHit: "assets/sound/sfx/letter_hit.wav",
   letterMiss: "assets/sound/sfx/letter_miss.mp3",
-  solveSuccess: "assets/sound/sfx/solve_success.wav",
   solveFail: "assets/sound/sfx/solve_fail.wav"
 }
 ```

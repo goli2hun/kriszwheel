@@ -108,7 +108,6 @@
   const SFX = {
     letterHit: AUDIO_CONFIG.files?.letterHit ?? "assets/sound/sfx/letter_hit.wav",
     letterMiss: AUDIO_CONFIG.files?.letterMiss ?? "assets/sound/sfx/letter_miss.mp3",
-    solveSuccess: AUDIO_CONFIG.files?.solveSuccess ?? "assets/sound/sfx/solve_success.wav",
     solveFail: AUDIO_CONFIG.files?.solveFail ?? "assets/sound/sfx/solve_fail.wav"
   };
 
@@ -972,7 +971,6 @@
 
   function trySolve(answer, fromBot = false) {
     if (normalize(answer) === state.puzzle.text) {
-      playSfx("solveSuccess", Number(AUDIO_CONFIG.solveSuccessVolume ?? 0.75));
       finishRound(currentPlayer());
       return true;
     }
@@ -1010,6 +1008,14 @@
 
     winner.totalMoney += winner.roundMoney;
     state.phase = "roundEnd";
+
+    // Helyes megfejtésnél nincs külön sikerhang.
+    // A hátralévő betűk ugyanabban a ritmusban kapják a letter_hit SFX-et,
+    // mint ahogy a reveal animáció lefut.
+    if (hiddenLetterCount > 0) {
+      playHitSequence(hiddenLetterCount);
+    }
+
     renderAll();
     updateControls();
 

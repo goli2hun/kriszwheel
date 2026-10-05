@@ -151,10 +151,12 @@ Jelenlegi SFX:
 
 - `letter_hit.wav`
 - `letter_miss.mp3`
-- `solve_success.wav`
 - `solve_fail.wav`
 
 Több azonos találatnál a felvillanások és a találati hangok sorban futnak.
+
+Helyes megfejtésnél nincs külön sikerhang: a még rejtett betűk felfedésével
+szinkronban kizárólag a `letter_hit.wav` szól.
 
 Alap ritmus:
 

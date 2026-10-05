@@ -84,13 +84,11 @@ window.KRISZWHEEL_CONFIG = {
   audio: {
     defaultVolume: 0.70,
     letterHitVolume: 0.72,
-    solveSuccessVolume: 0.75,
     solveFailVolume: 0.72,
 
     files: {
       letterHit: "assets/sound/sfx/letter_hit.wav",
       letterMiss: "assets/sound/sfx/letter_miss.mp3",
-      solveSuccess: "assets/sound/sfx/solve_success.wav",
       solveFail: "assets/sound/sfx/solve_fail.wav"
     }
   },

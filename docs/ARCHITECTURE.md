@@ -226,6 +226,10 @@ A hangok `Audio` cache-ből mennek.
 Lejátszáskor `cloneNode()` készül, ezért az egymást követő találati hangok
 nem vágják le egymást.
 
+Helyes megfejtéshez nincs külön success SFX. A `finishRound()` a még rejtett
+betűhelyek számával hívja a `playHitSequence()` függvényt, így a
+`letter_hit` hang a felfedési animációval azonos ritmusban fut.
+
 ## 15. Kompatibilitási réteg
 
 A `.stage-logic-bridge` még megtart néhány régi, offscreen DOM elemet:
