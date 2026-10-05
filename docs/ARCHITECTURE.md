@@ -265,12 +265,13 @@ A `playSfx()`:
 2. az egyedi SFX hangerőt megszorozza a `masterVolume` értékkel;
 3. 0–1 tartományra clampeli az eredményt.
 
-A Hangfelismerés szekció DOM-ja már létezik, de a vezérlők egyelőre
-`disabled` állapotúak.
+A Hangfelismerés lobby-beállításai működnek. A játék közbeni listening
+állapotot külön runtime mikrofon gomb vezérli; a hangfelismerés nem indul el
+automatikusan.
 
 ## 17. Voice recognition alrendszer
 
-A reusable voice modulok a külön voice laborból érkeztek:
+Reusable modulok:
 
 ```text
 config/voice-config.js
@@ -280,13 +281,38 @@ speech/parsers.js
 speech/voice-engine.js
 ```
 
-A klasszikus `app.js` a lobby settingshez a
-`window.KRISZWHEEL_VOICE_CONFIG` globális configot olvassa.
+A klasszikus `app.js` a runtime engine-et dinamikus `import()`-tal tölti,
+így a fő alkalmazást nem kellett ES module-ra átírni.
 
-A tényleges `VoiceEngine` integráció ES module importtal történik majd.
+Runtime állapotok a központi state-ben:
 
-A játékmenet kizárólag unified voice eventeket kap; nyers transcriptet nem
-parse-ol közvetlenül.
+```text
+voiceEngine
+voiceModulePromise
+voiceParseLetter
+voiceMediaStream
+voiceActive
+voiceStartPending
+voiceEngineState
+voiceInputMode
+voiceIgnoreNextFinal
+voiceSolveDialogOwned
+```
+
+A voice adapter kizárólag a meglévő játékműveleteket hívja:
+
+- `spinWheel()`;
+- `buyVowel()`;
+- `handleConsonant()`;
+- `trySolve()`.
+
+A kiválasztott mikrofonból `getUserMedia()` stream készül. A track átadásra
+kerül a BrowserSpeechProvidernek; ha az adott böngésző nem támogatja a
+track-paraméteres `SpeechRecognition.start()` hívást, a provider saját
+fallbackje lép életbe.
+
+A mikrofon gomb runtime kapcsoló, a lobby
+`speechRecognitionEnabled` értéke pedig master engedély.
 
 ## 18. Fontos invariánsok
 

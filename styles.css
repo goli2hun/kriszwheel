@@ -1095,6 +1095,95 @@ body.game-active .app-shell {
 }
 
 /* --------------------------------------------------------------------------
+   Hangfelismerés – alsó tesztablak
+   -------------------------------------------------------------------------- */
+
+.stage-voice-debug {
+  position: absolute;
+  z-index: 42;
+  left: 1.8%;
+  bottom: 1.55%;
+  width: 29%;
+  min-height: 6.1%;
+  padding: .42cqw .62cqw .48cqw;
+  pointer-events: none;
+  border: 1px solid rgba(128, 177, 235, .28);
+  border-radius: .58cqw;
+  color: #d9e8f8;
+  background:
+    linear-gradient(180deg, rgba(5, 30, 69, .88), rgba(3, 18, 47, .94));
+  box-shadow:
+    0 .24cqw .7cqw rgba(0, 0, 0, .34),
+    inset 0 1px 0 rgba(255, 255, 255, .07);
+  backdrop-filter: blur(7px);
+}
+
+.stage-voice-debug-head {
+  display: flex;
+  align-items: center;
+  gap: .32cqw;
+  color: #9db9d9;
+  font-size: .43cqw;
+  font-weight: 900;
+  letter-spacing: .09em;
+}
+
+.stage-voice-debug-head strong {
+  color: #dcecff;
+}
+
+.stage-voice-debug-head #voiceDebugState {
+  margin-left: auto;
+  color: #91a9c7;
+}
+
+.stage-voice-debug-dot {
+  width: .42cqw;
+  height: .42cqw;
+  border-radius: 50%;
+  background: #60758e;
+  box-shadow: 0 0 .35cqw rgba(95, 119, 145, .28);
+}
+
+.stage-voice-debug[data-state="listening"] .stage-voice-debug-dot {
+  background: #5ee782;
+  box-shadow: 0 0 .55cqw rgba(94, 231, 130, .58);
+}
+
+.stage-voice-debug[data-state="error"] .stage-voice-debug-dot {
+  background: #ff6f78;
+  box-shadow: 0 0 .5cqw rgba(255, 92, 102, .52);
+}
+
+.stage-voice-debug-text {
+  margin-top: .28cqw;
+  min-height: .72cqw;
+  overflow: hidden;
+  color: #ffffff;
+  font-size: .59cqw;
+  font-weight: 800;
+  line-height: 1.22;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.stage-voice-debug-text.is-interim {
+  color: #b9cbe0;
+  font-style: italic;
+}
+
+.stage-voice-debug-event {
+  margin-top: .2cqw;
+  overflow: hidden;
+  color: #ffd978;
+  font-size: .45cqw;
+  font-weight: 800;
+  line-height: 1.15;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* --------------------------------------------------------------------------
    Aktuális játékos – jobb alsó stúdiópanel
    -------------------------------------------------------------------------- */
 
@@ -1111,6 +1200,102 @@ body.game-active .app-shell {
   justify-content: center;
   gap: .58cqw;
   pointer-events: none;
+}
+
+.stage-voice-mic-btn {
+  position: absolute;
+  z-index: 6;
+  left: 50%;
+  top: -2.55cqw;
+  min-width: 4.6cqw;
+  height: 1.95cqw;
+  padding: 0 .55cqw;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .32cqw;
+  transform: translateX(-50%);
+  pointer-events: auto;
+  border: .08cqw solid rgba(166, 193, 230, .50);
+  border-radius: 999px;
+  color: #bdd0e8;
+  background:
+    linear-gradient(180deg, rgba(23, 51, 91, .92), rgba(7, 25, 57, .96));
+  box-shadow:
+    0 .2cqw .55cqw rgba(0, 0, 0, .36),
+    inset 0 1px 0 rgba(255, 255, 255, .08);
+  font-size: .5cqw;
+  font-weight: 900;
+  letter-spacing: .07em;
+  cursor: pointer;
+  backdrop-filter: blur(7px);
+  transition:
+    color .15s ease,
+    border-color .15s ease,
+    background .15s ease,
+    box-shadow .15s ease,
+    transform .15s ease,
+    opacity .15s ease;
+}
+
+.stage-voice-mic-btn svg {
+  width: .82cqw;
+  height: .82cqw;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.9;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.stage-voice-mic-btn:hover:not(:disabled),
+.stage-voice-mic-btn:focus-visible:not(:disabled) {
+  transform: translateX(-50%) translateY(-.05cqw);
+  color: #ffffff;
+  border-color: rgba(255, 224, 125, .72);
+}
+
+.stage-voice-mic-btn.is-active {
+  color: #d8ffe3;
+  border-color: rgba(93, 231, 132, .78);
+  background:
+    linear-gradient(180deg, rgba(25, 104, 60, .94), rgba(8, 54, 35, .96));
+  box-shadow:
+    0 0 .72cqw rgba(61, 224, 111, .30),
+    0 .2cqw .55cqw rgba(0, 0, 0, .36),
+    inset 0 1px 0 rgba(255, 255, 255, .10);
+}
+
+.stage-voice-mic-btn.is-listening::after {
+  content: "";
+  position: absolute;
+  inset: -.18cqw;
+  pointer-events: none;
+  border: .08cqw solid rgba(97, 239, 139, .68);
+  border-radius: 999px;
+  animation: voiceMicPulse 1.35s ease-out infinite;
+}
+
+.stage-voice-mic-btn.is-loading {
+  cursor: wait;
+  opacity: .78;
+}
+
+.stage-voice-mic-btn:disabled {
+  cursor: not-allowed;
+  opacity: .42;
+}
+
+@keyframes voiceMicPulse {
+  0% {
+    opacity: .82;
+    transform: scale(.96);
+  }
+  70%,
+  100% {
+    opacity: 0;
+    transform: scale(1.18);
+  }
 }
 
 .stage-current-avatar-ring {

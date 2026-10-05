@@ -220,7 +220,18 @@
     roundNumber: 0,
     justRevealed: new Set(),
     pendingWheelSegment: null,
-    pendingWheelFromBot: false
+    pendingWheelFromBot: false,
+
+    voiceEngine: null,
+    voiceModulePromise: null,
+    voiceParseLetter: null,
+    voiceMediaStream: null,
+    voiceActive: false,
+    voiceStartPending: false,
+    voiceEngineState: "idle",
+    voiceInputMode: null,
+    voiceIgnoreNextFinal: false,
+    voiceSolveDialogOwned: false
   };
 
   const el = {
@@ -253,6 +264,12 @@
     stageCurrentPlayerName: document.getElementById("stageCurrentPlayerName"),
     stageCurrentMoney: document.getElementById("stageCurrentMoney"),
     stageFeedback: document.getElementById("stageFeedback"),
+    voiceMicBtn: document.getElementById("voiceMicBtn"),
+    voiceMicBtnLabel: document.getElementById("voiceMicBtnLabel"),
+    voiceDebugPanel: document.getElementById("voiceDebugPanel"),
+    voiceDebugState: document.getElementById("voiceDebugState"),
+    voiceDebugText: document.getElementById("voiceDebugText"),
+    voiceDebugEvent: document.getElementById("voiceDebugEvent"),
     spinBtn: document.getElementById("spinBtn"),
     consonantStageBtn: document.getElementById("consonantStageBtn"),
     solveBtn: document.getElementById("solveBtn"),
@@ -287,6 +304,7 @@
     "hidden",
     DEBUG_CONFIG.showTestButton === false
   );
+  updateVoiceRuntimeUi();
 
   function updateMasterVolumeLabel() {
     el.masterVolumeValue.textContent =
@@ -573,10 +591,13 @@
     el.setupScreen.classList.add("hidden");
     el.gameScreen.classList.remove("hidden");
 
+    resetVoiceRuntimeForGame();
     newRound();
   }
 
   function newRound() {
+    state.voiceInputMode = null;
+    state.voiceIgnoreNextFinal = false;
     clearTimeout(state.botTimer);
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
@@ -814,6 +835,7 @@
     // A középső képi gomb csak jelzi, hogy most betűt várunk.
     // A tényleges választás közvetlen billentyűleütéssel történik.
     el.consonantStageBtn.disabled = !(human && state.phase === "letter");
+    updateVoiceRuntimeUi();
   }
 
   function hideStageFeedback() {
@@ -841,7 +863,595 @@
     el.message.textContent = msg;
   }
 
+  function voiceFeedback(message, type = "info") {
+    showStageFeedback(
+      message,
+      type,
+      Number(VOICE_CONFIG.runtime?.commandFeedbackMs ?? 1400)
+    );
+  }
+
+  function setVoiceDebugText(text, { interim = false } = {}) {
+    el.voiceDebugText.textContent = String(text || "–");
+    el.voiceDebugText.classList.toggle("is-interim", interim);
+  }
+
+  function setVoiceDebugEvent(text = "–") {
+    el.voiceDebugEvent.textContent = String(text || "–");
+  }
+
+  function updateVoiceRuntimeUi() {
+    const apiSupported =
+      speechRecognitionSupported() &&
+      microphoneApiSupported();
+    const enabled =
+      Boolean(userSettings.speechRecognitionEnabled) &&
+      apiSupported;
+    const listening =
+      state.voiceActive &&
+      state.voiceEngineState === "listening";
+
+    el.voiceMicBtn.disabled =
+      !enabled || state.voiceStartPending;
+    el.voiceMicBtn.classList.toggle(
+      "is-active",
+      state.voiceActive
+    );
+    el.voiceMicBtn.classList.toggle(
+      "is-listening",
+      listening
+    );
+    el.voiceMicBtn.classList.toggle(
+      "is-loading",
+      state.voiceStartPending ||
+      ["starting", "restarting"].includes(state.voiceEngineState)
+    );
+
+    el.voiceMicBtn.setAttribute(
+      "aria-pressed",
+      state.voiceActive ? "true" : "false"
+    );
+    el.voiceMicBtnLabel.textContent =
+      state.voiceActive ? "BE" : "KI";
+
+    const title = !userSettings.speechRecognitionEnabled
+      ? "Hangfelismerés kikapcsolva a Beállításokban"
+      : !apiSupported
+        ? "A böngésző nem támogatja a hangfelismerést"
+        : state.voiceActive
+          ? "Hangvezérlés kikapcsolása"
+          : "Hangvezérlés bekapcsolása";
+
+    el.voiceMicBtn.title = title;
+    el.voiceMicBtn.setAttribute("aria-label", title);
+
+    let panelState = "idle";
+    let stateLabel = "KI";
+
+    if (!apiSupported) {
+      panelState = "error";
+      stateLabel = "NEM ELÉRHETŐ";
+    } else if (listening) {
+      panelState = "listening";
+      stateLabel = "HALLGAT";
+    } else if (state.voiceActive) {
+      panelState = "active";
+      stateLabel =
+        state.voiceEngineState === "restarting"
+          ? "ÚJRAINDUL"
+          : "AKTÍV";
+    }
+
+    el.voiceDebugPanel.dataset.state = panelState;
+    el.voiceDebugState.textContent = stateLabel;
+  }
+
+  function stopVoiceMediaStream() {
+    state.voiceMediaStream?.getTracks().forEach(track => {
+      try {
+        track.stop();
+      } catch {
+        // A track már leállhatott.
+      }
+    });
+    state.voiceMediaStream = null;
+  }
+
+  function closeVoiceSolveMode() {
+    const ownedDialog = state.voiceSolveDialogOwned;
+    state.voiceInputMode = null;
+    state.voiceSolveDialogOwned = false;
+    state.voiceIgnoreNextFinal = false;
+
+    if (ownedDialog && el.solveDialog.open) {
+      el.solveDialog.close("voice-cancelled");
+    }
+
+    el.solveInput.placeholder = "";
+  }
+
+  function stopVoiceListening({ abort = false } = {}) {
+    closeVoiceSolveMode();
+
+    try {
+      if (abort) {
+        state.voiceEngine?.abort();
+      } else {
+        state.voiceEngine?.stop();
+      }
+    } catch {
+      // A recognizer már állhat.
+    }
+
+    stopVoiceMediaStream();
+    state.voiceActive = false;
+    state.voiceStartPending = false;
+    state.voiceEngineState = "stopped";
+    updateVoiceRuntimeUi();
+  }
+
+  function handleVoiceEngineState(nextState) {
+    state.voiceEngineState = String(nextState || "idle");
+
+    if (state.voiceEngineState === "stopped" && !state.voiceStartPending) {
+      state.voiceActive = false;
+      stopVoiceMediaStream();
+    }
+
+    updateVoiceRuntimeUi();
+  }
+
+  function handleVoiceError(error) {
+    const code = error?.code ?? "ismeretlen";
+    setVoiceDebugText(`Hangfelismerési hiba: ${code}`);
+    setVoiceDebugEvent(
+      error?.fatal
+        ? "HIBA · A MIKROFON LEÁLLT"
+        : "HIBA · ÚJRAPRÓBÁLKOZÁS"
+    );
+
+    el.voiceDebugPanel.dataset.state = "error";
+
+    if (error?.fatal) {
+      state.voiceActive = false;
+      state.voiceInputMode = null;
+      stopVoiceMediaStream();
+      updateVoiceRuntimeUi();
+      voiceFeedback(
+        `Hangfelismerési hiba: ${code}`,
+        "error"
+      );
+    }
+  }
+
+  function extractInlineSolveAnswer(transcript) {
+    const words = String(transcript ?? "")
+      .trim()
+      .split(/\s+/)
+      .filter(Boolean);
+
+    return words.length > 1
+      ? words.slice(1).join(" ")
+      : "";
+  }
+
+  function voiceActionAllowed() {
+    if (!document.body.classList.contains("game-active")) {
+      return false;
+    }
+
+    const player = currentPlayer();
+    if (!player || player.isBot) {
+      setVoiceDebugEvent("VÁRAKOZÁS · BOT KÖRE");
+      return false;
+    }
+
+    return true;
+  }
+
+  function voiceSolveAllowed() {
+    return ![
+      "spinning",
+      "wheelResult",
+      "playerTransition",
+      "roundEnd",
+      "setup"
+    ].includes(state.phase);
+  }
+
+  function openVoiceSolveMode() {
+    state.voiceInputMode = "solve";
+    state.voiceSolveDialogOwned = true;
+    el.solveInput.value = "";
+    el.solveInput.placeholder = "Mondd be a megfejtést…";
+
+    if (!el.solveDialog.open) {
+      el.solveDialog.showModal();
+    }
+
+    voiceFeedback("Mondd a megfejtést!");
+    setVoiceDebugEvent("VÁRAKOZÁS · MEGFEJTÉS");
+  }
+
+  function submitVoiceSolve(answer) {
+    const value = String(answer ?? "").trim();
+    if (!value) return false;
+
+    state.voiceInputMode = null;
+    state.voiceSolveDialogOwned = false;
+    el.solveInput.value = value;
+    el.solveInput.placeholder = "";
+
+    if (el.solveDialog.open) {
+      el.solveDialog.close("voice-answer");
+    }
+
+    hideStageFeedback();
+
+    requestAnimationFrame(() => {
+      trySolve(value, false);
+    });
+
+    return true;
+  }
+
+  function handleVoiceLetter(event) {
+    if (!voiceActionAllowed()) return;
+
+    const letter = normalize(event.value);
+    if (letter.length !== 1 || !/\p{L}/u.test(letter)) {
+      return;
+    }
+
+    setVoiceDebugEvent(`BETŰ · ${letter}`);
+
+    if (state.voiceInputMode === "vowel") {
+      if (!VOWELS.has(letter)) {
+        voiceFeedback("Magánhangzót mondj!", "error");
+        return;
+      }
+
+      state.voiceInputMode = null;
+      buyVowel(letter, false);
+      return;
+    }
+
+    if (VOWELS.has(letter)) {
+      if (!["spin", "letter"].includes(state.phase)) {
+        voiceFeedback(
+          "Most nem vásárolható magánhangzó.",
+          "error"
+        );
+        return;
+      }
+
+      buyVowel(letter, false);
+      return;
+    }
+
+    if (state.phase !== "letter") {
+      voiceFeedback("Előbb pörgess!", "error");
+      return;
+    }
+
+    handleConsonant(letter, false);
+  }
+
+  function handleVoiceCommand(event) {
+    if (!voiceActionAllowed()) return;
+
+    switch (event.command) {
+      case "SPIN":
+        state.voiceInputMode = null;
+        setVoiceDebugEvent("PARANCS · PÖRGETÉS");
+
+        if (state.phase !== "spin") {
+          voiceFeedback("Most nem lehet pörgetni.", "error");
+          return;
+        }
+
+        spinWheel(false);
+        return;
+
+      case "VOWEL": {
+        setVoiceDebugEvent("PARANCS · MAGÁNHANGZÓ");
+
+        if (!["spin", "letter"].includes(state.phase)) {
+          voiceFeedback(
+            "Most nem vásárolható magánhangzó.",
+            "error"
+          );
+          return;
+        }
+
+        if (currentPlayer().roundMoney < VOWEL_PRICE) {
+          voiceFeedback(
+            "Nincs elég pénzed magánhangzóra.",
+            "error"
+          );
+          return;
+        }
+
+        const inlineLetter = state.voiceParseLetter?.(
+          event.transcript,
+          VOICE_CONFIG.letters
+        );
+
+        if (inlineLetter && VOWELS.has(normalize(inlineLetter.value))) {
+          state.voiceInputMode = null;
+          buyVowel(normalize(inlineLetter.value), false);
+          return;
+        }
+
+        state.voiceInputMode = "vowel";
+        voiceFeedback("Mondd a magánhangzót!");
+        setVoiceDebugEvent("VÁRAKOZÁS · MAGÁNHANGZÓ");
+        return;
+      }
+
+      case "SOLVE": {
+        setVoiceDebugEvent("PARANCS · MEGFEJTÉS");
+
+        if (!voiceSolveAllowed()) {
+          voiceFeedback("Most nem lehet megfejteni.", "error");
+          return;
+        }
+
+        state.voiceIgnoreNextFinal = true;
+        const inlineAnswer = extractInlineSolveAnswer(
+          event.transcript
+        );
+
+        if (inlineAnswer) {
+          state.voiceInputMode = null;
+          state.voiceSolveDialogOwned = false;
+          submitVoiceSolve(inlineAnswer);
+          return;
+        }
+
+        openVoiceSolveMode();
+        return;
+      }
+
+      case "GAME":
+        setVoiceDebugEvent("PARANCS · JÁTÉK");
+        voiceFeedback(
+          "A Játék hangparancs még nincs hozzárendelve."
+        );
+        return;
+
+      default:
+        setVoiceDebugEvent(
+          `ISMERETLEN PARANCS · ${event.command}`
+        );
+    }
+  }
+
+  function handleVoiceEvent(event) {
+    if (!state.voiceActive || !event) return;
+
+    // Megfejtés módban a következő teljes transcript maga a válasz.
+    if (state.voiceInputMode === "solve") {
+      return;
+    }
+
+    if (event.type === "COMMAND") {
+      handleVoiceCommand(event);
+      return;
+    }
+
+    if (event.type === "LETTER") {
+      handleVoiceLetter(event);
+    }
+  }
+
+  function handleVoiceInterim(payload) {
+    if (!state.voiceActive) return;
+
+    const transcript = payload?.transcript ?? "";
+    if (!transcript) return;
+
+    setVoiceDebugText(transcript, { interim: true });
+
+    if (
+      state.voiceInputMode === "solve" &&
+      el.solveDialog.open
+    ) {
+      el.solveInput.value = transcript;
+    }
+  }
+
+  function handleVoiceFinal(payload) {
+    if (!state.voiceActive) return;
+
+    const transcript =
+      payload?.alternatives?.[0]?.transcript?.trim() ?? "";
+
+    if (transcript) {
+      setVoiceDebugText(transcript);
+    }
+
+    if (state.voiceIgnoreNextFinal) {
+      state.voiceIgnoreNextFinal = false;
+      return;
+    }
+
+    if (
+      state.voiceInputMode === "solve" &&
+      transcript
+    ) {
+      setVoiceDebugEvent("MEGFEJTÉS · FELISMERVE");
+      submitVoiceSolve(transcript);
+    }
+  }
+
+  async function ensureVoiceEngine() {
+    if (state.voiceEngine) {
+      return state.voiceEngine;
+    }
+
+    if (!state.voiceModulePromise) {
+      state.voiceModulePromise = Promise.all([
+        import("./speech/voice-engine.js"),
+        import("./speech/parsers.js")
+      ]);
+    }
+
+    const [engineModule, parserModule] =
+      await state.voiceModulePromise;
+
+    state.voiceParseLetter = parserModule.parseLetter;
+
+    const runtimeConfig = {
+      ...VOICE_CONFIG,
+      recognition: {
+        ...VOICE_CONFIG.recognition,
+        language:
+          userSettings.speechLanguage ||
+          VOICE_CONFIG.recognition?.language ||
+          "hu-HU"
+      }
+    };
+
+    state.voiceEngine = new engineModule.VoiceEngine(
+      runtimeConfig,
+      {
+        onState: handleVoiceEngineState,
+        onInterim: handleVoiceInterim,
+        onFinal: handleVoiceFinal,
+        onVoiceEvent: handleVoiceEvent,
+        onError: handleVoiceError
+      }
+    );
+
+    return state.voiceEngine;
+  }
+
+  async function createVoiceAudioTrack() {
+    const preferredId = userSettings.microphoneDeviceId;
+    let stream = null;
+
+    if (preferredId) {
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({
+          audio: {
+            deviceId: { exact: preferredId }
+          },
+          video: false
+        });
+      } catch (error) {
+        if (error?.name !== "OverconstrainedError" &&
+            error?.name !== "NotFoundError") {
+          throw error;
+        }
+      }
+    }
+
+    if (!stream) {
+      stream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: false
+      });
+    }
+
+    state.voiceMediaStream = stream;
+    return stream.getAudioTracks()[0] ?? null;
+  }
+
+  async function startVoiceListening() {
+    if (state.voiceActive || state.voiceStartPending) {
+      return;
+    }
+
+    if (!userSettings.speechRecognitionEnabled) {
+      voiceFeedback(
+        "Kapcsold be a hangfelismerést a Beállításokban.",
+        "error"
+      );
+      return;
+    }
+
+    if (
+      !speechRecognitionSupported() ||
+      !microphoneApiSupported()
+    ) {
+      voiceFeedback(
+        "A böngésző nem támogatja a hangfelismerést.",
+        "error"
+      );
+      return;
+    }
+
+    state.voiceStartPending = true;
+    state.voiceEngineState = "starting";
+    setVoiceDebugText("Mikrofon indítása…");
+    setVoiceDebugEvent("–");
+    updateVoiceRuntimeUi();
+
+    try {
+      const engine = await ensureVoiceEngine();
+
+      if (!engine.isSupported()) {
+        throw new Error(
+          "A SpeechRecognition provider nem támogatott."
+        );
+      }
+
+      const track = await createVoiceAudioTrack();
+
+      state.voiceActive = true;
+      engine.start(track);
+      updateVoiceRuntimeUi();
+    } catch (error) {
+      state.voiceActive = false;
+      state.voiceEngineState = "error";
+      stopVoiceMediaStream();
+      setVoiceDebugText(
+        `Mikrofonindítási hiba: ${error?.message ?? error}`
+      );
+      setVoiceDebugEvent("HIBA · INDÍTÁS");
+      el.voiceDebugPanel.dataset.state = "error";
+      voiceFeedback(
+        "Nem sikerült elindítani a mikrofont.",
+        "error"
+      );
+    } finally {
+      state.voiceStartPending = false;
+      updateVoiceRuntimeUi();
+    }
+  }
+
+  async function toggleVoiceListening() {
+    if (state.voiceActive) {
+      stopVoiceListening();
+      setVoiceDebugText("Mikrofon kikapcsolva.");
+      setVoiceDebugEvent("–");
+      return;
+    }
+
+    await startVoiceListening();
+  }
+
+  function resetVoiceRuntimeForGame() {
+    stopVoiceListening({ abort: true });
+    state.voiceEngine = null;
+    state.voiceEngineState = "idle";
+    state.voiceInputMode = null;
+    state.voiceIgnoreNextFinal = false;
+    state.voiceSolveDialogOwned = false;
+
+    setVoiceDebugText(
+      userSettings.speechRecognitionEnabled
+        ? "Mikrofon kikapcsolva. Kattints a mikrofon gombra."
+        : "Hangfelismerés kikapcsolva a Beállításokban."
+    );
+    setVoiceDebugEvent("–");
+    updateVoiceRuntimeUi();
+  }
+
   function nextPlayer(reason = "") {
+    state.voiceInputMode = null;
+    state.voiceIgnoreNextFinal = false;
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.botTimer);
 
@@ -986,6 +1596,8 @@
   }
 
   function finishRound(winner) {
+    state.voiceInputMode = null;
+    state.voiceIgnoreNextFinal = false;
     clearTimeout(state.botTimer);
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
@@ -1481,6 +2093,9 @@
   function spinWheel(fromBot = false) {
     if (state.phase !== "spin") return;
 
+    state.voiceInputMode = null;
+    state.voiceIgnoreNextFinal = false;
+
     const scene = getWheelScene();
     if (!scene?.ready || !scene.wheelContainer) {
       setMessage("A kerék még betöltődik…");
@@ -1536,6 +2151,10 @@
   }
 
   el.startGameBtn.addEventListener("click", startGame);
+  el.voiceMicBtn.addEventListener(
+    "click",
+    () => void toggleVoiceListening()
+  );
   el.settingsBtn.addEventListener("click", showSettingsScreen);
   el.settingsBackBtn.addEventListener("click", () => {
     populateSettingsForm();
@@ -1621,7 +2240,11 @@
   });
 
   el.solveBtn.addEventListener("click", () => {
+    state.voiceInputMode = null;
+    state.voiceSolveDialogOwned = false;
+    state.voiceIgnoreNextFinal = false;
     el.solveInput.value = "";
+    el.solveInput.placeholder = "";
     el.solveDialog.showModal();
     setTimeout(() => el.solveInput.focus(), 0);
   });
@@ -1632,11 +2255,26 @@
     const answer = el.solveInput.value;
     if (!answer.trim()) return;
 
+    state.voiceInputMode = null;
+    state.voiceSolveDialogOwned = false;
+    state.voiceIgnoreNextFinal = false;
+    el.solveInput.placeholder = "";
     el.solveDialog.close();
 
     requestAnimationFrame(() => {
       trySolve(answer, false);
     });
+  });
+
+  el.solveDialog.addEventListener("close", () => {
+    if (state.voiceInputMode === "solve") {
+      state.voiceInputMode = null;
+      state.voiceSolveDialogOwned = false;
+      state.voiceIgnoreNextFinal = false;
+      el.solveInput.placeholder = "";
+      hideStageFeedback();
+      setVoiceDebugEvent("MEGFEJTÉS · MEGSZAKÍTVA");
+    }
   });
 
   el.nextRoundBtn.addEventListener("click", () => {
@@ -1651,6 +2289,8 @@
   });
 
   function returnToLobby() {
+    stopVoiceListening({ abort: true });
+    state.voiceEngine = null;
     clearTimeout(state.botTimer);
     clearTimeout(state.wheelConfirmTimer);
     clearTimeout(state.playerTransitionTimer);
@@ -1669,6 +2309,7 @@
     el.settingsScreen.classList.add("hidden");
     el.setupScreen.classList.remove("hidden");
     el.message.textContent = "";
+    updateVoiceRuntimeUi();
   }
 
   el.endGameBtn.addEventListener("click", () => {

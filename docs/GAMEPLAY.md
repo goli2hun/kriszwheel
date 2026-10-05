@@ -230,13 +230,98 @@ A jobb felső gomb megerősítést kér:
 - Nem → játék folytatódik.
 - Igen → lobby.
 
-## 12. Teszt mód
+## 12. Hangvezérlés
+
+Feltétel:
+
+- a lobby Beállításokban a Hangfelismerés engedélyezve legyen;
+- támogatott böngésző és mikrofon API;
+- játék közben a mikrofon gomb `BE` állapotban legyen;
+- Bot körében a hangos játékműveletek figyelmen kívül maradnak.
+
+### Mikrofon gomb
+
+Az aktuális játékos avatárja fölött található.
+
+- `KI` → VoiceEngine nem hallgat;
+- `BE` → VoiceEngine aktív;
+- `HALLGAT` → a provider ténylegesen listening állapotban van.
+
+### Pörgetés
+
+Kimondható például:
+
+```text
+pörgetek
+pörgetés
+pörgess
+```
+
+Csak `spin` fázisban hajtódik végre.
+
+### Mássalhangzó
+
+A kerék pénzmezője után:
+
+```text
+B mint Balázs
+Cé mint Cecil
+K mint Károly
+```
+
+A parser `LETTER` eseménye a meglévő `handleConsonant()` függvénybe kerül.
+
+### Magánhangzó
+
+Két mód támogatott:
+
+```text
+magánhangzó
+A mint Alma
+```
+
+vagy közvetlenül:
+
+```text
+A mint Alma
+```
+
+A meglévő `buyVowel()` fut, ezért az ár- és pénzszabály változatlan.
+
+### Megfejtés
+
+Kétlépcsős:
+
+```text
+Megfejtés
+A kocka el van vetve
+```
+
+A második végleges transcript a meglévő `trySolve()` függvénybe kerül.
+
+Egymondatos forma is elfogadott:
+
+```text
+Megfejtés A kocka el van vetve
+```
+
+### HANG TESZT panel
+
+A stage bal alsó részén mutatja:
+
+- interim transcript;
+- final transcript;
+- felismert parancs vagy betű;
+- VoiceEngine állapot;
+- hibákat.
+
+## 13. Teszt mód
 
 A Teszt gomb megmutatja az aktuális megfejtést.
 
 `debug.showTestButton = false` esetén elrejthető.
 
-## 13. Állapotfolyam
+## 14. Állapotfolyam
 
 ```text
 setup

@@ -41,30 +41,44 @@ Módosítás után:
 9. Frissítés szükség esetén mikrofonengedélyt kér;
 10. provider, nyelv, engedélyezés és mikrofon menthető;
 11. játék indul;
-12. puzzle közép–közép;
-13. Pörgetés hover;
-14. Magánhangzó hover disabled állapotban is;
-15. Megfejtés hover;
-16. wheel overlay feljön;
-17. kerék célmezőre áll;
-18. eredmény automatikusan eltűnik;
-19. kis/nagybetű működik;
-20. ékezetes betű működik;
-21. több találat sorban villan;
-22. hangok sorban szólnak;
-23. magánhangzó ára levonódik;
-24. hibás solve dialog azonnal bezár;
-25. helytelen feedback látszik;
-26. játékosváltási szünet működik;
-27. helyes solve után teljes betűfelfedés lefut;
-28. victory overlay megjelenik;
-29. avatar és pénzek helyesek;
-30. tűzijáték fut;
-31. victory gombok késleltetve aktívak;
-32. Következő feladvány működik;
-33. victory Játék vége lobbyba visz;
-34. stage Játék vége megerősítést kér;
-35. Teszt gomb config szerint működik.
+12. mikrofon gomb látható az aktuális avatar fölött;
+13. hangfelismerés tiltott settings esetén a mikrofon gomb disabled;
+14. engedélyezett settings mellett a mikrofon gomb bekapcsolható;
+15. HANG TESZT panel interim transcriptet mutat;
+16. HANG TESZT panel final transcriptet mutat;
+17. `Pörgetés` hangparancs spin fázisban elindítja a kereket;
+18. pénzmező után `B mint Balázs` mássalhangzót ad be;
+19. `Magánhangzó` után `A mint Alma` vásárlást indít;
+20. közvetlen `A mint Alma` is működik spin/letter fázisban;
+21. `Megfejtés` után a következő transcript válaszként értékelődik;
+22. `Megfejtés <teljes válasz>` egymondatos forma működik;
+23. Bot körében voice esemény nem hajt végre játékakciót;
+24. mikrofon KI után nincs voice akció;
+25. lobbyba visszatérés leállítja a mikrofon streamet;
+26. puzzle közép–közép;
+27. Pörgetés hover;
+28. Magánhangzó hover disabled állapotban is;
+29. Megfejtés hover;
+30. wheel overlay feljön;
+31. kerék célmezőre áll;
+32. eredmény automatikusan eltűnik;
+33. kis/nagybetű működik;
+34. ékezetes betű működik;
+35. több találat sorban villan;
+36. hangok sorban szólnak;
+37. magánhangzó ára levonódik;
+38. hibás solve dialog azonnal bezár;
+39. helytelen feedback látszik;
+40. játékosváltási szünet működik;
+41. helyes solve után teljes betűfelfedés és letter_hit hangsor lefut;
+42. victory overlay megjelenik;
+43. avatar és pénzek helyesek;
+44. tűzijáték fut;
+45. victory gombok késleltetve aktívak;
+46. Következő feladvány működik;
+47. victory Játék vége lobbyba visz;
+48. stage Játék vége megerősítést kér;
+49. Teszt gomb config szerint működik.
 
 ## 4. Beállítások tesztelése
 

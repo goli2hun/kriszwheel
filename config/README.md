@@ -470,7 +470,8 @@ Fő csoportok:
 - `recognition` – nyelv, continuous, interim, alternatívák, restart delay;
 - `microphone` – preferált eszköznév szabályok;
 - `letters` – `mint/min` parser és kivételek;
-- `commands` – SPIN, SOLVE, VOWEL, GAME aliasok.
+- `commands` – SPIN, SOLVE, VOWEL, GAME aliasok;
+- `runtime.commandFeedbackMs` – a rövid voice stage feedback hossza.
 
 A lobbyban módosítható értékek `localStorage`-ba kerülnek, nem írják át ezt
 a fájlt.

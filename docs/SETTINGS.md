@@ -161,7 +161,16 @@ Y mint ipszilon -> Y
 Duplavé mint Walter -> W
 ```
 
-## 8. Következő integrációs lépés
+## 8. Játék közbeni runtime
 
-A következő commitban a `VoiceEngine` példányosítása és a unified
-`COMMAND` / `LETTER` események meglévő KriszWheel akciókra kötése következik.
+A VoiceEngine már be van kötve a játékmenetbe.
+
+A lobby `speechRecognitionEnabled` értéke master engedély. Játék közben az
+aktuális játékos avatarja fölötti mikrofon gomb kapcsolja a tényleges
+listening állapotot.
+
+A mikrofon nem indul automatikusan.
+
+Runtime részletek:
+
+[VOICE_RECOGNITION.md](VOICE_RECOGNITION.md)

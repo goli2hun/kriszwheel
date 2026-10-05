@@ -2,7 +2,7 @@
 
 ## Forrás
 
-Az első integráció alapja:
+Az integráció alapja:
 
 `goli2hun/voice-recognition`
 
@@ -20,55 +20,161 @@ speech/parsers.js
 speech/voice-engine.js
 ```
 
-A modulok célja, hogy a mikrofon / provider, a transcript értelmezése és a
-játéklogika külön maradjon.
+## Adatfolyam
 
 ```text
-Microphone
-   ↓
-SpeechProvider
-   ↓
+mikrofon
+  ↓
+BrowserSpeechProvider
+  ↓
 VoiceEngine
-   ↓
-command / letter parser
-   ↓
-unified voice event
-   ↓
-KriszWheel existing game action
+  ↓
+COMMAND / LETTER
+  ↓
+KriszWheel voice adapter az app.js-ben
+  ↓
+meglévő játékművelet
 ```
 
-## Fontos integrációs szabály
+A hangvezérlés nem tart fenn külön játékszabályokat.
 
-A hangvezérlés nem kaphat külön játékszabály-implementációt.
+## Runtime életciklus
 
-A későbbi `COMMAND: SPIN` ugyanazt a `spinWheel()` logikát hívja majd, mint
-a UI. A `LETTER` esemény ugyanabba a jelenlegi betűkezelésbe kerül, a
-`SOLVE` pedig a meglévő megfejtési folyamatot nyitja.
+A lobby `speechRecognitionEnabled` beállítása master kapcsoló.
 
-## Jelenlegi commit határa
+Játék közben az avatár fölötti:
 
-Már elkészült:
+`#voiceMicBtn`
 
-- voice config;
-- reusable provider/parser/engine modulok;
-- provider támogatás ellenőrzése a lobbyban;
-- hangfelismerés ki/be beállítás;
-- provider és nyelv beállítás;
-- mikrofonlista;
-- mikrofonengedély és frissítés;
-- mikrofon választás mentése.
+kapcsolja a tényleges listening állapotot.
 
-Még nincs bekötve:
+A mikrofon **nem indul automatikusan**.
 
-- VoiceEngine indítása játék közben;
-- mikrofon stream életciklus;
-- COMMAND események;
-- LETTER események;
-- élő transcript/debug;
-- benchmark.
+Bekapcsoláskor:
 
-## Provider csere
+1. dinamikusan importálódik a `VoiceEngine` és a parser;
+2. a mentett mikrofon `deviceId` alapján `getUserMedia()` stream indul;
+3. a kiválasztott audio track átadásra kerül a providernek;
+4. a VoiceEngine callbacks aktívvá válnak.
 
-A `VoiceEngine` stabil eseményhatára miatt később a browser provider
-Whisperre cserélhető anélkül, hogy a KriszWheel játékszabályait újra kellene
-írni.
+Kikapcsoláskor:
+
+- provider stop/abort;
+- audio trackek stop;
+- függő voice input mód törlődik.
+
+Lobbyba visszalépéskor a voice runtime teljesen leáll.
+
+## COMMAND események
+
+### SPIN / Pörgetés
+
+A meglévő:
+
+`spinWheel(false)`
+
+fut.
+
+Csak `spin` fázisban érvényes.
+
+### VOWEL / Magánhangzó
+
+A játék magánhangzó-várakozó módba lép.
+
+Ha ugyanabban a transcriptben már van betű:
+
+```text
+magánhangzó A mint Alma
+```
+
+akkor azonnal megpróbálja a vásárlást.
+
+Egyébként a következő `LETTER` eseményt várja.
+
+### SOLVE / Megfejtés
+
+A solve dialog voice módban megnyílik.
+
+A következő final transcript teljes válaszként kerül a:
+
+`trySolve(answer, false)`
+
+függvénybe.
+
+Az egymondatos:
+
+```text
+Megfejtés A kocka el van vetve
+```
+
+forma is támogatott.
+
+### GAME
+
+A parserből örökölt command jelenleg csak debug-visszajelzést ad; nincs
+játékművelethez rendelve.
+
+## LETTER események
+
+A parser szabálya:
+
+```text
+B mint Balázs -> B
+Cé mint Cecil -> C
+Y mint ipszilon -> Y
+Duplavé mint Walter -> W
+```
+
+Ha a betű magánhangzó, a meglévő `buyVowel()` hívódik.
+
+Ha mássalhangzó:
+
+- csak `letter` fázisban fogadható;
+- a meglévő `handleConsonant()` hívódik.
+
+## Bot kör
+
+A VoiceEngine továbbra is hallgathat, de játékműveletet Bot körében nem hajt
+végre.
+
+A debug panel ilyenkor:
+
+`VÁRAKOZÁS · BOT KÖRE`
+
+állapotot mutat.
+
+## HANG TESZT panel
+
+DOM:
+
+- `#voiceDebugPanel`
+- `#voiceDebugState`
+- `#voiceDebugText`
+- `#voiceDebugEvent`
+
+Megjeleníti az interim/final transcriptet, az értelmezett eseményt és a
+provider állapotát.
+
+Ez kifejezetten a következő finomhangolási körökhöz készült.
+
+## Hibakezelés
+
+Fatal provider hiba esetén:
+
+- `voiceActive = false`;
+- mikrofon stream leáll;
+- panel piros hibastátuszt kap;
+- stage feedback megjelenik.
+
+Nem fatal hiba esetén a browser provider újraindulhat.
+
+## Következő finomhangolások
+
+Tervezett:
+
+- command aliasok bővítése;
+- magyar betűfelismerés pontosságának hangolása;
+- solve transcript tisztítás;
+- háttérzaj-tűrés;
+- mikrofon/provider viselkedés összehasonlítása;
+- később Whisper provider.

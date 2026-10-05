@@ -303,6 +303,19 @@
         </div>
 
         <aside class="stage-current-player" aria-label="Aktuális játékos">
+          <button id="voiceMicBtn"
+                  type="button"
+                  class="stage-voice-mic-btn"
+                  aria-pressed="false"
+                  aria-label="Hangvezérlés bekapcsolása"
+                  title="Hangvezérlés bekapcsolása">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M12 15a3.5 3.5 0 0 0 3.5-3.5v-5a3.5 3.5 0 1 0-7 0v5A3.5 3.5 0 0 0 12 15Z"/>
+              <path d="M5.8 10.8v.7a6.2 6.2 0 0 0 12.4 0v-.7M12 17.7V21M8.8 21h6.4"/>
+            </svg>
+            <span id="voiceMicBtnLabel">KI</span>
+          </button>
+
           <div class="stage-current-avatar-ring">
             <img id="stageCurrentAvatar"
                  src="assets/images/krisz.png"
@@ -395,6 +408,21 @@
             </div>
           </section>
         </div>
+
+        <section id="voiceDebugPanel"
+                 class="stage-voice-debug"
+                 aria-label="Hangfelismerés tesztablak">
+          <div class="stage-voice-debug-head">
+            <span class="stage-voice-debug-dot" aria-hidden="true"></span>
+            <strong>HANG TESZT</strong>
+            <span id="voiceDebugState">KI</span>
+          </div>
+          <div id="voiceDebugText"
+               class="stage-voice-debug-text"
+               aria-live="polite">Mikrofon kikapcsolva.</div>
+          <div id="voiceDebugEvent"
+               class="stage-voice-debug-event">–</div>
+        </section>
 
         <div class="stage-logic-bridge" aria-hidden="true">
           <div id="playersList"></div>

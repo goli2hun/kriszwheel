@@ -200,7 +200,48 @@ Megerősítést kér.
 
 Közvetlen lobby.
 
-## 16. Reszponzivitás
+## 16. Hangvezérlés UI
+
+### Mikrofon gomb
+
+DOM:
+
+`#voiceMicBtn`
+
+Elhelyezés:
+
+- az aktuális játékos avatarja fölött;
+- a player panel külső geometriáját nem tolja el;
+- `pointer-events: auto`, miközben a player panel többi része továbbra sem
+  interaktív.
+
+Állapotok:
+
+- KI;
+- BE;
+- HALLGAT;
+- ÚJRAINDUL;
+- disabled / nem támogatott.
+
+### HANG TESZT panel
+
+DOM:
+
+`#voiceDebugPanel`
+
+Elhelyezés:
+
+- stage bal alsó része;
+- nem fedheti a középső fő hotspotokat.
+
+Tartalom:
+
+- provider állapot;
+- interim/final transcript;
+- felismert command vagy letter;
+- hibaüzenet.
+
+## 17. Reszponzivitás
 
 A stage megtartja a 1672:941 arányt.
 
@@ -210,7 +251,7 @@ A wheel overlay saját négyzetes területet használ.
 
 A teljes mobil-layout még nem végleges.
 
-## 17. Háttérkép cseréje
+## 18. Háttérkép cseréje
 
 Új háttérnél ellenőrizendő:
 

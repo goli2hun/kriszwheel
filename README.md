@@ -158,6 +158,23 @@ Több azonos találatnál a felvillanások és a találati hangok sorban futnak.
 Helyes megfejtésnél nincs külön sikerhang: a még rejtett betűk felfedésével
 szinkronban kizárólag a `letter_hit.wav` szól.
 
+### Hangvezérlés
+
+Ha a lobby Beállításokban engedélyezve van a hangfelismerés, a színpadon az
+aktuális játékos avatárja fölött megjelenő mikrofon gombbal kapcsolható ki/be
+az élő hangvezérlés.
+
+Első körben támogatott:
+
+- `Pörgetés` → ugyanazt a `spinWheel()` folyamatot indítja, mint a gomb;
+- `Magánhangzó` → magánhangzó-várakozó mód;
+- `Megfejtés` → a következő kimondott szöveget teljes megfejtésként értékeli;
+- `B mint Balázs` / `Cé mint Cecil` jellegű betűmondás;
+- közvetlen magánhangzó-betűmondás;
+- élő interim/final transcript az alsó `HANG TESZT` panelen.
+
+A mikrofon nem indul automatikusan a játék indításakor.
+
 Alap ritmus:
 
 `500 ms`

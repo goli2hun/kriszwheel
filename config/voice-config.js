@@ -26,6 +26,10 @@ window.KRISZWHEEL_VOICE_CONFIG = {
     defaultDevicePenalty: 2
   },
 
+  runtime: {
+    commandFeedbackMs: 1400
+  },
+
   letters: {
     enabled: true,
     connectors: ["mint", "min"],
