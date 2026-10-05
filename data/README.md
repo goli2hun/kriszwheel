@@ -35,12 +35,12 @@ A parser támogatja az idézőjelezett mezőket és a duplázott idézőjelet.
 Teszt módban ezek a fájlok nem használódnak.
 
 Éles módban a játék indulásakor a lobbyban kiválasztott nehézséghez tartozó
-CSV betöltődik a `state.livePuzzles` tömbbe. A mapping és az elvárt minimális
-elemszám a `config/game-config.js` `puzzles` blokkjában található.
+CSV betöltődik a `state.livePuzzles` tömbbe. A mapping a
+`config/game-config.js` `puzzles` blokkjában található.
 
-Ha a kérés hibára fut vagy a lista rövidebb a
-`puzzles.expectedCountPerDifficulty` értéknél, a játék a lobbyban marad és
-hibaüzenetet mutat.
+A játék csak azt követeli meg, hogy a CSV legalább egy érvényes feladványt
+tartalmazzon. Ha a kérés hibára fut vagy a lista üres / csak hibás sorokat
+tartalmaz, a játék a lobbyban marad és hibaüzenetet mutat.
 
 ## Szerkesztési szabályok
 
@@ -102,7 +102,7 @@ példányait), majd automatikusan újra lefuttatja az ellenőrzést.
 A script magyarul írja ki az eredményt, és ellenőrzi:
 
 - a négy CSV meglétét és fejlécét;
-- a pontos 100-as elemszámot;
+- hogy legyen legalább 1 érvényes feladvány;
 - az üres mezőket;
 - a fájlon belüli duplikációkat;
 - a nehézségi szintek közötti duplikációkat;
@@ -121,9 +121,9 @@ Alap módban a script csak olvas. CSV-t kizárólag a kifejezetten megadott
 A nehézségi szintek közötti duplikáció továbbra is csak figyelmeztetés, ezért
 azokat a javító mód sem törli automatikusan.
 
-**Fontos:** törlés után egy lista 100 alá csökkenhet. Ekkor a validátor
-elemszámhibát jelez, és az éles játék sem fogja elfogadni a listát addig,
-amíg új, érvényes feladványokkal vissza nem töltjük 100 elemre.
+**Fontos:** törlés után a lista lehet 100 alatti is; ez önmagában nem hiba.
+Csak az számít hibának, ha az adott CSV-ben egyetlen érvényes feladvány sem
+marad.
 
 ## Bővítés
 
