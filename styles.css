@@ -186,20 +186,34 @@ h2 {
   border-radius: 50%;
 }
 
-.guest-avatar-clip .avatar-photo {
-  transform: scale(1.28);
+.guest-avatar-clip .guest-avatar-1 {
+  transform: scale(1.50);
 }
 
-.player-option:hover .guest-avatar-clip .avatar-photo {
-  transform: scale(1.31);
+.guest-avatar-clip .guest-avatar-2 {
+  transform: scale(1.55);
 }
 
-/* A stage/victory képeknél nincs külön crop wrapper, ezért a clip-path
-   tartja meg az eredeti körméretet a belső nagyítás mellett. */
-.stage-current-avatar-ring img.is-guest-avatar,
-.victory-avatar-ring img.is-guest-avatar {
-  transform: scale(1.28);
-  clip-path: circle(39.1% at 50% 50%);
+.player-option:hover .guest-avatar-clip .guest-avatar-1 {
+  transform: scale(1.54);
+}
+
+.player-option:hover .guest-avatar-clip .guest-avatar-2 {
+  transform: scale(1.59);
+}
+
+/* A két új PNG kompozíciója nem teljesen azonos, ezért külön skálát kapnak.
+   A clip-path kompenzálja a transformot, így a külső kör mérete változatlan. */
+.stage-current-avatar-ring img.guest-avatar-1,
+.victory-avatar-ring img.guest-avatar-1 {
+  transform: scale(1.50);
+  clip-path: circle(33.33% at 50% 50%);
+}
+
+.stage-current-avatar-ring img.guest-avatar-2,
+.victory-avatar-ring img.guest-avatar-2 {
+  transform: scale(1.55);
+  clip-path: circle(32.26% at 50% 50%);
 }
 
 .player-option strong {

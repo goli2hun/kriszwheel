@@ -84,10 +84,11 @@
     const safeName = PLAYER_IMAGES[playerName] ? playerName : "Bot";
     imageElement.src = PLAYER_IMAGES[safeName];
     imageElement.alt = altText ?? `${playerName} profilképe`;
-    imageElement.classList.toggle(
-      "is-guest-avatar",
-      GUEST_PLAYERS.has(safeName)
-    );
+
+    const isGuest = GUEST_PLAYERS.has(safeName);
+    imageElement.classList.toggle("is-guest-avatar", isGuest);
+    imageElement.classList.toggle("guest-avatar-1", safeName === "Vendég 1");
+    imageElement.classList.toggle("guest-avatar-2", safeName === "Vendég 2");
   }
 
   const SFX = {

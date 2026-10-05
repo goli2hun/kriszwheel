@@ -148,9 +148,10 @@ A két vendég PNG avatart használ:
 - `assets/images/guest2.png`
 
 A vendég PNG-k nagyobb belső margóval készültek, ezért a lobby külön
-`guest-avatar-clip` crop réteget és 1.28× belső nagyítást használ. A
-játékszínpad és a győzelmi képernyő az `is-guest-avatar` osztállyal
-alkalmazza ugyanezt a vizuális korrekciót.
+`guest-avatar-clip` crop réteget használ. A két forrás kompozíciója eltér:
+Vendég 1 1.50×, Vendég 2 1.55× belső nagyítást kap. A játékszínpad és a
+győzelmi képernyő a `guest-avatar-1` / `guest-avatar-2` osztályokkal ugyanazt
+a korrekciót alkalmazza.
 
 A Bot felismerése továbbra is:
 
