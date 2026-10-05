@@ -89,6 +89,16 @@ Futtatás a repository gyökeréből:
 python tools/validate_puzzles.py
 ```
 
+Automatikus javító mód:
+
+```powershell
+python tools/validate_puzzles.py --javitas
+```
+
+A `--javitas` törli a valódi hibát okozó feladványsorokat (például a
+15×4-es táblára nem tördelhető sort vagy fájlon belüli duplikáció további
+példányait), majd automatikusan újra lefuttatja az ellenőrzést.
+
 A script magyarul írja ki az eredményt, és ellenőrzi:
 
 - a négy CSV meglétét és fejlécét;
@@ -105,7 +115,15 @@ A `[HIBA]` problémák 1-es exit kódot eredményeznek. A
 `[FIGYELMEZTETÉS]` elemek nem teszik sikertelenné a futást, de kézi
 áttekintést igényelnek.
 
-A script csak olvas: CSV-t soha nem módosít automatikusan.
+Alap módban a script csak olvas. CSV-t kizárólag a kifejezetten megadott
+`--javitas` kapcsolóval módosít.
+
+A nehézségi szintek közötti duplikáció továbbra is csak figyelmeztetés, ezért
+azokat a javító mód sem törli automatikusan.
+
+**Fontos:** törlés után egy lista 100 alá csökkenhet. Ekkor a validátor
+elemszámhibát jelez, és az éles játék sem fogja elfogadni a listát addig,
+amíg új, érvényes feladványokkal vissza nem töltjük 100 elemre.
 
 ## Bővítés
 
