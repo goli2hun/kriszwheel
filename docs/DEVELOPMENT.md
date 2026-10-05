@@ -139,7 +139,7 @@ Fontos:
 - hosszú szó esetén tördelést tesztelni;
 - a lista érje el a `puzzles.expectedCountPerDifficulty` minimumot.
 
-## 9. Új játékos
+## 10. Új játékos
 
 Módosítandó:
 
