@@ -105,6 +105,16 @@ Minden feladványmódosítás után futtasd:
 python tools/validate_puzzles.py
 ```
 
+A hibás feladványsorok automatikus törléséhez:
+
+```powershell
+python tools/validate_puzzles.py --javitas
+```
+
+A javító mód után mindig nézd meg az elemszámot is: a törölt sorokat új,
+érvényes feladványokkal pótolni kell, hogy minden éles lista ismét elérje a
+100 elemet.
+
 A script magyar kimenetet ad. A `[HIBA]` jelölések javítandók; ezeknél a
 folyamat exit kódja 1. A szintek közötti ismétlések
 `[FIGYELMEZTETÉS]` szinten jelennek meg.
