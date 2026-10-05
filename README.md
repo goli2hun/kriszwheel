@@ -360,6 +360,7 @@ kriszwheel/
 ├── config/
 │   ├── game-config.js
 │   ├── voice-config.js
+│   ├── hungarian-names.js
 │   └── README.md
 ├── data/
 │   ├── child.csv
