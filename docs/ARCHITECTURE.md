@@ -368,6 +368,7 @@ Reusable modulok:
 
 ```text
 config/voice-config.js
+config/hungarian-names.js
 speech/provider.js
 speech/browser-provider.js
 speech/parsers.js
@@ -395,7 +396,13 @@ voiceIgnoreNextFinal
 voiceSolveDialogOwned
 ```
 
-A voice adapter kizárólag a meglévő játékműveleteket hívja:
+A voice adapter kizárólag a meglévő játékműveleteket hívja. A
+`currentVoiceLetterConfig()` runtime-ban összefűzi a
+`config/voice-config.js` betűszabályait a
+`config/hungarian-names.js` névlistájával és a mentett
+`advancedNameRecognitionEnabled` kapcsolóval.
+
+A voice adapter kizárólag ezeket a meglévő játékműveleteket hívja:
 
 - `spinWheel()`;
 - `buyVowel()`;
@@ -505,3 +512,30 @@ normalizált szöveg, mert az index CSV-átrendezéskor megváltozhat.
 
 Teljes készletkimerüléskor `PUZZLE_POOL_EXHAUSTED` hiba keletkezik, amit a
 `newRound()` kezel: visszalép a lobbyba és felhasználói hibaüzenetet mutat.
+
+
+## 23. Haladó névfelismerés architektúrája
+
+A névfelismerés konfigurációja külön globális objektum:
+
+`window.KRISZWHEEL_HUNGARIAN_NAMES`
+
+Forrás:
+
+`config/hungarian-names.js`
+
+A parser sorrendje betűfelismeréskor:
+
+1. hagyományos `mint/min` connector keresése;
+2. a meglévő connector-kivételek ellenőrzése;
+3. connector után az első betű használata;
+4. ha nincs connector-alapú találat és a Haladó névfelismerés engedélyezett,
+   a transcript teljes szavainak összevetése a névlistával;
+5. speciális névfelismerési kivételek kezelése, például
+   `Ypszilon` / `ipszilon` → Y.
+
+A teljes szavas egyezés csökkenti a részszavas fals pozitív találatokat.
+
+A beállítás user preference, ezért nem a statikus configban kapcsoljuk ki/be,
+hanem a `kriszwheel.user-settings.v1` objektumban tárolódik
+`advancedNameRecognitionEnabled` néven.
