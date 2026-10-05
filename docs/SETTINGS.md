@@ -4,9 +4,10 @@
 
 A lobbyból külön `Beállítások` képernyő nyitható.
 
-Két fő szekció:
+Három fő szekció:
 
 - Általános beállítások;
+- Zene és hangulat;
 - Hangfelismerés.
 
 A képernyő alján:
@@ -85,7 +86,92 @@ Alapérték:
 `pickPuzzle()` és a jelenlegi `PUZZLES` lista nincs rákötve erre a
 beállításra.
 
-## 3. Hangfelismerés
+## 3. Zene és hangulat
+
+Minden zenei sávhoz két felhasználói beállítás tartozik:
+
+- engedélyezés;
+- egyedi hangerő 0–100% között.
+
+A tényleges hangerő:
+
+```text
+egyedi hangerő × masterVolume
+```
+
+### Kerék forgási hang
+
+DOM:
+
+- `#wheelSpinSoundEnabledSetting`
+- `#wheelSpinVolumeSetting`
+- `#wheelSpinVolumeValue`
+
+Mentett mezők:
+
+- `wheelSpinSoundEnabled`
+- `wheelSpinVolume`
+
+Csak a Phaser kerék tween tényleges futása alatt szól.
+
+### Lobby zene
+
+DOM:
+
+- `#lobbyMusicEnabledSetting`
+- `#lobbyMusicVolumeSetting`
+- `#lobbyMusicVolumeValue`
+
+Mentett mezők:
+
+- `lobbyMusicEnabled`
+- `lobbyMusicVolume`
+
+A lobbyban és a Beállítások képernyőjén loopol. Autoplay-blokkolás esetén az
+első user gesture után automatikusan újrapróbáljuk.
+
+### Győzelmi zene
+
+DOM:
+
+- `#winnerMusicEnabledSetting`
+- `#winnerMusicVolumeSetting`
+- `#winnerMusicVolumeValue`
+
+Mentett mezők:
+
+- `winnerMusicEnabled`
+- `winnerMusicVolume`
+
+A `finishRound()` indítja, nulláról a konfigurált fade-idő alatt erősödik fel.
+
+### Játékzene
+
+DOM a Beállításokban:
+
+- `#gameMusicEnabledSetting`
+- `#gameMusicVolumeSetting`
+- `#gameMusicVolumeValue`
+
+Stage runtime kapcsoló:
+
+`#gameMusicToggleBtn`
+
+Mentett mezők:
+
+- `gameMusicEnabled`
+- `gameMusicVolume`
+
+A stage kapcsoló ugyanazt a `gameMusicEnabled` értéket módosítja és azonnal
+perzisztálja.
+
+Aktív mikrofon mellett a játékzene duckinget kap. Paraméterek:
+
+- `audio.music.game.microphoneDuckMultiplier`
+- `audio.music.game.microphoneDuckFadeMs`
+- `audio.music.game.microphoneRestoreFadeMs`
+
+## 4. Hangfelismerés
 
 A voice-alrendszer alapja a külön `goli2hun/voice-recognition` laborból
 érkezett, a következő forrásverzióból:
@@ -144,7 +230,7 @@ a mikrofonok valódi nevét.
 A preferált mikrofon kiválasztási szabályai a
 `config/voice-config.js` fájlban vannak.
 
-## 4. Felhasználói settings objektum
+## 5. Felhasználói settings objektum
 
 Tárolási kulcs:
 
@@ -158,6 +244,14 @@ Jelenlegi forma:
   "masterVolume": 1,
   "autoSpinEnabled": false,
   "puzzleMode": "test",
+  "wheelSpinSoundEnabled": true,
+  "wheelSpinVolume": 0.65,
+  "lobbyMusicEnabled": true,
+  "lobbyMusicVolume": 0.3,
+  "winnerMusicEnabled": true,
+  "winnerMusicVolume": 0.75,
+  "gameMusicEnabled": true,
+  "gameMusicVolume": 0.2,
   "speechRecognitionEnabled": false,
   "speechProvider": "browser",
   "speechLanguage": "hu-HU",
@@ -165,15 +259,15 @@ Jelenlegi forma:
 }
 ```
 
-A régebbi settings objektumok továbbra is betölthetők; a hiányzó voice mezők
-default értéket kapnak.
+A régebbi settings objektumok továbbra is betölthetők; minden hiányzó mező
+a config/default értéket kapja.
 
-## 5. Vissza
+## 6. Vissza
 
 A `Vissza` gomb nem menti a módosításokat. Újranyitáskor a legutóbb mentett
 értékek töltődnek vissza.
 
-## 6. Voice modulok
+## 7. Voice modulok
 
 A KriszWheelbe áthozott reusable modulok:
 
@@ -188,7 +282,7 @@ speech/voice-engine.js
 A benchmark és a voice-recognition demo debug UI-ja szándékosan nem része
 ennek az integrációs commitnak.
 
-## 7. Betűfelismerési szabály
+## 8. Betűfelismerési szabály
 
 A parser a konfigurált kapcsolószót keresi:
 
@@ -208,7 +302,7 @@ Y mint ipszilon -> Y
 Duplavé mint Walter -> W
 ```
 
-## 8. Játék közbeni runtime
+## 9. Játék közbeni runtime
 
 A VoiceEngine már be van kötve a játékmenetbe.
 

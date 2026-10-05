@@ -51,6 +51,9 @@ A `totalMoney` megmarad.
 
 `spin → spinning → wheelResult`
 
+A `wheel_spinning.mp3` a tényleges tween indulásakor kezdődik és a kerék
+megállásakor leáll. Engedélyezése és hangereje külön user setting.
+
 A játék véletlen célcikkelyt választ, majd Phaser fizikailag annak megfelelő
 szögre forgatja a kereket.
 
@@ -153,6 +156,9 @@ A válasz normalizálása:
 - következő játékos.
 
 ### Helyes válasz
+
+A `finishRound()` a játékzenét leállítja/fade-eli, majd a
+`winner_music.mp3` sávot nulláról fokozatosan felerősíti.
 
 1. a dialog már zárva van;
 2. a rejtett betűk sorban felfedődnek;
@@ -314,6 +320,10 @@ Automatikus visszakapcsolás:
 
 Ha a voice owner köre később visszatér, a mikrofon **nem** kapcsol be már a
 `spin` fázis elején; előbb pörgetni kell.
+
+Amíg a mikrofon aktív vagy indul, a `game_music.mp3` automatikusan a
+konfigurált duck hangerőre halkul. A mikrofon leállásakor fokozatosan
+visszaerősödik.
 
 ### Pörgetés
 

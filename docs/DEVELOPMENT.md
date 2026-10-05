@@ -31,47 +31,35 @@ URL:
 Módosítás után:
 
 1. lobby betölt;
-2. játékosválasztás működik;
-3. Beállítások nézet megnyílik;
-4. Auto pörgetés és Feladványmód menthető;
-5. játék indul;
-6. manuális mikrofon BE az aktuális emberi játékost voice ownerként eltárolja;
-7. pörgetés indulásakor a mikrofon automatikusan leáll, owner megmarad;
-8. pénzmező után owner körében a mikrofon automatikusan visszakapcsol;
-9. játékosváltáskor a mikrofon azonnal leáll;
-10. másik játékos körében a mikrofon nem indul vissza;
-11. owner következő körében a mikrofon spin előtt nem indul vissza;
-12. owner következő körében a mikrofon csak a pörgetés után indul vissza;
-13. következő játékos megjelenése után `turnReadyDelayMs` várakozás történik;
-14. `turnReady` alatt kézi vezérlés, Bot és Auto pörgetés nem indul;
-15. Auto pörgetés KI/BE viselkedése helyes;
-16. kézi pörgetés törli a függő auto-pörgetést;
-17. Bot körében az Auto pörgetés nem avatkozik be;
-18. HANG TESZT panel interim/final transcriptet mutat;
-19. `Pörgetés` hangparancs működik;
-20. `B mint Balázs` mássalhangzó működik;
-21. `Magánhangzó` + betű működik;
-22. `Megfejtés` voice flow működik;
-23. lobbyba visszatérés leállítja a mikrofont és törli az ownert;
-24. puzzle és kerék flow működik;
-25. hibás/helyes solve flow működik;
-26. victory overlay és standings működik;
-27. játék vége flow működik.
+2. első user gesture után lobby zene hallható, ha engedélyezett;
+3. Beállításokban mind a négy zenei elem enable + hangerő értéke menthető;
+4. játék indításakor lobby zene leáll;
+5. engedélyezett játékzene diszkréten elindul;
+6. stage `♫ Játékzene` kapcsoló azonnal ki-/bekapcsol és ment;
+7. pörgetés teljes ideje alatt `wheel_spinning.mp3` szól;
+8. kerék megállásakor a forgási hang leáll;
+9. mikrofon bekapcsolásakor a játékzene lehalkul;
+10. mikrofon szünetelésekor a játékzene visszaerősödik;
+11. sikeres megfejtéskor a játékzene leáll/fade-el;
+12. winner music nulláról fokozatosan felerősödik;
+13. következő feladványnál winner music leáll és game music visszatér;
+14. lobbyba visszatéréskor game/winner/wheel zene leáll, lobby music elindul;
+15. masterVolume minden zenei sáv tényleges hangerejét szorozza;
+16. zenei kapcsolók KI állapotában az adott sáv nem indul;
+17. voice owner / turnReady / Auto pörgetés regresszió nélkül működik;
+18. puzzle, solve, victory és játék vége flow működik.
 
 ## 4. Beállítások tesztelése
 
-A lobby Beállítások nézete nem a statikus configot módosítja.
-
 Ellenőrzés:
 
-1. kapcsold ki a hangokat, Mentés, indíts játékot;
-2. ellenőrizd, hogy nincs SFX;
-3. menj vissza a lobbyba, nyisd meg újra a Beállításokat;
-4. az állapot maradjon meg;
-5. állítsd a fő hangerőt például 25%-ra, Mentés;
-6. indíts játékot és ellenőrizd a halkabb SFX-et;
-7. módosíts értéket mentés nélkül, majd Vissza;
-8. újranyitva a legutóbb mentett érték jelenjen meg.
+1. rövid SFX ki/be és fő hangerő menthető;
+2. mind a négy zenei sáv enable + hangerő menthető;
+3. 50% master × 30% lobby = kb. 15% tényleges célhangerő;
+4. kerékhang kikapcsolható úgy, hogy a többi zene megmarad;
+5. stage Játékzene gomb ki-/bekapcsol és perzisztál;
+6. mikrofon alatt game music ducking hallható;
+7. módosítás mentés nélkül + Vissza esetén a korábbi mentett érték tér vissza.
 
 Részletek:
 

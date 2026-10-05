@@ -211,7 +211,27 @@ Megerősítést kér.
 
 Közvetlen lobby.
 
-## 16. Hangvezérlés UI
+## 16. Játékzene kapcsoló
+
+DOM:
+
+`#gameMusicToggleBtn`
+
+Elhelyezés:
+
+- stage bal felső sarok;
+- a jobb felső `Játék vége` gomb vizuális párja.
+
+Állapot:
+
+- `♫ Játékzene: BE`
+- `♫ Játékzene: KI`
+
+A kapcsoló a perzisztált `gameMusicEnabled` értéket módosítja.
+
+Aktív mikrofon alatt a játékzene automatikusan halkul, majd visszafade-el.
+
+## 17. Hangvezérlés UI
 
 ### Mikrofon gomb
 
@@ -252,7 +272,7 @@ Tartalom:
 - felismert command vagy letter;
 - hibaüzenet.
 
-## 17. Reszponzivitás
+## 18. Reszponzivitás
 
 A stage megtartja a 1672:941 arányt.
 
@@ -262,7 +282,7 @@ A wheel overlay saját négyzetes területet használ.
 
 A teljes mobil-layout még nem végleges.
 
-## 18. Háttérkép cseréje
+## 19. Háttérkép cseréje
 
 Új háttérnél ellenőrizendő:
 

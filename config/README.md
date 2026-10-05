@@ -350,37 +350,65 @@ A kiválasztott betű bejelentése és tényleges beadása közti idő.
 
 ## 5. audio
 
-### audio.defaultVolume
+### Rövid SFX
 
 ```js
-defaultVolume: 0.70
-```
-
-Általános fallback hangerő.
-
-### Specifikus hangerők
-
-```js
+defaultVolume: 0.70,
 letterHitVolume: 0.72,
 solveFailVolume: 0.72
 ```
 
-Helyes megfejtéshez nincs külön siker-SFX. A fennmaradó betűk felfedésekor a
-`letterHitVolume` és a `letter_hit.wav` használódik.
+A `soundsEnabled` a rövid SFX-eket kapcsolja. A `masterVolume` az SFX-re
+és a zenei sávokra egyaránt érvényes.
 
-0–1 tartomány ajánlott.
-
-### audio.files
+### audio.music.wheelSpin
 
 ```js
-files: {
-  letterHit: "assets/sound/sfx/letter_hit.wav",
-  letterMiss: "assets/sound/sfx/letter_miss.mp3",
-  solveFail: "assets/sound/sfx/solve_fail.wav"
-}
+file: "assets/sound/sfx/wheel_spinning.mp3",
+defaultEnabled: true,
+defaultVolume: 0.65,
+loop: true,
+fadeOutMs: 120
 ```
 
-A fájlutak a repo gyökeréhez képest értendők.
+### audio.music.lobby
+
+```js
+file: "assets/sound/sfx/lobby_music.mp3",
+defaultEnabled: true,
+defaultVolume: 0.30,
+loop: true,
+fadeInMs: 650,
+fadeOutMs: 350
+```
+
+### audio.music.winner
+
+```js
+file: "assets/sound/sfx/winner_music.mp3",
+defaultEnabled: true,
+defaultVolume: 0.75,
+loop: true,
+fadeInMs: 2600,
+fadeOutMs: 300
+```
+
+### audio.music.game
+
+```js
+file: "assets/sound/sfx/game_music.mp3",
+defaultEnabled: true,
+defaultVolume: 0.20,
+loop: true,
+fadeInMs: 700,
+fadeOutMs: 350,
+microphoneDuckMultiplier: 0.10,
+microphoneDuckFadeMs: 220,
+microphoneRestoreFadeMs: 650
+```
+
+A `defaultEnabled` és `defaultVolume` csak hiányzó user setting esetén
+alapérték. A tényleges választás `localStorage`-ban tárolódik.
 
 ## 6. victory
 

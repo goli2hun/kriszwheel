@@ -98,6 +98,48 @@ window.KRISZWHEEL_CONFIG = {
       letterHit: "assets/sound/sfx/letter_hit.wav",
       letterMiss: "assets/sound/sfx/letter_miss.mp3",
       solveFail: "assets/sound/sfx/solve_fail.wav"
+    },
+
+    music: {
+      wheelSpin: {
+        file: "assets/sound/sfx/wheel_spinning.mp3",
+        defaultEnabled: true,
+        defaultVolume: 0.65,
+        loop: true,
+        fadeOutMs: 120
+      },
+
+      lobby: {
+        file: "assets/sound/sfx/lobby_music.mp3",
+        defaultEnabled: true,
+        defaultVolume: 0.30,
+        loop: true,
+        fadeInMs: 650,
+        fadeOutMs: 350
+      },
+
+      winner: {
+        file: "assets/sound/sfx/winner_music.mp3",
+        defaultEnabled: true,
+        defaultVolume: 0.75,
+        loop: true,
+        fadeInMs: 2600,
+        fadeOutMs: 300
+      },
+
+      game: {
+        file: "assets/sound/sfx/game_music.mp3",
+        defaultEnabled: true,
+        defaultVolume: 0.20,
+        loop: true,
+        fadeInMs: 700,
+        fadeOutMs: 350,
+
+        // Aktív mikrofon mellett a játékzene ennyiszeres hangerőre halkul.
+        microphoneDuckMultiplier: 0.10,
+        microphoneDuckFadeMs: 220,
+        microphoneRestoreFadeMs: 650
+      }
     }
   },
 

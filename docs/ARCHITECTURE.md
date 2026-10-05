@@ -223,16 +223,55 @@ wheel overlay
 victory overlay
 ```
 
-## 14. Hang
+## 14. Hang és zene
 
-A hangok `Audio` cache-ből mennek.
+### SFX
 
-Lejátszáskor `cloneNode()` készül, ezért az egymást követő találati hangok
-nem vágják le egymást.
+A rövid hanghatások `Audio` cache-ből mennek. Lejátszáskor `cloneNode()`
+készül, ezért az egymást követő találati hangok nem vágják le egymást.
 
-Helyes megfejtéshez nincs külön success SFX. A `finishRound()` a még rejtett
-betűhelyek számával hívja a `playHitSequence()` függvényt, így a
-`letter_hit` hang a felfedési animációval azonos ritmusban fut.
+### Hosszú zenei sávok
+
+A tartós sávok külön `Audio` objektumot használnak:
+
+```text
+wheelSpin
+lobby
+winner
+game
+```
+
+A `MUSIC_TRACK_DEFS` köti össze a configot a user setting enable flaggel és
+hangerővel. Fő runtime műveletek:
+
+- `playMusicTrack()`
+- `stopMusicTrack()`
+- `fadeMusicTo()`
+- `syncMusicForCurrentScreen()`
+- `setGameMusicDucked()`
+
+Életciklus:
+
+```text
+lobby -> lobby music
+startGame -> lobby fade out + game music
+spinWheel -> wheelSpin start
+wheel stop -> wheelSpin stop
+finishRound -> game fade out + winner fade in
+newRound -> winner stop + game music
+returnToLobby -> game/winner/wheel stop + lobby music
+```
+
+Aktív / induló mikrofon mellett a játékzene célhangereje:
+
+```text
+gameMusicVolume × masterVolume × microphoneDuckMultiplier
+```
+
+A mikrofon leállásakor a hangerő `microphoneRestoreFadeMs` alatt áll vissza.
+
+A lobby music indulását autoplay policy blokkolhatja; az első `pointerdown`
+vagy `keydown` újrapróbálja a képernyőhöz tartozó zenei szinkront.
 
 ## 15. Kompatibilitási réteg
 
@@ -260,6 +299,14 @@ soundsEnabled
 masterVolume
 autoSpinEnabled
 puzzleMode
+wheelSpinSoundEnabled
+wheelSpinVolume
+lobbyMusicEnabled
+lobbyMusicVolume
+winnerMusicEnabled
+winnerMusicVolume
+gameMusicEnabled
+gameMusicVolume
 speechRecognitionEnabled
 speechProvider
 speechLanguage

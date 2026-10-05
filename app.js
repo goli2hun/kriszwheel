@@ -6,6 +6,7 @@
   const WHEEL_CONFIG = CONFIG.wheel ?? {};
   const BOT_CONFIG = CONFIG.bot ?? {};
   const AUDIO_CONFIG = CONFIG.audio ?? {};
+  const MUSIC_CONFIG = AUDIO_CONFIG.music ?? {};
   const VICTORY_CONFIG = CONFIG.victory ?? {};
   const DEBUG_CONFIG = CONFIG.debug ?? {};
   const VOICE_CONFIG = window.KRISZWHEEL_VOICE_CONFIG ?? {};
@@ -16,6 +17,24 @@
     masterVolume: 1,
     autoSpinEnabled: false,
     puzzleMode: "test",
+
+    wheelSpinSoundEnabled:
+      MUSIC_CONFIG.wheelSpin?.defaultEnabled !== false,
+    wheelSpinVolume:
+      Number(MUSIC_CONFIG.wheelSpin?.defaultVolume ?? 0.65),
+    lobbyMusicEnabled:
+      MUSIC_CONFIG.lobby?.defaultEnabled !== false,
+    lobbyMusicVolume:
+      Number(MUSIC_CONFIG.lobby?.defaultVolume ?? 0.30),
+    winnerMusicEnabled:
+      MUSIC_CONFIG.winner?.defaultEnabled !== false,
+    winnerMusicVolume:
+      Number(MUSIC_CONFIG.winner?.defaultVolume ?? 0.75),
+    gameMusicEnabled:
+      MUSIC_CONFIG.game?.defaultEnabled !== false,
+    gameMusicVolume:
+      Number(MUSIC_CONFIG.game?.defaultVolume ?? 0.20),
+
     speechRecognitionEnabled: false,
     speechProvider: "browser",
     speechLanguage: VOICE_CONFIG.recognition?.language ?? "hu-HU",
@@ -48,6 +67,40 @@
           ["test", "live"].includes(stored.puzzleMode)
             ? stored.puzzleMode
             : DEFAULT_USER_SETTINGS.puzzleMode,
+
+        wheelSpinSoundEnabled:
+          typeof stored.wheelSpinSoundEnabled === "boolean"
+            ? stored.wheelSpinSoundEnabled
+            : DEFAULT_USER_SETTINGS.wheelSpinSoundEnabled,
+        wheelSpinVolume:
+          stored.wheelSpinVolume == null
+            ? DEFAULT_USER_SETTINGS.wheelSpinVolume
+            : clamp01(stored.wheelSpinVolume),
+        lobbyMusicEnabled:
+          typeof stored.lobbyMusicEnabled === "boolean"
+            ? stored.lobbyMusicEnabled
+            : DEFAULT_USER_SETTINGS.lobbyMusicEnabled,
+        lobbyMusicVolume:
+          stored.lobbyMusicVolume == null
+            ? DEFAULT_USER_SETTINGS.lobbyMusicVolume
+            : clamp01(stored.lobbyMusicVolume),
+        winnerMusicEnabled:
+          typeof stored.winnerMusicEnabled === "boolean"
+            ? stored.winnerMusicEnabled
+            : DEFAULT_USER_SETTINGS.winnerMusicEnabled,
+        winnerMusicVolume:
+          stored.winnerMusicVolume == null
+            ? DEFAULT_USER_SETTINGS.winnerMusicVolume
+            : clamp01(stored.winnerMusicVolume),
+        gameMusicEnabled:
+          typeof stored.gameMusicEnabled === "boolean"
+            ? stored.gameMusicEnabled
+            : DEFAULT_USER_SETTINGS.gameMusicEnabled,
+        gameMusicVolume:
+          stored.gameMusicVolume == null
+            ? DEFAULT_USER_SETTINGS.gameMusicVolume
+            : clamp01(stored.gameMusicVolume),
+
         speechRecognitionEnabled:
           typeof stored.speechRecognitionEnabled === "boolean"
             ? stored.speechRecognitionEnabled
@@ -173,6 +226,365 @@
     });
   }
 
+  const MUSIC_TRACK_DEFS = {
+    wheelSpin: {
+      config: MUSIC_CONFIG.wheelSpin ?? {},
+      enabledSetting: "wheelSpinSoundEnabled",
+      volumeSetting: "wheelSpinVolume"
+    },
+    lobby: {
+      config: MUSIC_CONFIG.lobby ?? {},
+      enabledSetting: "lobbyMusicEnabled",
+      volumeSetting: "lobbyMusicVolume"
+    },
+    winner: {
+      config: MUSIC_CONFIG.winner ?? {},
+      enabledSetting: "winnerMusicEnabled",
+      volumeSetting: "winnerMusicVolume"
+    },
+    game: {
+      config: MUSIC_CONFIG.game ?? {},
+      enabledSetting: "gameMusicEnabled",
+      volumeSetting: "gameMusicVolume"
+    }
+  };
+
+  const musicTracks = Object.fromEntries(
+    Object.entries(MUSIC_TRACK_DEFS).map(([name, def]) => {
+      const audio = new Audio(def.config.file ?? "");
+      audio.preload = "auto";
+      audio.loop = def.config.loop !== false;
+      audio.volume = 0;
+      return [name, audio];
+    })
+  );
+
+  const musicFadeFrames = Object.create(null);
+
+  function cancelMusicFade(name) {
+    const frame = musicFadeFrames[name];
+    if (frame) {
+      cancelAnimationFrame(frame);
+      musicFadeFrames[name] = null;
+    }
+  }
+
+  function musicTrackEnabled(name) {
+    const def = MUSIC_TRACK_DEFS[name];
+    return Boolean(
+      def &&
+      userSettings[def.enabledSetting]
+    );
+  }
+
+  function baseMusicVolume(name) {
+    const def = MUSIC_TRACK_DEFS[name];
+    if (!def) return 0;
+
+    return clamp01(
+      Number(userSettings[def.volumeSetting]) *
+      userSettings.masterVolume
+    );
+  }
+
+  function targetMusicVolume(name) {
+    let volume = baseMusicVolume(name);
+
+    if (name === "game" && state.gameMusicDucked) {
+      volume *= clamp01(
+        Number(
+          MUSIC_CONFIG.game?.microphoneDuckMultiplier ?? 0.10
+        )
+      );
+    }
+
+    return clamp01(volume);
+  }
+
+  function fadeMusicTo(
+    name,
+    target,
+    durationMs,
+    {
+      pauseWhenDone = false,
+      resetWhenDone = false
+    } = {}
+  ) {
+    const audio = musicTracks[name];
+    if (!audio) return;
+
+    cancelMusicFade(name);
+
+    const safeTarget = clamp01(target);
+    const duration = Math.max(0, Number(durationMs) || 0);
+
+    if (duration === 0) {
+      audio.volume = safeTarget;
+
+      if (pauseWhenDone) {
+        audio.pause();
+        if (resetWhenDone) {
+          try {
+            audio.currentTime = 0;
+          } catch {
+            // A média még nem biztos, hogy seekelhető.
+          }
+        }
+      }
+      return;
+    }
+
+    const startVolume = audio.volume;
+    const startedAt = performance.now();
+
+    const step = now => {
+      const progress = Math.min(
+        1,
+        (now - startedAt) / duration
+      );
+      const eased = 1 - Math.pow(1 - progress, 3);
+
+      audio.volume =
+        startVolume + (safeTarget - startVolume) * eased;
+
+      if (progress < 1) {
+        musicFadeFrames[name] = requestAnimationFrame(step);
+        return;
+      }
+
+      musicFadeFrames[name] = null;
+      audio.volume = safeTarget;
+
+      if (pauseWhenDone) {
+        audio.pause();
+        if (resetWhenDone) {
+          try {
+            audio.currentTime = 0;
+          } catch {
+            // A média még nem biztos, hogy seekelhető.
+          }
+        }
+      }
+    };
+
+    musicFadeFrames[name] = requestAnimationFrame(step);
+  }
+
+  function playMusicTrack(
+    name,
+    {
+      restart = false,
+      fadeMs = 0
+    } = {}
+  ) {
+    const audio = musicTracks[name];
+    const def = MUSIC_TRACK_DEFS[name];
+
+    if (!audio || !def || !musicTrackEnabled(name)) {
+      return;
+    }
+
+    cancelMusicFade(name);
+
+    if (restart) {
+      try {
+        audio.currentTime = 0;
+      } catch {
+        // Betöltés előtt a seek nem minden böngészőben elérhető.
+      }
+    }
+
+    const target = targetMusicVolume(name);
+    audio.volume = fadeMs > 0 ? 0 : target;
+
+    audio.play()
+      .then(() => {
+        if (fadeMs > 0) {
+          fadeMusicTo(name, target, fadeMs);
+        }
+      })
+      .catch(() => {
+        // Autoplay policy esetén az első user gesture újrapróbálja.
+      });
+  }
+
+  function stopMusicTrack(
+    name,
+    {
+      fadeMs = 0,
+      reset = true
+    } = {}
+  ) {
+    const audio = musicTracks[name];
+    if (!audio) return;
+
+    if (audio.paused) {
+      cancelMusicFade(name);
+      if (reset) {
+        try {
+          audio.currentTime = 0;
+        } catch {
+          // Nincs teendő.
+        }
+      }
+      return;
+    }
+
+    if (fadeMs > 0) {
+      fadeMusicTo(name, 0, fadeMs, {
+        pauseWhenDone: true,
+        resetWhenDone: reset
+      });
+      return;
+    }
+
+    cancelMusicFade(name);
+    audio.pause();
+
+    if (reset) {
+      try {
+        audio.currentTime = 0;
+      } catch {
+        // Nincs teendő.
+      }
+    }
+  }
+
+  function updateGameMusicToggleUi() {
+    const enabled = Boolean(userSettings.gameMusicEnabled);
+
+    el.gameMusicToggleBtn.classList.toggle("is-on", enabled);
+    el.gameMusicToggleBtn.setAttribute(
+      "aria-pressed",
+      enabled ? "true" : "false"
+    );
+    el.gameMusicToggleBtn.textContent =
+      enabled ? "♫ Játékzene: BE" : "♫ Játékzene: KI";
+    el.gameMusicToggleBtn.title =
+      enabled ? "Játékzene kikapcsolása" : "Játékzene bekapcsolása";
+    el.gameMusicToggleBtn.setAttribute(
+      "aria-label",
+      el.gameMusicToggleBtn.title
+    );
+  }
+
+  function refreshActiveMusicVolumes() {
+    for (const name of Object.keys(musicTracks)) {
+      if (!musicTrackEnabled(name)) {
+        stopMusicTrack(name, {
+          fadeMs: 120,
+          reset: name !== "game"
+        });
+        continue;
+      }
+
+      const audio = musicTracks[name];
+      if (!audio.paused) {
+        fadeMusicTo(name, targetMusicVolume(name), 180);
+      }
+    }
+
+    updateGameMusicToggleUi();
+  }
+
+  function setGameMusicDucked(ducked) {
+    const next = Boolean(ducked);
+    if (state.gameMusicDucked === next) return;
+
+    state.gameMusicDucked = next;
+
+    const audio = musicTracks.game;
+    if (!audio || audio.paused) return;
+
+    const fadeMs = next
+      ? Number(MUSIC_CONFIG.game?.microphoneDuckFadeMs ?? 220)
+      : Number(MUSIC_CONFIG.game?.microphoneRestoreFadeMs ?? 650);
+
+    fadeMusicTo(
+      "game",
+      targetMusicVolume("game"),
+      fadeMs
+    );
+  }
+
+  function startLobbyMusic() {
+    stopMusicTrack("winner", { fadeMs: 180, reset: true });
+    stopMusicTrack("game", { fadeMs: 220, reset: false });
+    stopMusicTrack("wheelSpin", { fadeMs: 80, reset: true });
+
+    playMusicTrack("lobby", {
+      fadeMs: Number(MUSIC_CONFIG.lobby?.fadeInMs ?? 650)
+    });
+  }
+
+  function startGameMusic() {
+    stopMusicTrack("lobby", {
+      fadeMs: Number(MUSIC_CONFIG.lobby?.fadeOutMs ?? 350),
+      reset: false
+    });
+
+    if (
+      document.body.classList.contains("game-active") &&
+      state.phase !== "roundEnd"
+    ) {
+      playMusicTrack("game", {
+        fadeMs: Number(MUSIC_CONFIG.game?.fadeInMs ?? 700)
+      });
+    }
+  }
+
+  function startWinnerMusic() {
+    stopMusicTrack("game", {
+      fadeMs: Number(MUSIC_CONFIG.game?.fadeOutMs ?? 350),
+      reset: false
+    });
+
+    playMusicTrack("winner", {
+      restart: true,
+      fadeMs: Number(MUSIC_CONFIG.winner?.fadeInMs ?? 2600)
+    });
+  }
+
+  function stopWinnerMusic() {
+    stopMusicTrack("winner", {
+      fadeMs: Number(MUSIC_CONFIG.winner?.fadeOutMs ?? 300),
+      reset: true
+    });
+  }
+
+  function startWheelSpinSound() {
+    playMusicTrack("wheelSpin", {
+      restart: true
+    });
+  }
+
+  function stopWheelSpinSound() {
+    stopMusicTrack("wheelSpin", {
+      fadeMs: Number(MUSIC_CONFIG.wheelSpin?.fadeOutMs ?? 120),
+      reset: true
+    });
+  }
+
+  function syncMusicForCurrentScreen() {
+    updateGameMusicToggleUi();
+
+    if (document.body.classList.contains("lobby-active")) {
+      startLobbyMusic();
+      return;
+    }
+
+    if (document.body.classList.contains("game-active")) {
+      stopMusicTrack("lobby", { fadeMs: 220, reset: false });
+
+      if (state.phase === "roundEnd") {
+        startWinnerMusic();
+      } else {
+        stopWinnerMusic();
+        startGameMusic();
+      }
+    }
+  }
+
   const PUZZLES = [
     { category: "Mondás", text: "A KOCKA EL VAN VETVE" },
     { category: "Budapest", text: "SZÉCHENYI LÁNCHÍD" },
@@ -246,7 +658,9 @@
     voiceSessionToken: 0,
     voiceInputMode: null,
     voiceIgnoreNextFinal: false,
-    voiceSolveDialogOwned: false
+    voiceSolveDialogOwned: false,
+
+    gameMusicDucked: false
   };
 
   const el = {
@@ -261,6 +675,21 @@
     soundsEnabledSetting: document.getElementById("soundsEnabledSetting"),
     masterVolumeSetting: document.getElementById("masterVolumeSetting"),
     masterVolumeValue: document.getElementById("masterVolumeValue"),
+
+    wheelSpinSoundEnabledSetting: document.getElementById("wheelSpinSoundEnabledSetting"),
+    wheelSpinVolumeSetting: document.getElementById("wheelSpinVolumeSetting"),
+    wheelSpinVolumeValue: document.getElementById("wheelSpinVolumeValue"),
+    lobbyMusicEnabledSetting: document.getElementById("lobbyMusicEnabledSetting"),
+    lobbyMusicVolumeSetting: document.getElementById("lobbyMusicVolumeSetting"),
+    lobbyMusicVolumeValue: document.getElementById("lobbyMusicVolumeValue"),
+    winnerMusicEnabledSetting: document.getElementById("winnerMusicEnabledSetting"),
+    winnerMusicVolumeSetting: document.getElementById("winnerMusicVolumeSetting"),
+    winnerMusicVolumeValue: document.getElementById("winnerMusicVolumeValue"),
+    gameMusicEnabledSetting: document.getElementById("gameMusicEnabledSetting"),
+    gameMusicVolumeSetting: document.getElementById("gameMusicVolumeSetting"),
+    gameMusicVolumeValue: document.getElementById("gameMusicVolumeValue"),
+    gameMusicToggleBtn: document.getElementById("gameMusicToggleBtn"),
+
     autoSpinEnabledSetting: document.getElementById("autoSpinEnabledSetting"),
     puzzleModeSetting: document.getElementById("puzzleModeSetting"),
     speechRecognitionEnabledSetting: document.getElementById("speechRecognitionEnabledSetting"),
@@ -323,10 +752,46 @@
     DEBUG_CONFIG.showTestButton === false
   );
   updateVoiceRuntimeUi();
+  updateGameMusicToggleUi();
+
+  let firstAudioGestureHandled = false;
+  const handleFirstAudioGesture = () => {
+    if (firstAudioGestureHandled) return;
+    firstAudioGestureHandled = true;
+    unlockSfx();
+    syncMusicForCurrentScreen();
+  };
+
+  document.addEventListener(
+    "pointerdown",
+    handleFirstAudioGesture,
+    { once: true, capture: true }
+  );
+  document.addEventListener(
+    "keydown",
+    handleFirstAudioGesture,
+    { once: true, capture: true }
+  );
+
+  syncMusicForCurrentScreen();
 
   function updateMasterVolumeLabel() {
     el.masterVolumeValue.textContent =
       `${Math.round(Number(el.masterVolumeSetting.value))}%`;
+  }
+
+  function updateMusicVolumeLabels() {
+    const pairs = [
+      [el.wheelSpinVolumeSetting, el.wheelSpinVolumeValue],
+      [el.lobbyMusicVolumeSetting, el.lobbyMusicVolumeValue],
+      [el.winnerMusicVolumeSetting, el.winnerMusicVolumeValue],
+      [el.gameMusicVolumeSetting, el.gameMusicVolumeValue]
+    ];
+
+    pairs.forEach(([input, output]) => {
+      output.textContent =
+        `${Math.round(Number(input.value))}%`;
+    });
   }
 
   function normalizeMicrophoneLabel(value) {
@@ -504,6 +969,24 @@
       userSettings.autoSpinEnabled;
     el.puzzleModeSetting.value =
       userSettings.puzzleMode;
+
+    el.wheelSpinSoundEnabledSetting.checked =
+      userSettings.wheelSpinSoundEnabled;
+    el.wheelSpinVolumeSetting.value =
+      String(Math.round(userSettings.wheelSpinVolume * 100));
+    el.lobbyMusicEnabledSetting.checked =
+      userSettings.lobbyMusicEnabled;
+    el.lobbyMusicVolumeSetting.value =
+      String(Math.round(userSettings.lobbyMusicVolume * 100));
+    el.winnerMusicEnabledSetting.checked =
+      userSettings.winnerMusicEnabled;
+    el.winnerMusicVolumeSetting.value =
+      String(Math.round(userSettings.winnerMusicVolume * 100));
+    el.gameMusicEnabledSetting.checked =
+      userSettings.gameMusicEnabled;
+    el.gameMusicVolumeSetting.value =
+      String(Math.round(userSettings.gameMusicVolume * 100));
+
     el.speechRecognitionEnabledSetting.checked =
       userSettings.speechRecognitionEnabled;
     el.speechProviderSetting.value =
@@ -511,6 +994,7 @@
     el.speechLanguageSetting.value =
       userSettings.speechLanguage;
     updateMasterVolumeLabel();
+    updateMusicVolumeLabels();
     renderSpeechSupportState();
     el.settingsSaveStatus.textContent = "";
   }
@@ -545,6 +1029,24 @@
       ["test", "live"].includes(el.puzzleModeSetting.value)
         ? el.puzzleModeSetting.value
         : "test";
+
+    userSettings.wheelSpinSoundEnabled =
+      el.wheelSpinSoundEnabledSetting.checked;
+    userSettings.wheelSpinVolume =
+      clamp01(Number(el.wheelSpinVolumeSetting.value) / 100);
+    userSettings.lobbyMusicEnabled =
+      el.lobbyMusicEnabledSetting.checked;
+    userSettings.lobbyMusicVolume =
+      clamp01(Number(el.lobbyMusicVolumeSetting.value) / 100);
+    userSettings.winnerMusicEnabled =
+      el.winnerMusicEnabledSetting.checked;
+    userSettings.winnerMusicVolume =
+      clamp01(Number(el.winnerMusicVolumeSetting.value) / 100);
+    userSettings.gameMusicEnabled =
+      el.gameMusicEnabledSetting.checked;
+    userSettings.gameMusicVolume =
+      clamp01(Number(el.gameMusicVolumeSetting.value) / 100);
+
     userSettings.speechRecognitionEnabled =
       el.speechRecognitionEnabledSetting.checked;
     userSettings.speechProvider =
@@ -568,6 +1070,9 @@
     if (userSettings.soundsEnabled) {
       unlockSfx();
     }
+
+    refreshActiveMusicVolumes();
+    syncMusicForCurrentScreen();
   }
 
   populateSettingsForm();
@@ -595,6 +1100,11 @@
 
   function startGame() {
     unlockSfx();
+    stopMusicTrack("lobby", {
+      fadeMs: Number(MUSIC_CONFIG.lobby?.fadeOutMs ?? 350),
+      reset: false
+    });
+    stopWinnerMusic();
 
     const selected = [...document.querySelectorAll('.player-option input:checked')]
       .map(input => input.value);
@@ -624,6 +1134,10 @@
   }
 
   function newRound() {
+    stopWinnerMusic();
+    stopWheelSpinSound();
+    state.gameMusicDucked = false;
+
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
     clearTimeout(state.botTimer);
@@ -649,6 +1163,7 @@
     closeWheelOverlay();
 
     state.phase = "spin";
+    startGameMusic();
 
     for (const p of state.players) {
       p.roundMoney = 0;
@@ -950,6 +1465,11 @@
     const listening =
       state.voiceActive &&
       state.voiceEngineState === "listening";
+
+    setGameMusicDucked(
+      state.voiceActive || state.voiceStartPending
+    );
+
     const temporarilyBlocked = [
       "spinning",
       "wheelResult",
@@ -1870,6 +2390,7 @@
     suspendVoiceListening(
       "Forduló vége. Mikrofon szünetel."
     );
+    startWinnerMusic();
     clearTimeout(state.botTimer);
     clearTimeout(state.turnReadyTimer);
     state.turnReadyTimer = null;
@@ -2500,8 +3021,10 @@
 
     openWheelOverlay();
     updateControls();
+    startWheelSpinSound();
 
     const started = scene.spinTo(index, () => {
+      stopWheelSpinSound();
       state.pendingWheelSegment = segment;
       state.phase = "wheelResult";
 
@@ -2525,6 +3048,7 @@
     });
 
     if (!started) {
+      stopWheelSpinSound();
       state.phase = "spin";
       closeWheelOverlay();
       updateControls();
@@ -2541,6 +3065,24 @@
   }
 
   el.startGameBtn.addEventListener("click", startGame);
+
+  el.gameMusicToggleBtn.addEventListener("click", () => {
+    userSettings.gameMusicEnabled =
+      !userSettings.gameMusicEnabled;
+
+    persistUserSettings(userSettings);
+    updateGameMusicToggleUi();
+
+    if (userSettings.gameMusicEnabled) {
+      startGameMusic();
+    } else {
+      stopMusicTrack("game", {
+        fadeMs: Number(MUSIC_CONFIG.game?.fadeOutMs ?? 350),
+        reset: false
+      });
+    }
+  });
+
   el.voiceMicBtn.addEventListener(
     "click",
     () => void toggleVoiceListening()
@@ -2555,6 +3097,15 @@
     "input",
     updateMasterVolumeLabel
   );
+
+  [
+    el.wheelSpinVolumeSetting,
+    el.lobbyMusicVolumeSetting,
+    el.winnerMusicVolumeSetting,
+    el.gameMusicVolumeSetting
+  ].forEach(input => {
+    input.addEventListener("input", updateMusicVolumeLabels);
+  });
   el.refreshSpeechMicrophonesBtn.addEventListener(
     "click",
     () => void refreshSpeechMicrophones({
@@ -2681,6 +3232,13 @@
   function returnToLobby() {
     stopVoiceListening({ abort: true });
     state.voiceEngine = null;
+
+    stopWheelSpinSound();
+    stopWinnerMusic();
+    stopMusicTrack("game", {
+      fadeMs: Number(MUSIC_CONFIG.game?.fadeOutMs ?? 350),
+      reset: false
+    });
     clearTimeout(state.botTimer);
     clearTimeout(state.autoSpinTimer);
     clearTimeout(state.turnReadyTimer);
@@ -2704,6 +3262,7 @@
     el.setupScreen.classList.remove("hidden");
     el.message.textContent = "";
     updateVoiceRuntimeUi();
+    startLobbyMusic();
   }
 
   el.endGameBtn.addEventListener("click", () => {

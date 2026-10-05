@@ -156,7 +156,7 @@ Két út van:
 1. jobb felső `Játék vége` → megerősítő dialog;
 2. győzelmi képernyő `Játék vége` → közvetlen lobby.
 
-### Hangok
+### Hangok és zene
 
 Jelenlegi SFX:
 
@@ -164,10 +164,30 @@ Jelenlegi SFX:
 - `letter_miss.mp3`
 - `solve_fail.wav`
 
-Több azonos találatnál a felvillanások és a találati hangok sorban futnak.
+Zenei / atmoszféra sávok:
 
-Helyes megfejtésnél nincs külön sikerhang: a még rejtett betűk felfedésével
-szinkronban kizárólag a `letter_hit.wav` szól.
+- `wheel_spinning.mp3` – csak a tényleges kerékforgás alatt;
+- `lobby_music.mp3` – lobby és Beállítások;
+- `winner_music.mp3` – sikeres megfejtéskor fokozatos fade-innel;
+- `game_music.mp3` – diszkrét, loopolt játékzene.
+
+A négy sáv külön engedélyezhető és külön hangerőt kap a Beállításokban. A
+`masterVolume` mindegyikre közös szorzó.
+
+A játékzene a stage bal felső `♫ Játékzene` gombjával játék közben is
+azonnal ki-/bekapcsolható; ez a választás mentődik.
+
+Aktív mikrofon alatt a játékzene automatikusan lehalkul
+(`audio.music.game.microphoneDuckMultiplier`), majd a mikrofon
+szüneteltetésekor fokozatosan visszaáll.
+
+Több azonos betűnél a felvillanások és a találati hangok sorban futnak.
+Helyes megfejtésnél a betűfelfedési `letter_hit` hangok megmaradnak, ezek
+mellé indul a győzelmi zene.
+
+A böngésző autoplay szabályai miatt a lobby zene első indulását a böngésző
+blokkolhatja. Ilyenkor az első kattintás vagy billentyű után automatikusan
+újrapróbáljuk.
 
 ### Hangvezérlés
 

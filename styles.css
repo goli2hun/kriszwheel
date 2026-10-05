@@ -1604,6 +1604,63 @@ body.game-active .app-shell {
 
 
 /* --------------------------------------------------------------------------
+   Játékzene kapcsoló – bal felső sarok
+   -------------------------------------------------------------------------- */
+
+.stage-game-music-btn {
+  position: absolute;
+  z-index: 45;
+  top: 2.0%;
+  left: 1.8%;
+  min-width: 10.2%;
+  height: 4.2%;
+  padding: 0 .9cqw;
+  border: 1px solid rgba(132, 190, 246, .56);
+  border-radius: 999px;
+  color: #eaf5ff;
+  background:
+    linear-gradient(180deg, rgba(25, 70, 123, .90), rgba(8, 35, 76, .94));
+  box-shadow:
+    0 .25cqw .65cqw rgba(0, 0, 0, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .10);
+  font-size: .58cqw;
+  font-weight: 900;
+  letter-spacing: .035em;
+  cursor: pointer;
+  backdrop-filter: blur(7px);
+  transition:
+    transform .14s ease,
+    border-color .14s ease,
+    background .14s ease,
+    box-shadow .14s ease,
+    color .14s ease;
+}
+
+.stage-game-music-btn:hover,
+.stage-game-music-btn:focus-visible {
+  transform: translateY(-.05cqw);
+  border-color: rgba(255, 220, 116, .82);
+  color: #ffffff;
+  box-shadow:
+    0 0 .65cqw rgba(255, 215, 94, .18),
+    0 .28cqw .75cqw rgba(0, 0, 0, .34),
+    inset 0 1px 0 rgba(255, 255, 255, .13);
+}
+
+.stage-game-music-btn.is-on {
+  border-color: rgba(91, 224, 132, .66);
+  color: #dcffe7;
+  background:
+    linear-gradient(180deg, rgba(27, 105, 67, .92), rgba(8, 58, 40, .95));
+}
+
+.stage-game-music-btn:not(.is-on) {
+  color: #aebfd2;
+  background:
+    linear-gradient(180deg, rgba(50, 61, 78, .86), rgba(23, 30, 43, .92));
+}
+
+/* --------------------------------------------------------------------------
    Játék vége – jobb felső sarok + megerősítés
    -------------------------------------------------------------------------- */
 
@@ -2188,6 +2245,60 @@ body.lobby-active .settings-panel {
   background: rgba(220, 65, 65, .10);
 }
 
+.settings-music-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.settings-music-card {
+  padding: 12px 14px;
+  display: grid;
+  gap: 12px;
+  border: 1px solid rgba(255, 255, 255, .07);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, .035);
+}
+
+.settings-music-toggle,
+.settings-music-volume {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.settings-music-toggle > span:first-child {
+  display: grid;
+  gap: 4px;
+}
+
+.settings-music-toggle strong {
+  color: #eef6ff;
+}
+
+.settings-music-toggle small,
+.settings-music-volume > span:first-child {
+  color: #94afd0;
+  line-height: 1.35;
+}
+
+.settings-music-toggle input[type="checkbox"] {
+  width: 22px;
+  height: 22px;
+  flex: 0 0 auto;
+  accent-color: #f0bd42;
+}
+
+.settings-music-volume {
+  padding-top: 10px;
+  border-top: 1px solid rgba(255, 255, 255, .06);
+}
+
+.settings-music-volume .settings-range-control {
+  min-width: 205px;
+}
+
 .settings-device-control {
   min-width: 330px;
   display: flex;
@@ -2306,6 +2417,16 @@ body.lobby-active .settings-panel {
   .settings-toggle-row,
   .settings-range-row,
   .settings-select-row {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .settings-music-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .settings-music-toggle,
+  .settings-music-volume {
     align-items: stretch;
     flex-direction: column;
   }

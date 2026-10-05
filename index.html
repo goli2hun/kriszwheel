@@ -197,6 +197,110 @@
         </label>
       </section>
 
+      <section class="settings-section music-settings-section"
+               aria-labelledby="musicSettingsTitle">
+        <div class="settings-section-heading">
+          <div>
+            <span class="settings-section-kicker">ZENE</span>
+            <h3 id="musicSettingsTitle">Zene és hangulat</h3>
+          </div>
+        </div>
+
+        <p class="settings-section-copy">
+          Minden zenei elem külön kapcsolható és külön hangerővel rendelkezik.
+          A Fő hangerő ezekre is közös szorzóként érvényes.
+        </p>
+
+        <div class="settings-music-grid">
+          <article class="settings-music-card">
+            <label class="settings-music-toggle"
+                   for="wheelSpinSoundEnabledSetting">
+              <span>
+                <strong>Kerék forgási hang</strong>
+                <small>Csak a tényleges pörgetés alatt szól.</small>
+              </span>
+              <input id="wheelSpinSoundEnabledSetting" type="checkbox" />
+            </label>
+            <label class="settings-music-volume"
+                   for="wheelSpinVolumeSetting">
+              <span>Hangerő</span>
+              <span class="settings-range-control">
+                <input id="wheelSpinVolumeSetting"
+                       type="range" min="0" max="100" step="5" />
+                <output id="wheelSpinVolumeValue"
+                        for="wheelSpinVolumeSetting">65%</output>
+              </span>
+            </label>
+          </article>
+
+          <article class="settings-music-card">
+            <label class="settings-music-toggle"
+                   for="lobbyMusicEnabledSetting">
+              <span>
+                <strong>Lobby zene</strong>
+                <small>A lobbyban és a Beállítások képernyőjén loopol.</small>
+              </span>
+              <input id="lobbyMusicEnabledSetting" type="checkbox" />
+            </label>
+            <label class="settings-music-volume"
+                   for="lobbyMusicVolumeSetting">
+              <span>Hangerő</span>
+              <span class="settings-range-control">
+                <input id="lobbyMusicVolumeSetting"
+                       type="range" min="0" max="100" step="5" />
+                <output id="lobbyMusicVolumeValue"
+                        for="lobbyMusicVolumeSetting">30%</output>
+              </span>
+            </label>
+          </article>
+
+          <article class="settings-music-card">
+            <label class="settings-music-toggle"
+                   for="winnerMusicEnabledSetting">
+              <span>
+                <strong>Győzelmi zene</strong>
+                <small>Sikeres megfejtéskor fokozatosan erősödik fel.</small>
+              </span>
+              <input id="winnerMusicEnabledSetting" type="checkbox" />
+            </label>
+            <label class="settings-music-volume"
+                   for="winnerMusicVolumeSetting">
+              <span>Hangerő</span>
+              <span class="settings-range-control">
+                <input id="winnerMusicVolumeSetting"
+                       type="range" min="0" max="100" step="5" />
+                <output id="winnerMusicVolumeValue"
+                        for="winnerMusicVolumeSetting">75%</output>
+              </span>
+            </label>
+          </article>
+
+          <article class="settings-music-card">
+            <label class="settings-music-toggle"
+                   for="gameMusicEnabledSetting">
+              <span>
+                <strong>Játékzene</strong>
+                <small>
+                  Játék közben diszkréten loopol. A stage-en is külön
+                  ki-/bekapcsolható.
+                </small>
+              </span>
+              <input id="gameMusicEnabledSetting" type="checkbox" />
+            </label>
+            <label class="settings-music-volume"
+                   for="gameMusicVolumeSetting">
+              <span>Hangerő</span>
+              <span class="settings-range-control">
+                <input id="gameMusicVolumeSetting"
+                       type="range" min="0" max="100" step="5" />
+                <output id="gameMusicVolumeValue"
+                        for="gameMusicVolumeSetting">20%</output>
+              </span>
+            </label>
+          </article>
+        </div>
+      </section>
+
       <section class="settings-section speech-settings-section"
                aria-labelledby="speechSettingsTitle">
         <div class="settings-section-heading">
@@ -219,7 +323,7 @@
                for="speechRecognitionEnabledSetting">
           <span>
             <strong>Hangfelismerés engedélyezése</strong>
-            <small>A következő integrációs lépésben ez kapcsolja majd a játék hangvezérlését.</small>
+            <small>A játék közbeni mikrofon és hangvezérlés master kapcsolója.</small>
           </span>
           <input id="speechRecognitionEnabledSetting" type="checkbox" />
         </label>
@@ -275,10 +379,10 @@
         </div>
 
         <div class="speech-settings-future">
-          <strong>Ebben a commitban</strong>
+          <strong>Aktív integráció</strong>
           <span>
-            A konfiguráció és a mikrofonválasztás már menthető. A tényleges
-            játékvezérlést a következő lépésben kötjük rá a VoiceEngine eseményeire.
+            A mikrofonválasztás, a VoiceEngine és a játékparancsok már be
+            vannak kötve. A HANG TESZT panelen élőben látható a felismerés.
           </span>
         </div>
       </section>
@@ -299,6 +403,13 @@
 
     <section id="gameScreen" class="stage-screen hidden">
       <div class="stage-canvas">
+        <button id="gameMusicToggleBtn"
+                type="button"
+                class="stage-game-music-btn is-on"
+                aria-pressed="true"
+                aria-label="Játékzene kikapcsolása"
+                title="Játékzene kikapcsolása">♫ Játékzene: BE</button>
+
         <button id="endGameBtn"
                 type="button"
                 class="stage-end-game-btn"
