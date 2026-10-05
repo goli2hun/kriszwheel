@@ -1,0 +1,4 @@
+{
+  "resetId": "initial",
+  "description": "Puzzle history reset marker. Update with tools/reset_puzzle_history.py."
+}
