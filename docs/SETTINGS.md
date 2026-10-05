@@ -82,9 +82,9 @@ Alapérték:
 
 `test`
 
-**Fontos:** ez a választás ebben a commitban csak mentődik. A
-`pickPuzzle()` és a jelenlegi `PUZZLES` lista nincs rákötve erre a
-beállításra.
+A választás aktívan vezérli a feladványforrást. `test` módban a beépített
+`PUZZLES` lista használódik, `live` módban pedig a lobbyban kiválasztott
+nehézséghez tartozó CSV töltődik be.
 
 ### Lobby nehézség
 
@@ -110,9 +110,15 @@ Alapérték:
 
 `easy`
 
-A választás azonnal perzisztálódik. **Még nincs bekötve** a
-`pickPuzzle()` függvénybe. A tervezett működés szerint csak
-`puzzleMode = live` esetén fogja szűrni az éles feladványkészletet.
+A választás azonnal perzisztálódik. `puzzleMode = live` esetén a mapping:
+
+- `child` → `data/child.csv`
+- `easy` → `data/low.csv`
+- `medium` → `data/med.csv`
+- `hard` → `data/high.csv`
+
+A fájlutak a `config/game-config.js` `puzzles.files` blokkban
+paraméterezhetők.
 
 ## 3. Zene és hangulat
 
@@ -193,7 +199,9 @@ Mentett mezők:
 A stage kapcsoló ugyanazt a `gameMusicEnabled` értéket módosítja és azonnal
 perzisztálja.
 
-Aktív mikrofon mellett a játékzene duckinget kap. Paraméterek:
+A voice owner saját körében a játékzene alapból teljesen elnémul
+(`voiceOwnerTurnMultiplier = 0`). Más helyzetekben aktív mikrofon mellett
+ducking alkalmazható. Paraméterek:
 
 - `audio.music.game.microphoneDuckMultiplier`
 - `audio.music.game.microphoneDuckFadeMs`
@@ -348,3 +356,19 @@ köre jön, a mikrofon csak a pörgetés eredményének lezárása után indul v
 Runtime részletek:
 
 [VOICE_RECOGNITION.md](VOICE_RECOGNITION.md)
+
+
+## 10. Lobby build-információ
+
+A lobby jobb alsó sarkában a `#lobbyBuildInfo` elem mutatja az alkalmazás
+verzióját, build dátumát és az aktív feladványmódot.
+
+Példák:
+
+```text
+v0.8.0 · 2026.10.05 · TESZT
+v0.8.0 · 2026.10.05 · ÉLES / KÖZEPES
+```
+
+A verzió és dátum a `config/game-config.js` `app` blokkjából jön. Éles
+módban hoverre a konkrét CSV-forrás és az elvárt elemszám is látszik.
