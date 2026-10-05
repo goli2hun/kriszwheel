@@ -1409,6 +1409,12 @@
       .replace(/\s+/g, " ")
       .trim();
 
+  const normalizeSolveText = (value) =>
+    String(value ?? "")
+      .normalize("NFC")
+      .toLocaleUpperCase("hu-HU")
+      .replace(/[^\p{L}\p{N}]+/gu, "");
+
   const fmtMoney = (n) =>
     new Intl.NumberFormat("hu-HU").format(n) + " Ft";
 
@@ -2194,11 +2200,17 @@
 
   function submitVoiceSolve(answer) {
     const value = String(answer ?? "").trim();
-    if (!value) return false;
+    const sanitizedValue = value
+      .normalize("NFC")
+      .replace(/[^\p{L}\p{N}\s]+/gu, "")
+      .replace(/\s+/g, " ")
+      .trim();
+
+    if (!sanitizedValue) return false;
 
     state.voiceInputMode = null;
     state.voiceSolveDialogOwned = false;
-    el.solveInput.value = value;
+    el.solveInput.value = sanitizedValue;
     el.solveInput.placeholder = "";
 
     if (el.solveDialog.open) {
@@ -2208,7 +2220,7 @@
     hideStageFeedback();
 
     requestAnimationFrame(() => {
-      trySolve(value, false);
+      trySolve(sanitizedValue, false);
     });
 
     return true;
@@ -2868,7 +2880,13 @@
   }
 
   function trySolve(answer, fromBot = false) {
-    if (normalize(answer) === state.puzzle.text) {
+    const normalizedAnswer = normalizeSolveText(answer);
+    const normalizedPuzzle = normalizeSolveText(state.puzzle.text);
+
+    if (
+      normalizedAnswer &&
+      normalizedAnswer === normalizedPuzzle
+    ) {
       finishRound(currentPlayer());
       return true;
     }
