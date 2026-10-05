@@ -212,56 +212,14 @@ A négy sáv külön engedélyezhető és külön hangerőt kap a Beállítások
 A játékzene a stage bal felső `♫ Játékzene` gombjával játék közben is
 azonnal ki-/bekapcsolható; ez a választás mentődik.
 
-A voice owner **saját körében** a játékzene teljesen elnémul
-(`audio.music.game.voiceOwnerTurnMultiplier = 0`). Más játékos körében
-visszaáll a beállított hangerőre.
+A mikrofon runtime állapota globális a játékban: bármely emberi játékos
+ki- vagy bekapcsolhatja, és az állapot játékosváltáskor megmarad. Bot körében
+a mikrofon gomb le van tiltva és a listening szünetel; a következő emberi
+játékosnál a globális mikrofonállapot ismét érvényesül.
 
-Az aktív mikrofon ducking továbbra is megmarad más helyzetekre; a saját kör
-némítása elsőbbséget élvez.
-
-Több azonos betűnél a felvillanások és a találati hangok sorban futnak.
-Sikeres mássalhangzó után a következő pörgetés csak az összes találat teljes
-felfedése után, további 1 másodperc késleltetéssel engedélyeződik
-(`gameplay.letterRevealPostDelayMs`). Ha nincs több rejtett mássalhangzó,
-a játék ezt külön jelzi és több pörgetést nem enged; megfejtés és
-magánhangzó-vásárlás továbbra is lehetséges.
-
-Helyes megfejtésnél a betűfelfedési `letter_hit` hangok megmaradnak, ezek
-mellé indul a győzelmi zene és a tűzijáték. A victory ünneplés minimum ideje
-paraméterezhető (`victory.minimumCelebrationMs`), alapból 3000 ms.
-
-A böngésző autoplay szabályai miatt a lobby zene első indulását a böngésző
-blokkolhatja. Ilyenkor az első kattintás vagy billentyű után automatikusan
-újrapróbáljuk.
-
-### Hangvezérlés
-
-Ha a lobby Beállításokban engedélyezve van a hangfelismerés, a színpadon az
-aktuális játékos avatárja fölött megjelenő mikrofon gombbal kapcsolható ki/be
-az élő hangvezérlés.
-
-Első körben támogatott:
-
-- `Pörgetés` → ugyanazt a `spinWheel()` folyamatot indítja, mint a gomb;
-- `Magánhangzó` → magánhangzó-várakozó mód;
-- `Megfejtés` → a következő kimondott szöveget teljes megfejtésként értékeli;
-- `B mint Balázs` / `Cé mint Cecil` jellegű betűmondás;
-- közvetlen magánhangzó-betűmondás;
-- élő interim/final transcript az alsó `HANG TESZT` panelen.
-
-A mikrofon nem indul automatikusan a játék indításakor.
-
-A Beállításokban opcionálisan bekapcsolható a **Haladó névfelismerés**.
-Ilyenkor a `config/hungarian-names.js` listájában szereplő magyar
-keresztnevek önmagukban is betűként értelmezhetők, például `Anna` → A,
-`Béla` → B, `Botond` → B. A speciális `Ypszilon` / `ipszilon`
-kivétel Y betűt ad.
-
-Bekapcsoláskor a mikrofon az aktuális emberi játékoshoz kötődik. Ha másik
-játékos következik, automatikusan leáll. Amikor a tulajdonos köre újra eljön,
-a mikrofon nem azonnal, hanem **a pörgetés után** kapcsol vissza.
-
-A pörgetés alatt a mikrofon szintén automatikusan szünetel.
+Ha a globális mikrofon be van kapcsolva és emberi játékos van soron, a
+játékzene a voice konfiguráció szerint némítható. Pörgetés közben a mikrofon
+szünetel, majd a kerék megállásakor visszakapcsol.
 
 Alap ritmus:
 
