@@ -17,6 +17,8 @@ Választható játékosok:
 - Adri
 - Alíz
 - Bot
+- Vendég 1
+- Vendég 2
 
 Minimum két játékos szükséges. Alapértelmezett kijelölés: Krisz + Bot.
 
@@ -253,6 +255,8 @@ kriszwheel/
     ├── images/
     │   ├── adri.png
     │   ├── bot.png
+    │   ├── guest1.svg
+    │   ├── guest2.svg
     │   ├── krisz.png
     │   ├── lizus.png
     │   ├── studio_lobby.png

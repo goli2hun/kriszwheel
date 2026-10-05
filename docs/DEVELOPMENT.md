@@ -133,6 +133,28 @@ Módosítandó:
 - portré asset;
 - `PLAYER_IMAGES` mapping.
 
+A jelenlegi játékosok:
+
+- Krisz
+- Adri
+- Alíz
+- Bot
+- Vendég 1
+- Vendég 2
+
+A két vendég semleges SVG avatart használ:
+
+- `assets/images/guest1.svg`
+- `assets/images/guest2.svg`
+
+A Bot felismerése továbbra is:
+
+```js
+isBot: name === "Bot"
+```
+
+Ezért a Vendég 1 és Vendég 2 automatikusan emberi játékosként működik.
+
 ## 10. Hangcsere
 
 A fájlutak és fontos hangerők configból állíthatók.

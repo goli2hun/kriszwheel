@@ -6,6 +6,18 @@ Ez a dokumentum a jelenleg implementált szabályokat írja le.
 
 A lobbyban legalább két játékost kell kijelölni.
 
+Elérhető játékosok:
+
+- Krisz
+- Adri
+- Alíz
+- Bot
+- Vendég 1
+- Vendég 2
+
+A Vendég 1 és Vendég 2 normál emberi játékosok; a Bot továbbra is az egyetlen
+automatikus játékos.
+
 A játék indulásakor:
 
 1. létrejön a játékoslista;

@@ -568,6 +568,7 @@ body.lobby-active .setup-panel > p:not(.error) {
 }
 
 body.lobby-active .player-picker {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   margin: 20px 0;
 }
 
