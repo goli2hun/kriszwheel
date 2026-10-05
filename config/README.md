@@ -71,6 +71,22 @@ mielőtt a következő játékos aktív lesz.
 Ez alatt a színpad látható visszajelzést mutat, a játékgombok pedig nem
 fogadnak új akciót.
 
+### gameplay.autoSpinDelayMs
+
+Típus: szám, ms.
+
+Alap:
+
+```js
+autoSpinDelayMs: 900
+```
+
+Ha a felhasználó bekapcsolta az **Auto pörgetés** beállítást, ennyi idővel
+az emberi játékos `spin` fázisba kerülése után indul automatikusan a kerék.
+
+A beállítás maga `localStorage`-ban van; ez a config csak a késleltetést
+adja meg.
+
 ## 3. wheel
 
 ### wheel.image

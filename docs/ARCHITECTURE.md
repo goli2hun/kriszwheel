@@ -258,10 +258,22 @@ Jelenlegi mezők:
 ```text
 soundsEnabled
 masterVolume
+autoSpinEnabled
+puzzleMode
+speechRecognitionEnabled
+speechProvider
+speechLanguage
+microphoneDeviceId
 ```
 
 Betöltéskor az `app.js` biztonságos fallbacket használ, ha a
 `localStorage` nem érhető el vagy hibás adatot tartalmaz.
+
+Az `autoSpinEnabled` runtime automatizmus külön `autoSpinTimer`-t használ,
+így nem ütközik a Bot `botTimer` kezelésével.
+
+A `puzzleMode` jelenleg kizárólag perzisztált preference; a
+`pickPuzzle()` nem olvassa.
 
 A `playSfx()`:
 

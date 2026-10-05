@@ -27,11 +27,18 @@ A lobby saját stúdió-hátteret és játékosportrékat használ.
 A lobbyban külön **Beállítások** gomb található. A Beállítások nézet két
 szekcióból áll:
 
-- **Általános beállítások** – hangok be/ki és fő hangerő;
+- **Általános beállítások** – hangok, fő hangerő, Auto pörgetés és feladványmód;
 - **Hangfelismerés** – előkészített hely a hamarosan érkező magyar
   hangvezérléshez.
 
 A felhasználói beállítások böngészőnként, `localStorage`-ban mentődnek.
+
+Az **Auto pörgetés** alapból ki van kapcsolva. Bekapcsolva emberi játékosnál,
+`spin` fázisban rövid késleltetés után automatikusan elindítja a kereket.
+
+A **Feladványmód** alapértéke `Teszt`. A `Teszt / Éles` választás már
+mentődik, de ebben a verzióban még nincs összekötve a tényleges
+feladványforrással.
 
 A Hangfelismerés szekció már kezeli az engedélyezést, a Browser
 SpeechRecognition providert, a magyar nyelvet, a mikrofon kiválasztását és a

@@ -170,6 +170,31 @@
                     for="masterVolumeSetting">100%</output>
           </span>
         </label>
+
+        <label class="settings-toggle-row" for="autoSpinEnabledSetting">
+          <span>
+            <strong>Auto pörgetés</strong>
+            <small>
+              Ha emberi játékosnak pörgetnie kell, a játék rövid késleltetés
+              után automatikusan elindítja a kereket.
+            </small>
+          </span>
+          <input id="autoSpinEnabledSetting" type="checkbox" />
+        </label>
+
+        <label class="settings-select-row" for="puzzleModeSetting">
+          <span>
+            <strong>Feladványmód</strong>
+            <small>
+              A választás már mentődik, de a feladványbetöltéshez ebben a
+              verzióban még nincs bekötve.
+            </small>
+          </span>
+          <select id="puzzleModeSetting">
+            <option value="test">Teszt feladványok</option>
+            <option value="live">Éles feladványok</option>
+          </select>
+        </label>
       </section>
 
       <section class="settings-section speech-settings-section"

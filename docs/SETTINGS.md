@@ -39,6 +39,52 @@ Belső tárolás:
 
 `0.0–1.0`
 
+### Auto pörgetés
+
+DOM:
+
+`#autoSpinEnabledSetting`
+
+Mentett mező:
+
+`autoSpinEnabled`
+
+Alapérték:
+
+`false`
+
+Bekapcsolva csak **emberi játékosnál**, `spin` fázisban ütemez automatikus
+pörgetést. A Bot továbbra is a saját Bot-logikáját használja.
+
+A késleltetés:
+
+`gameplay.autoSpinDelayMs`
+
+Kézi vagy hangvezérelt pörgetéskor a függő auto-pörgetés timer törlődik.
+
+### Feladványmód
+
+DOM:
+
+`#puzzleModeSetting`
+
+Mentett mező:
+
+`puzzleMode`
+
+Értékek:
+
+- `test` – Teszt feladványok;
+- `live` – Éles feladványok.
+
+Alapérték:
+
+`test`
+
+**Fontos:** ez a választás ebben a commitban csak mentődik. A
+`pickPuzzle()` és a jelenlegi `PUZZLES` lista nincs rákötve erre a
+beállításra.
+
 ## 3. Hangfelismerés
 
 A voice-alrendszer alapja a külön `goli2hun/voice-recognition` laborból
@@ -46,8 +92,7 @@ A voice-alrendszer alapja a külön `goli2hun/voice-recognition` laborból
 
 `6afec468b2231d23594c35a56b88b5273b869733`
 
-Ebben a lépésben a **lobby beállítások** vannak bekötve. A hang még nem vezérli
-a játékot.
+A lobby beállítások és a játék közbeni VoiceEngine runtime is be van kötve.
 
 ### Engedélyezés
 
@@ -111,6 +156,8 @@ Jelenlegi forma:
 {
   "soundsEnabled": true,
   "masterVolume": 1,
+  "autoSpinEnabled": false,
+  "puzzleMode": "test",
   "speechRecognitionEnabled": false,
   "speechProvider": "browser",
   "speechLanguage": "hu-HU",

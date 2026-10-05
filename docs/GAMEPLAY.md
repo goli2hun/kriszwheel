@@ -217,7 +217,33 @@ A gombok a `victory.buttonDelayMs` idő után aktiválódnak.
 
 A győzelmi képernyőn közvetlenül visszatér a lobbyba.
 
-## 10. Bot
+## 10. Auto pörgetés
+
+Beállítás:
+
+`autoSpinEnabled`
+
+Alap:
+
+`false`
+
+Ha be van kapcsolva:
+
+1. az aktuális játékos ember;
+2. a játék `spin` fázisban van;
+3. `gameplay.autoSpinDelayMs` letelik;
+4. a játék meghívja a meglévő `spinWheel(false)` függvényt.
+
+A timer minden állapotváltásnál újraellenőrzi a feltételeket. Kézi gomb vagy
+hangparancs esetén a timer törlődik, ezért nem indul második pörgetés.
+
+A Botot az Auto pörgetés nem kezeli; arra továbbra is a Bot saját automatája
+felel.
+
+A `puzzleMode` beállítás jelenleg még **nem része a gameplay puzzle
+választásának**.
+
+## 11. Bot
 
 A Bot:
 
@@ -228,7 +254,7 @@ A Bot:
 
 A döntések és timer-ek konfigurálhatók.
 
-## 11. Játék vége a színpadról
+## 12. Játék vége a színpadról
 
 A jobb felső gomb megerősítést kér:
 
@@ -237,7 +263,7 @@ A jobb felső gomb megerősítést kér:
 - Nem → játék folytatódik.
 - Igen → lobby.
 
-## 12. Hangvezérlés
+## 13. Hangvezérlés
 
 Feltétel:
 
@@ -322,13 +348,13 @@ A stage bal alsó részén mutatja:
 - VoiceEngine állapot;
 - hibákat.
 
-## 13. Teszt mód
+## 14. Teszt mód
 
 A Teszt gomb megmutatja az aktuális megfejtést.
 
 `debug.showTestButton = false` esetén elrejthető.
 
-## 14. Állapotfolyam
+## 15. Állapotfolyam
 
 ```text
 setup

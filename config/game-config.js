@@ -9,7 +9,11 @@ window.KRISZWHEEL_CONFIG = {
 
     // Játékosváltáskor ennyi ideig marad látható a visszajelzés,
     // mielőtt a következő játékos aktívvá válik.
-    playerSwitchDelayMs: 1000
+    playerSwitchDelayMs: 1000,
+
+    // Bekapcsolt Auto pörgetésnél ennyit várunk, mielőtt egy emberi
+    // játékos spin fázisában automatikusan elindul a kerék.
+    autoSpinDelayMs: 900
   },
 
   wheel: {

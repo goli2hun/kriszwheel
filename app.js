@@ -14,6 +14,8 @@
   const DEFAULT_USER_SETTINGS = Object.freeze({
     soundsEnabled: true,
     masterVolume: 1,
+    autoSpinEnabled: false,
+    puzzleMode: "test",
     speechRecognitionEnabled: false,
     speechProvider: "browser",
     speechLanguage: VOICE_CONFIG.recognition?.language ?? "hu-HU",
@@ -38,6 +40,14 @@
           stored.masterVolume == null
             ? DEFAULT_USER_SETTINGS.masterVolume
             : clamp01(stored.masterVolume),
+        autoSpinEnabled:
+          typeof stored.autoSpinEnabled === "boolean"
+            ? stored.autoSpinEnabled
+            : DEFAULT_USER_SETTINGS.autoSpinEnabled,
+        puzzleMode:
+          ["test", "live"].includes(stored.puzzleMode)
+            ? stored.puzzleMode
+            : DEFAULT_USER_SETTINGS.puzzleMode,
         speechRecognitionEnabled:
           typeof stored.speechRecognitionEnabled === "boolean"
             ? stored.speechRecognitionEnabled
@@ -217,6 +227,7 @@
     roundEndTimer: null,
     victoryButtonTimer: null,
     feedbackTimer: null,
+    autoSpinTimer: null,
     roundNumber: 0,
     justRevealed: new Set(),
     pendingWheelSegment: null,
@@ -246,6 +257,8 @@
     soundsEnabledSetting: document.getElementById("soundsEnabledSetting"),
     masterVolumeSetting: document.getElementById("masterVolumeSetting"),
     masterVolumeValue: document.getElementById("masterVolumeValue"),
+    autoSpinEnabledSetting: document.getElementById("autoSpinEnabledSetting"),
+    puzzleModeSetting: document.getElementById("puzzleModeSetting"),
     speechRecognitionEnabledSetting: document.getElementById("speechRecognitionEnabledSetting"),
     speechProviderSetting: document.getElementById("speechProviderSetting"),
     speechLanguageSetting: document.getElementById("speechLanguageSetting"),
@@ -483,6 +496,10 @@
     el.soundsEnabledSetting.checked = userSettings.soundsEnabled;
     el.masterVolumeSetting.value =
       String(Math.round(userSettings.masterVolume * 100));
+    el.autoSpinEnabledSetting.checked =
+      userSettings.autoSpinEnabled;
+    el.puzzleModeSetting.value =
+      userSettings.puzzleMode;
     el.speechRecognitionEnabledSetting.checked =
       userSettings.speechRecognitionEnabled;
     el.speechProviderSetting.value =
@@ -518,6 +535,12 @@
     userSettings.masterVolume = clamp01(
       Number(el.masterVolumeSetting.value) / 100
     );
+    userSettings.autoSpinEnabled =
+      el.autoSpinEnabledSetting.checked;
+    userSettings.puzzleMode =
+      ["test", "live"].includes(el.puzzleModeSetting.value)
+        ? el.puzzleModeSetting.value
+        : "test";
     userSettings.speechRecognitionEnabled =
       el.speechRecognitionEnabledSetting.checked;
     userSettings.speechProvider =
@@ -600,6 +623,8 @@
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
     clearTimeout(state.botTimer);
+    clearTimeout(state.autoSpinTimer);
+    state.autoSpinTimer = null;
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
     clearTimeout(state.victoryButtonTimer);
@@ -630,7 +655,7 @@
     setMessage(`${currentPlayer().name} következik. Pörgess!`);
     renderAll();
     updateControls();
-    maybeRunBot();
+    maybeRunTurnAutomation();
   }
 
   function renderAll() {
@@ -1455,6 +1480,8 @@
     state.voiceIgnoreNextFinal = false;
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.botTimer);
+    clearTimeout(state.autoSpinTimer);
+    state.autoSpinTimer = null;
 
     const delayMs = Math.max(
       0,
@@ -1488,7 +1515,7 @@
         `${currentPlayer().name} következik. Pörgess!`
       );
 
-      maybeRunBot();
+      maybeRunTurnAutomation();
     }, delayMs);
   }
 
@@ -1526,7 +1553,7 @@
       renderAll();
       updateControls();
       checkAutoSolved();
-      maybeRunBot();
+      maybeRunTurnAutomation();
     } else {
       state.justRevealed.clear();
       playSfx("letterMiss");
@@ -1570,7 +1597,7 @@
       setMessage(`${letter}: ${hits} találat. A magánhangzó ára levonva.`);
       updateControls();
       checkAutoSolved();
-      maybeRunBot();
+      maybeRunTurnAutomation();
     } else {
       state.justRevealed.clear();
       playSfx("letterMiss");
@@ -1674,6 +1701,47 @@
     const unique = [...new Set(letters)];
     if (!unique.length) return 1;
     return unique.filter(ch => state.revealed.has(ch)).length / unique.length;
+  }
+
+  function maybeAutoSpin() {
+    clearTimeout(state.autoSpinTimer);
+    state.autoSpinTimer = null;
+
+    if (!userSettings.autoSpinEnabled) return;
+    if (!document.body.classList.contains("game-active")) return;
+
+    const player = currentPlayer();
+    if (!player || player.isBot || state.phase !== "spin") return;
+
+    const delayMs = Math.max(
+      0,
+      Number(GAMEPLAY_CONFIG.autoSpinDelayMs ?? 900)
+    );
+
+    state.autoSpinTimer = setTimeout(() => {
+      state.autoSpinTimer = null;
+
+      const activePlayer = currentPlayer();
+      if (
+        !userSettings.autoSpinEnabled ||
+        !activePlayer ||
+        activePlayer.isBot ||
+        state.phase !== "spin" ||
+        !document.body.classList.contains("game-active")
+      ) {
+        return;
+      }
+
+      setMessage(
+        `${activePlayer.name}: automatikus pörgetés…`
+      );
+      spinWheel(false);
+    }, delayMs);
+  }
+
+  function maybeRunTurnAutomation() {
+    maybeRunBot();
+    maybeAutoSpin();
   }
 
   function maybeRunBot() {
@@ -2148,6 +2216,8 @@
   function spinWheel(fromBot = false) {
     if (state.phase !== "spin") return;
 
+    clearTimeout(state.autoSpinTimer);
+    state.autoSpinTimer = null;
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
 
@@ -2347,6 +2417,8 @@
     stopVoiceListening({ abort: true });
     state.voiceEngine = null;
     clearTimeout(state.botTimer);
+    clearTimeout(state.autoSpinTimer);
+    state.autoSpinTimer = null;
     clearTimeout(state.wheelConfirmTimer);
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
