@@ -212,3 +212,54 @@ mikrofon-ducking ettől külön mechanizmus.
 A pörgetés alatt a mikrofon szünetel, majd a kerék fizikai megállásakor azonnal
 visszakapcsolhat, miközben a zene továbbra is a voice-owner szabály szerint
 marad némítva.
+
+
+## Haladó névfelismerés
+
+A Beállításokban külön kapcsoló:
+
+`Haladó névfelismerés`
+
+Mentett kulcs:
+
+`advancedNameRecognitionEnabled`
+
+Bekapcsolva a parser a final transcript minden szavát összeveti a
+`config/hungarian-names.js` listával. Egyezésnél a konfigurált betű lesz a
+LETTER esemény értéke.
+
+Példák:
+
+```text
+Anna -> A
+Aladár -> A
+Béla -> B
+Botond -> B
+Krisztián -> K
+Ypszilon -> Y
+```
+
+Ez kiegészítő mechanizmus: a meglévő `B mint Balázs`, `Cé mint Cecil`
+és más `mint/min` formák változatlanul működnek.
+
+A névlista külön konfigurációs fájlban van:
+
+`config/hungarian-names.js`
+
+Struktúra:
+
+```js
+namesByLetter: {
+  A: ["Anna", "Aladár"],
+  B: ["Béla", "Botond"]
+}
+```
+
+Speciális aliasok külön kivétellistában adhatók meg. Jelenleg:
+
+```text
+Ypszilon / ipszilon -> Y
+```
+
+A felismerés teljes szavas egyezést használ, így egy név részlete nem vált ki
+téves betűeseményt.
