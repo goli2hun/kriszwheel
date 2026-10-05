@@ -21,7 +21,6 @@ from pathlib import Path
 
 BOARD_COLS = 15
 BOARD_ROWS = 4
-EXPECTED_COUNT = 100
 
 DATASETS = {
     "Gyerek": "data/child.csv",
@@ -231,10 +230,8 @@ def read_dataset(
         print_issue("[HIBA]", path, None, message)
         return []
 
-    if len(entries) != EXPECTED_COUNT:
-        message = (
-            f"Az elemszám {len(entries)}, az elvárt pontosan {EXPECTED_COUNT}."
-        )
+    if not entries:
+        message = "A CSV nem tartalmaz érvényes feladványt."
         errors.append(message)
         print_issue("[HIBA]", path, None, message)
 
@@ -388,7 +385,7 @@ def main() -> int:
     print("=" * 38)
     print(
         f"Tábla: {BOARD_COLS}×{BOARD_ROWS} · "
-        f"Elvárt elemszám: {EXPECTED_COUNT} / nehézség"
+        "Követelmény: legalább 1 érvényes feladvány / nehézség"
     )
 
     if args.javitas:
