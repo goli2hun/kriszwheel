@@ -251,6 +251,12 @@ Első körben támogatott:
 
 A mikrofon nem indul automatikusan a játék indításakor.
 
+A Beállításokban opcionálisan bekapcsolható a **Haladó névfelismerés**.
+Ilyenkor a `config/hungarian-names.js` listájában szereplő magyar
+keresztnevek önmagukban is betűként értelmezhetők, például `Anna` → A,
+`Béla` → B, `Botond` → B. A speciális `Ypszilon` / `ipszilon`
+kivétel Y betűt ad.
+
 Bekapcsoláskor a mikrofon az aktuális emberi játékoshoz kötődik. Ha másik
 játékos következik, automatikusan leáll. Amikor a tulajdonos köre újra eljön,
 a mikrofon nem azonnal, hanem **a pörgetés után** kapcsol vissza.
