@@ -110,6 +110,7 @@ livePuzzleSource
 - `wheelResult` – megállt eredmény látszik
 - `letter` – mássalhangzót vár
 - `letterReveal` – sikeres találat animációja és post-delay fut
+- `solveOnly` – nincs több rejtett mássalhangzó; pörgetés tiltott
 - `playerTransition` – váltási szünet
 - `turnReady` – a következő játékos már látszik, de input még tiltott
 - `roundEnd` – megfejtett forduló, felfedés / victory
@@ -451,3 +452,21 @@ Sikeres mássalhangzónál a state nem vált azonnal `spin` értékre. A
 ```
 
 Csak ezután engedélyeződik újra a pörgetés és a turn automation.
+
+
+## 21. Mássalhangzó-kimerülés
+
+A `hasHiddenConsonants()` nem az ábécé fel nem használt betűit nézi, hanem
+az aktuális feladványban még rejtett, nem magánhangzó karaktereket.
+
+Ha nincs ilyen karakter:
+
+- `enterSolveOnlyMode()` törli a Bot és Auto pörgetés timereket;
+- `phase = solveOnly`;
+- `wheelValue` nullázódik;
+- Pörgetés letiltódik;
+- megfejtés és magánhangzó-vásárlás megmarad;
+- Bot esetén automatikus megfejtési kísérlet indul.
+
+A `spinWheel()` és az Auto/Bot automatizmus külön guardot is tartalmaz,
+így versenyhelyzetből sem indulhat új pörgetés.
