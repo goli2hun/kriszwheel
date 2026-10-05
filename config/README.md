@@ -26,7 +26,25 @@ window.KRISZWHEEL_CONFIG
 
 A sorrend kötelező.
 
-## 2. gameplay
+## 2. app
+
+### app.version
+
+```js
+version: "0.8.0"
+```
+
+A lobby jobb alsó build-információjában megjelenő alkalmazásverzió.
+
+### app.buildDate
+
+```js
+buildDate: "2026.10.05"
+```
+
+A build / tesztcsomag dátuma. A verzióval együtt jelenik meg a lobbyban.
+
+## 3. gameplay
 
 ### gameplay.vowelPrice
 
@@ -127,7 +145,41 @@ az emberi játékos `spin` fázisba kerülése után indul automatikusan a keré
 A beállítás maga `localStorage`-ban van; ez a config csak a késleltetést
 adja meg.
 
-## 3. wheel
+## 4. puzzles
+
+### puzzles.files
+
+Éles módban a nehézségválasztó ezekre a fájlokra mutat:
+
+```js
+files: {
+  child: "data/child.csv",
+  easy: "data/low.csv",
+  medium: "data/med.csv",
+  hard: "data/high.csv"
+}
+```
+
+A CSV formátuma:
+
+```csv
+category,puzzle
+"Állat","PIROS KATICA"
+```
+
+### puzzles.expectedCountPerDifficulty
+
+```js
+expectedCountPerDifficulty: 100
+```
+
+Éles játék indításakor a betöltött lista legalább ennyi érvényes sort kell,
+hogy tartalmazzon. Ha a fájl nem érhető el vagy rövidebb, a játék a lobbyban
+hibát jelez és nem indul el.
+
+A jelenlegi négy lista egyenként 100 egyedi feladványból áll.
+
+## 5. wheel
 
 ### wheel.image
 
@@ -323,7 +375,7 @@ Jelenleg:
 
 Ha ez nem igaz, a logikai és képi mezők elcsúsznak.
 
-## 4. bot
+## 6. bot
 
 ### bot.actionDelayMs
 
@@ -391,7 +443,7 @@ consonantSubmitDelayMs: 550
 
 A kiválasztott betű bejelentése és tényleges beadása közti idő.
 
-## 5. audio
+## 7. audio
 
 ### Rövid SFX
 
@@ -469,7 +521,7 @@ gameMusicVolume × masterVolume × microphoneDuckMultiplier
 A `defaultEnabled` és `defaultVolume` csak hiányzó user setting esetén
 alapérték. A tényleges választás `localStorage`-ban tárolódik.
 
-## 6. victory
+## 8. victory
 
 ### victory.fireworks
 
@@ -515,7 +567,7 @@ Ennyi idő után jelenik meg és válik aktívvá a két győzelmi gomb.
 
 A tűzijáték hex színpalettája.
 
-## 7. debug
+## 9. debug
 
 ### debug.showTestButton
 
@@ -526,7 +578,7 @@ showTestButton: true
 - `true`: látszik a Teszt gomb;
 - `false`: a gomb `hidden` osztályt kap.
 
-## 8. Példák
+## 10. Példák
 
 ### Lassabb kerék
 
@@ -554,7 +606,7 @@ vowelPrice: 8000
 showTestButton: false
 ```
 
-## 9. Módosítás után
+## 11. Módosítás után
 
 Nincs build lépés.
 
@@ -566,7 +618,7 @@ Ha cache miatt nem látszik:
 Ctrl+F5
 ```
 
-## 10. Amit ne tegyél
+## 12. Amit ne tegyél
 
 Ne változtasd úgy a `segments` / `segmentRepeat` kombinációt, hogy ne
 egyezzen a wheel asset tényleges cikkelyszámával.
@@ -577,7 +629,7 @@ Ne tegyél titkos adatot ebbe a fájlba: kliensoldali JavaScript, minden
 böngészőből olvasható.
 
 
-## 11. voice-config.js
+## 13. voice-config.js
 
 A voice config a `voice-recognition` labor runtime konfigurációjának
 KriszWheel-változata.
@@ -593,11 +645,10 @@ Fő csoportok:
 A lobbyban módosítható értékek `localStorage`-ba kerülnek, nem írják át ezt
 a fájlt.
 
-## 12. Kapcsolódó roadmap
+## 14. Kapcsolódó roadmap
 
 A következő tervezett konfigurációs bővítések:
 
-- puzzle adatforrás;
 - teljes játék / session szabályok;
 - scoreboard;
 - Bot nehézségi profilok;
