@@ -367,6 +367,15 @@
           <input id="speechRecognitionEnabledSetting" type="checkbox" />
         </label>
 
+        <label class="settings-toggle-row"
+               for="advancedNameRecognitionSetting">
+          <span>
+            <strong>Haladó névfelismerés</strong>
+            <small>Magyar keresztnév felismerésekor a névhez rendelt betűt használja, „mint/min” nélkül is.</small>
+          </span>
+          <input id="advancedNameRecognitionSetting" type="checkbox" />
+        </label>
+
         <label class="settings-select-row"
                for="speechProviderSetting">
           <span>
@@ -411,9 +420,11 @@
         <div class="speech-settings-info">
           <strong>Betűfelismerési szabály</strong>
           <span>
-            A voice modul a <code>mint</code> / <code>min</code> utáni szó első
-            betűjét használja. Kivételek: <code>Y mint ipszilon</code> és
-            <code>Duplavé mint Walter</code>.
+            Alapból a <code>mint</code> / <code>min</code> utáni szó első
+            betűje számít. Haladó névfelismeréssel a konfigurált magyar
+            keresztnevek önmagukban is használhatók, például
+            <code>Anna</code> → A, <code>Béla</code> → B.
+            Kivétel: <code>Ypszilon</code> → Y.
           </span>
         </div>
 
@@ -652,6 +663,7 @@
   </dialog>
 
   <script src="config/voice-config.js"></script>
+  <script src="config/hungarian-names.js"></script>
   <script src="config/game-config.js"></script>
   <script src="app.js"></script>
 </body>
