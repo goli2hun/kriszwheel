@@ -56,8 +56,8 @@ A lobby saját stúdió-hátteret és játékosportrékat használ.
 
 A lobby jobb alsó sarkában build-információ látszik, például:
 `v0.8.0 · 2026.10.05 · ÉLES / KÖZEPES`. Teszt módban csak `TESZT`
-jelenik meg. Hoverre a konkrét feladványforrás és az elvárt elemszám is
-kiolvasható.
+jelenik meg. Hoverre a konkrét feladványforrás látszik, és betöltés után az
+aktuálisan betöltött feladványszám is megjelenik.
 
 A lobbyban külön **Beállítások** gomb található. A Beállítások nézet két
 szekcióból áll:
@@ -72,9 +72,9 @@ Az **Auto pörgetés** alapból ki van kapcsolva. Bekapcsolva emberi játékosn�
 `spin` fázisban rövid késleltetés után automatikusan elindítja a kereket.
 
 A **Feladványmód** alapértéke `Teszt`. Teszt módban a beépített minták,
-Éles módban a kiválasztott nehézséghez tartozó CSV tölthető be. Induláskor
-a játék ellenőrzi, hogy az éles lista legalább a konfigurált elemszámot
-tartalmazza; hibás vagy hiányzó fájlnál nem indul el csendben fallbackkel.
+Éles módban a kiválasztott nehézséghez tartozó CSV töltődik be. Induláskor
+a játék csak azt ellenőrzi, hogy legalább 1 érvényes feladvány legyen benne;
+hibás, hiányzó vagy üres fájlnál nem indul el csendben fallbackkel.
 
 A Hangfelismerés szekció kezeli az engedélyezést, a Browser SpeechRecognition
 providert, a magyar nyelvet, a mikrofon kiválasztását és a böngészőtámogatás
