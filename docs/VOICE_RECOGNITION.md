@@ -198,3 +198,17 @@ Tervezett:
 - háttérzaj-tűrés;
 - mikrofon/provider viselkedés összehasonlítása;
 - később Whisper provider.
+
+
+## Játékzene és voice owner
+
+A voice owner saját körében a játékzene célhangereje alapértelmezés szerint
+0, a `audio.music.game.voiceOwnerTurnMultiplier` miatt. Ez a némítás a teljes
+saját körre vonatkozik, nem csak az aktív listening időre.
+
+Más játékos körében a játékzene visszaáll a normál célhangerőre. Az általános
+mikrofon-ducking ettől külön mechanizmus.
+
+A pörgetés alatt a mikrofon szünetel, majd a kerék fizikai megállásakor azonnal
+visszakapcsolhat, miközben a zene továbbra is a voice-owner szabály szerint
+marad némítva.
