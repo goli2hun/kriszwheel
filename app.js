@@ -1808,7 +1808,7 @@
   }
 
   function renderUsedLetters() {
-    const letters = [...state.usedLetters].sort((a, b) => a.localeCompare(b, "hu"));
+    const letters = [...state.usedLetters];
     el.usedLetters.textContent = letters.length ? letters.join(" ") : "–";
   }
 
