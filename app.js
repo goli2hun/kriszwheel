@@ -1928,20 +1928,10 @@
     );
     syncGameMusicForCurrentPlayer();
 
-    const temporarilyBlocked = [
-      "spinning",
-      "wheelResult",
-      "playerTransition",
-      "turnReady",
-      "roundEnd",
-      "setup"
-    ].includes(state.phase);
-
     el.voiceMicBtn.disabled =
       !enabled ||
       state.voiceStartPending ||
-      !currentHuman ||
-      temporarilyBlocked;
+      !currentHuman;
 
     el.voiceMicBtn.classList.toggle(
       "is-active",
@@ -2630,7 +2620,6 @@
     state.voiceEngine = null;
     state.voiceEngineState = "idle";
     state.voiceArmed = false;
-    state.voiceOwnerName = null;
     state.voiceSessionToken += 1;
     state.voiceInputMode = null;
     state.voiceIgnoreNextFinal = false;
@@ -3575,7 +3564,7 @@
       if (
         !fromBot &&
         state.voiceArmed &&
-        voiceOwnerIsCurrentPlayer()
+        currentPlayerCanUseVoice()
       ) {
         void startVoiceListening({ automatic: false });
       }
