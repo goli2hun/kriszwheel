@@ -27,6 +27,20 @@ window.KRISZWHEEL_CONFIG = {
     autoSpinDelayMs: 900
   },
 
+  puzzles: {
+    // Éles módban a lobby nehézségválasztója ezekre a CSV-kre mutat.
+    // UI mapping: Gyerek -> child, Könnyű -> easy, Közepes -> medium, Nehéz -> hard.
+    files: {
+      child: "data/child.csv",
+      easy: "data/low.csv",
+      medium: "data/med.csv",
+      hard: "data/high.csv"
+    },
+
+    // Induláskor legalább ennyi érvényes feladványt várunk a kiválasztott fájlban.
+    expectedCountPerDifficulty: 100
+  },
+
   wheel: {
     // Grafika és Phaser canvas.
     image: "assets/images/wheel.png",
