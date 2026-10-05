@@ -2,6 +2,7 @@
   "use strict";
 
   const CONFIG = window.KRISZWHEEL_CONFIG ?? {};
+  const APP_CONFIG = CONFIG.app ?? {};
   const GAMEPLAY_CONFIG = CONFIG.gameplay ?? {};
   const PUZZLE_CONFIG = CONFIG.puzzles ?? {};
   const WHEEL_CONFIG = CONFIG.wheel ?? {};
@@ -821,6 +822,7 @@
     speechSupportText: document.getElementById("speechSupportText"),
     setupError: document.getElementById("setupError"),
     difficultySelector: document.getElementById("difficultySelector"),
+    lobbyBuildInfo: document.getElementById("lobbyBuildInfo"),
     playersList: document.getElementById("playersList"),
     categoryText: document.getElementById("categoryText"),
     puzzleBoard: document.getElementById("puzzleBoard"),
@@ -1119,6 +1121,41 @@
     el.settingsSaveStatus.textContent = "";
   }
 
+  function renderLobbyBuildInfo() {
+    if (!el.lobbyBuildInfo) return;
+
+    const version = String(APP_CONFIG.version ?? "0.0.0");
+    const buildDate = String(APP_CONFIG.buildDate ?? "–");
+    const mode = userSettings.puzzleMode === "live" ? "ÉLES" : "TESZT";
+
+    const difficultyLabels = {
+      child: "GYEREK",
+      easy: "KÖNNYŰ",
+      medium: "KÖZEPES",
+      hard: "NEHÉZ"
+    };
+
+    const difficulty =
+      difficultyLabels[userSettings.puzzleDifficulty] ?? "KÖNNYŰ";
+
+    el.lobbyBuildInfo.textContent =
+      userSettings.puzzleMode === "live"
+        ? `v${version} · ${buildDate} · ${mode} / ${difficulty}`
+        : `v${version} · ${buildDate} · ${mode}`;
+
+    if (userSettings.puzzleMode === "live") {
+      const source =
+        LIVE_PUZZLE_FILES[userSettings.puzzleDifficulty] ??
+        LIVE_PUZZLE_FILES.easy;
+      const count = Number(PUZZLE_CONFIG.expectedCountPerDifficulty ?? 100);
+      el.lobbyBuildInfo.title =
+        `Feladványforrás: ${source} · ${count} feladvány`;
+    } else {
+      el.lobbyBuildInfo.title =
+        `Feladványforrás: beépített tesztlista · ${PUZZLES.length} feladvány`;
+    }
+  }
+
   function renderDifficultySelector() {
     const valid = new Set(["child", "easy", "medium", "hard"]);
     const selected = valid.has(userSettings.puzzleDifficulty)
@@ -1147,6 +1184,7 @@
     userSettings.puzzleDifficulty = value;
     persistUserSettings(userSettings);
     renderDifficultySelector();
+    renderLobbyBuildInfo();
   }
 
   function showSettingsScreen() {
@@ -1166,6 +1204,7 @@
     el.setupScreen.classList.remove("hidden");
     el.settingsSaveStatus.textContent = "";
     renderDifficultySelector();
+    renderLobbyBuildInfo();
     el.settingsBtn.focus();
   }
 
@@ -1224,10 +1263,12 @@
 
     refreshActiveMusicVolumes();
     syncMusicForCurrentScreen();
+    renderLobbyBuildInfo();
   }
 
   populateSettingsForm();
   renderDifficultySelector();
+  renderLobbyBuildInfo();
 
   const normalize = (s) =>
     s.normalize("NFC")
