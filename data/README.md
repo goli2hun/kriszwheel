@@ -77,8 +77,37 @@ A listák vegyes kategóriákat tartalmazhatnak, például:
 A nehézségi szintet elsősorban a feladvány ismertsége, hossza, szóhasználata
 és megfejthetősége határozza meg, nem pusztán a kategória.
 
+## Validátor
+
+A repository tartalmaz külön fejlesztői ellenőrzőt:
+
+`tools/validate_puzzles.py`
+
+Futtatás a repository gyökeréből:
+
+```powershell
+python tools/validate_puzzles.py
+```
+
+A script magyarul írja ki az eredményt, és ellenőrzi:
+
+- a négy CSV meglétét és fejlécét;
+- a pontos 100-as elemszámot;
+- az üres mezőket;
+- a fájlon belüli duplikációkat;
+- a nehézségi szintek közötti duplikációkat;
+- a 15 karakternél hosszabb szavakat;
+- a játék 15 × 4-es tördelési logikájával való elférést;
+- a szokatlan karaktereket;
+- a kategóriák eloszlását.
+
+A `[HIBA]` problémák 1-es exit kódot eredményeznek. A
+`[FIGYELMEZTETÉS]` elemek nem teszik sikertelenné a futást, de kézi
+áttekintést igényelnek.
+
+A script csak olvas: CSV-t soha nem módosít automatikusan.
+
 ## Bővítés
 
-A következő fontos adatoldali fejlesztés egy külön puzzle-validátor, amely
-ellenőrzi a duplikációt, a táblába illeszthetőséget, a karaktereket és a
-kategóriastatisztikát.
+Később a validátor további minőségi statisztikákkal bővíthető, például
+átlagos hossz, szószám és nehézségi profil szerint.
