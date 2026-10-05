@@ -668,3 +668,35 @@ A következő tervezett konfigurációs bővítések:
 Részletek:
 
 [../docs/ROADMAP.md](../docs/ROADMAP.md)
+
+
+## 15. hungarian-names.js
+
+A fájl a Haladó névfelismerés paraméterezhető névlistája.
+
+Globális objektum:
+
+`window.KRISZWHEEL_HUNGARIAN_NAMES`
+
+Fő mező:
+
+`namesByLetter`
+
+Példa:
+
+```js
+A: ["Anna", "Aladár"],
+B: ["Béla", "Botond"]
+```
+
+A parser bekapcsolt Haladó névfelismerés mellett a transcript bármely teljes
+szavát összeveti ezekkel a nevekkel.
+
+A `exceptions` tömb speciális, nem feltétlenül keresztnév alapú aliasokat
+kezel. Jelenlegi kivétel:
+
+```js
+{ value: "Y", aliases: ["ypszilon", "ipszilon"] }
+```
+
+Új név hozzáadásához csak ezt a config fájlt kell módosítani; parserkódot nem.
