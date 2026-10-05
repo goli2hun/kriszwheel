@@ -22,15 +22,17 @@ A `tools/validate_puzzles.py` fejlesztői script ellenőrzi a négy éles CSV-t:
 A script magyarul kommunikál, nem módosít adatot, és hiba esetén 1-es exit
 kóddal tér vissza.
 
-## 2. Sessionön belüli ismétlés kizárása
+## 2. Tartós feladványismétlés-kizárás
 
-Jelenleg csak a közvetlenül előző puzzle indexét kerüljük.
+**Állapot: elkészült.**
 
-Jobb megoldás:
+Éles módban a már megjelent feladványokat a játék nehézségenként külön,
+tartós böngésző-localStorage előzményben tárolja. A kijátszott feladvány
+többé nem kerül vissza a választási készletbe, még új játék vagy böngésző-
+újraindítás után sem.
 
-- egy sessionben ugyanaz a feladvány ne jöhessen újra;
-- új játék indításakor az előzmény nullázódjon;
-- ha egy teljes készlet elfogyott, csak akkor induljon új ciklus.
+A tárolás index + normalizált szöveg kombinációt használ, így CSV-átrendezés
+után is stabil marad.
 
 ## 3. Teljes scoreboard játék közben
 
