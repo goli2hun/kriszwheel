@@ -55,6 +55,32 @@ letterHitGapMs: 500
 Ha ugyanaz a betű többször szerepel, az egyes cellák felvillanása és a
 találati hang között ennyi idő telik el.
 
+### gameplay.letterRevealAnimationMs
+
+Típus: szám, ms.
+
+Alap:
+
+```js
+letterRevealAnimationMs: 720
+```
+
+Egy újonnan felfedett betű animációjának hossza.
+
+### gameplay.letterRevealPostDelayMs
+
+Típus: szám, ms.
+
+Alap:
+
+```js
+letterRevealPostDelayMs: 1000
+```
+
+Sikeres mássalhangzó után a következő pörgetés csak akkor engedélyezett,
+amikor az összes találat felfedési animációja befejeződött, majd ez a
+további várakozási idő is letelt.
+
 ### gameplay.playerSwitchDelayMs
 
 Típus: szám, ms.
