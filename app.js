@@ -804,14 +804,9 @@
     }
 
     const puzzles = parsePuzzleCsv(await response.text());
-    const expectedCount = Math.max(
-      1,
-      Number(PUZZLE_CONFIG.expectedCountPerDifficulty ?? 100)
-    );
-
-    if (puzzles.length < expectedCount) {
+    if (puzzles.length < 1) {
       throw new Error(
-        `A feladványlista hiányos: ${path} (${puzzles.length}/${expectedCount})`
+        `A feladványlista üres vagy nem tartalmaz érvényes feladványt: ${path}`
       );
     }
 
