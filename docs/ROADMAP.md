@@ -1,147 +1,176 @@
 # KriszWheel – Roadmap
 
-Ez a dokumentum a következő fejlesztési irányokat priorizálja.
+Ez a dokumentum a jelenlegi állapotból indul ki. A korábban tervezett
+feladvány-adatforrás és a böngészős hangvezérlés már megvalósult, ezért ezek
+nem jövőbeli feladatként szerepelnek.
 
-## P0 – Következő érdemi lépés: feladvány-adatforrás
+## Elkészült alapok
 
-A legnagyobb jelenlegi technikai adósság, hogy a puzzle-ok az `app.js`-ben
-hardcode-olva vannak.
+Jelenleg működik:
 
-Javasolt első lépés:
+- lobby több játékossal és Bot támogatással;
+- Gyerek / Könnyű / Közepes / Nehéz nehézségválasztó;
+- Teszt / Éles feladványmód;
+- 4 külön CSV-adatforrás, egyenként 100 feladvánnyal;
+- Phaser kerék és konfigurálható méretezés;
+- billentyűzetes mássalhangzó- és magánhangzóbevitel;
+- Browser SpeechRecognition alapú hangvezérlés;
+- Bot;
+- fordulópénz és összesített pénz;
+- győzelmi overlay és tűzijáték;
+- külön lobby-, játék-, kerék- és győzelmi zene;
+- voice-owner körben automatikusan némuló játékzene;
+- Auto pörgetés;
+- konfigurálható játékidőzítések;
+- lobby build/verzió információ.
 
-`data/puzzles.json`
+## P0 – Stabilitási és intenzív tesztelési kör
 
-Példa:
+A következő szakasz elsődleges célja a jelenlegi játék kemény tesztelése.
 
-```json
-[
-  {
-    "category": "Mondás",
-    "text": "A KOCKA EL VAN VETVE"
-  }
-]
-```
+Kiemelten ellenőrizendő:
 
-Cél:
+- hosszú játék több egymást követő fordulóval;
+- Játék vége minden állapotból;
+- lobby ↔ játék zenei életciklus;
+- voice owner váltások;
+- mikrofon visszakapcsolása kerékmegálláskor;
+- Auto pörgetés és kézi/hangos pörgetés ütközése;
+- több azonos mássalhangzó felfedési sorrendje;
+- utolsó felfedés + 1 s utáni pörgetés;
+- CSŐD és KIMARADSZ;
+- hibás/helyes megfejtés;
+- Bot körök;
+- éles CSV-k mind a négy nehézségen;
+- hosszú vagy nehezen tördelhető feladványok.
 
-- több száz feladvány kezelhető legyen;
-- kódmódosítás nélkül lehessen puzzle-t hozzáadni;
-- kategóriák bővíthetők legyenek;
-- később SQLite/backend felé egyszerű legyen továbblépni.
+## P0 – Puzzle validátor
 
-## P1 – Scoreboard / teljes játékállás
+Az éles CSV-betöltés már ellenőrzi az elvárt minimális elemszámot, de kell
+egy teljes fejlesztői validátor is.
 
-Az aktuális játékos panel már működik, de nincs egyszerre látható teljes
-eredménytábla.
+Javasolt ellenőrzések:
 
-Javaslat:
+- pontos / minimális elemszám;
+- duplikált feladványok;
+- üres kategória vagy szöveg;
+- 15 × 4-es táblába való illeszthetőség;
+- túl hosszú szó;
+- támogatott magyar karakterek;
+- hibás CSV idézőjelezés;
+- kategóriastatisztika.
 
-- minden játékos avatarja;
+A validátor lehet külön fejlesztői script, hogy a runtime egyszerű maradjon.
+
+## P1 – Teljes scoreboard
+
+Az aktuális játékos panel működik, a victory képernyőn pedig már látszik a
+teljes állás. Játék közben azonban nincs folyamatos teljes eredménytábla.
+
+Lehetséges megoldás:
+
+- minden játékos kis avatarja;
 - totalMoney;
 - aktuális játékos kiemelése;
 - opcionálisan megnyert fordulók száma.
 
-Ezt a jobb oldalra vagy egy alsó keskeny sávba lehetne tenni.
+## P1 – Hangok finomítása
 
-## P1 – Hangok újratervezése
+A jelenlegi hangrendszer működőképes, de tovább gazdagítható:
 
-A jelenlegi hangok prototípusok.
-
-Érdemes külön készlet:
-
-- kerék indulás;
-- lassuló tick;
-- pénzmező;
-- CSŐD;
-- KIMARADSZ;
-- találat;
-- nincs találat;
-- helyes megfejtés;
-- hibás megfejtés;
-- victory fanfare.
-
-A kerék tick hangja sebességfüggően ritkulhatna a vizuális lassulással együtt.
+- kerék indulási hang;
+- sebességfüggő tick;
+- pénzmező visszajelzés;
+- külön CSŐD / KIMARADSZ effekt;
+- külön victory fanfare;
+- finomabb átmenetek.
 
 ## P1 – Magánhangzó UX véglegesítése
 
-A háttérképen már Magánhangzó gomb látszik, de a DOM ID történeti okból
+A háttérképen Magánhangzó gomb látszik, de a DOM ID történeti okból még
 `consonantStageBtn`.
 
-Javasolt refaktor:
+Javasolt:
 
-- `vowelStageBtn`;
-- kattintásra „Nyomj le egy magánhangzót” mód;
-- billentyűzet továbbra is közvetlenül működjön;
-- vizuális state: elég pénz / nincs elég pénz.
+- átnevezés `vowelStageBtn`-re;
+- egyértelmű elég pénz / nincs elég pénz állapot;
+- mobilon külön virtuális input;
+- kattintásos magánhangzó-várakozó mód finomítása.
 
-## P1 – Puzzle validátor
+## P1 – Feladvány-adatbázis bővítése
 
-Automatikus induláskori vagy fejlesztői validáció:
+A jelenlegi 4 × 100 CSV jó első éles készlet.
 
-- belefér-e 15 × 4-be;
-- nincs-e túl hosszú szó;
-- ismert kategória-e;
-- nincs-e duplikált puzzle;
-- magyar karakterek rendben vannak-e.
+Következő lépések:
 
-Ez különösen fontos lesz külső JSON esetén.
+- kategóriánként kiegyensúlyozottabb eloszlás;
+- duplikáció-ellenőrzés szintek között is;
+- több száz / több ezer feladvány;
+- opcionális kategóriaszűrés;
+- később admin vagy generáló workflow.
 
 ## P2 – Game session / végső győztes
 
-Most egy forduló nyertesét ünnepeljük.
+Most tetszőleges számú fordulót játszunk, és minden forduló nyertesét külön
+ünnepeljük.
 
-Később lehet valódi játék-vége:
+Lehetséges session szabályok:
 
 - X forduló;
 - célösszeg;
 - időlimit;
-- kézi „Játék vége”.
+- kézi Játék vége után végső összesítés.
 
-Ezután külön **teljes játék győztese** screen jelenhetne meg totalMoney alapján.
+Ezután külön teljes-játék győztes képernyő készülhetne.
 
 ## P2 – Bot fejlesztés
 
-Jelenlegi Bot egyszerű valószínűségi logika.
+A jelenlegi Bot valószínűségi alapú.
 
-Fejlesztések:
+Fejlesztési irányok:
 
 - magyar betűgyakoriság;
-- már látható mintázatok alapján jobb betűválasztás;
+- látható mintázatok figyelembevétele;
 - kategóriafüggő döntések;
-- ne vásároljon értelmetlen magánhangzót;
-- külön easy / normal / hard Bot profil.
+- jobb magánhangzó-vásárlási stratégia;
+- külön easy / normal / hard Bot profilok.
 
 ## P2 – Mobil / tablet layout
 
 Célplatformok:
 
-- Samsung S23
-- iPhone 15/16
-- iPad
-- Full HD desktop
+- Samsung S23;
+- iPhone 15/16;
+- iPad;
+- Full HD desktop.
 
-Feladat:
+Feladatok:
 
-- portrait/landscape döntés;
-- hotspot méretek;
-- victory card mobilon;
-- kerék méretezése;
-- billentyűzet nélküli mobil input.
+- portrait/landscape stratégia;
+- hotspotok méretezése;
+- victory card;
+- kerék overlay;
+- virtuális betűpanel;
+- voice UI helyigénye.
 
-Mobilon virtuális betűpanelre lesz szükség.
+## P2 – Voice finomhangolás
 
-## P2 – Keyboard UX
+A Browser SpeechRecognition runtime már működik.
 
-Desktopon hasznos:
+Következő lépések:
 
-- képernyőn röviden mutatni a lenyomott betűt;
-- már használt betűnél külön feedback;
-- nincs elég pénz magánhangzóra → külön üzenet;
-- billentyűzet shortcut súgó.
+- command aliasok bővítése;
+- háttérzaj-tűrés;
+- solve transcript tisztítás;
+- betűfelismerési edge case-ek;
+- mikrofon/provider összehasonlítás;
+- opcionális Whisper provider.
+
+A jelenlegi `mint/min` parser és a konfigurálható kivételek megtartandók.
 
 ## P3 – Backend
 
-Ha a statikus frontend kinőhető:
+Ha a statikus frontendet kinőjük:
 
 - FastAPI;
 - SQLite;
@@ -151,43 +180,11 @@ Ha a statikus frontend kinőhető:
 - felhasználók;
 - session mentés.
 
-A jelenlegi játékhoz még nem szükséges.
+A jelenlegi működéshez backend nem szükséges.
 
-## P3 – Hangvezérlés / Whisper
+## P3 – app.js refaktor
 
-A voice-recognition labor reusable moduljai már bekerültek a KriszWheelbe.
-A lobby Hangfelismerés beállításai működnek: engedélyezés, provider, nyelv és
-mikrofonválasztás menthető.
-
-A következő lépés a `VoiceEngine` játék közbeni életciklusa és a unified
-COMMAND / LETTER események meglévő játékműveletekre kötése.
-
-Tervezett magyar parancsok:
-
-- „Pörgetek”
-- „K mint Károly”
-- „A betű”
-- „Megfejtem”
-- teljes megfejtés diktálása
-
-Javasolt architektúra:
-
-```text
-browser
-  ↓ audio
-local / server Whisper
-  ↓ normalized command
-game input API
-```
-
-A hangvezérlést érdemes csak a billentyűzetes input teljes stabilizálása után
-bevezetni.
-
-## P3 – Refaktor
-
-Az `app.js` egyre nagyobb.
-
-Javasolt későbbi bontás:
+Az `app.js` már nagy, ezért stabilizálás után érdemes modulokra bontani:
 
 ```text
 src/
@@ -198,29 +195,30 @@ src/
 ├── victory.js
 ├── bot.js
 ├── audio.js
+├── voice.js
 └── ui.js
 ```
 
-Ezt csak akkor érdemes megtenni, amikor a fő játékmenet már stabil.
+A refaktort csak stabil gameplay után érdemes elkezdeni.
 
 ## Ajánlott sorrend
 
-1. `data/puzzles.json` + validátor
-2. teljes scoreboard
-3. hangok / kerék tick
-4. Magánhangzó UI refaktor
-5. game-session / végső győztes
-6. mobil input és reszponzivitás
-7. Bot fejlesztés
-8. app.js moduláris refaktor
-9. backend / SQLite
-10. Whisper hangvezérlés
+1. intenzív teszt + regressziójavítás;
+2. puzzle validátor;
+3. scoreboard;
+4. feladványadatbázis bővítése;
+5. hangok és UX finomhangolása;
+6. mobil / tablet;
+7. Bot fejlesztés;
+8. game-session;
+9. voice / Whisper további finomítás;
+10. moduláris refaktor;
+11. opcionális backend.
 
-## Rövid következő sprint
+## Következő sprint
 
-A következő kis, jól lezárható fejlesztési csomag szerintem:
+A jelenlegi állapotban a legjobb rövid sprint:
 
-**Puzzle adatforrás + validáció + scoreboard**
+**intenzív tesztelés + puzzle validátor + hibajavítások**.
 
-Ez már látványosan javítaná a játék használhatóságát, miközben nem kell
-megbolygatni a most stabil kerék / solve / victory folyamatot.
+Ez stabil alapot ad az adatbázis további bővítéséhez és a mobilos körhöz.
