@@ -3,6 +3,7 @@
 
   const CONFIG = window.KRISZWHEEL_CONFIG ?? {};
   const GAMEPLAY_CONFIG = CONFIG.gameplay ?? {};
+  const PUZZLE_CONFIG = CONFIG.puzzles ?? {};
   const WHEEL_CONFIG = CONFIG.wheel ?? {};
   const BOT_CONFIG = CONFIG.bot ?? {};
   const AUDIO_CONFIG = CONFIG.audio ?? {};
@@ -626,6 +627,89 @@
     { category: "Étel", text: "TÚRÓS CSUSZA SZALONNÁVAL" }
   ];
 
+  const LIVE_PUZZLE_FILES = {
+    child: PUZZLE_CONFIG.files?.child ?? "data/child.csv",
+    easy: PUZZLE_CONFIG.files?.easy ?? "data/low.csv",
+    medium: PUZZLE_CONFIG.files?.medium ?? "data/med.csv",
+    hard: PUZZLE_CONFIG.files?.hard ?? "data/high.csv"
+  };
+
+  function parseCsvRow(line) {
+    const values = [];
+    let current = "";
+    let quoted = false;
+
+    for (let i = 0; i < line.length; i += 1) {
+      const char = line[i];
+
+      if (char === '"') {
+        if (quoted && line[i + 1] === '"') {
+          current += '"';
+          i += 1;
+        } else {
+          quoted = !quoted;
+        }
+        continue;
+      }
+
+      if (char === "," && !quoted) {
+        values.push(current);
+        current = "";
+        continue;
+      }
+
+      current += char;
+    }
+
+    values.push(current);
+    return values;
+  }
+
+  function parsePuzzleCsv(csvText) {
+    const lines = String(csvText ?? "")
+      .replace(/^\uFEFF/, "")
+      .split(/\r?\n/)
+      .filter(line => line.trim());
+
+    if (lines.length < 2) return [];
+
+    return lines.slice(1)
+      .map(parseCsvRow)
+      .map(([category, puzzle]) => ({
+        category: String(category ?? "").trim(),
+        text: normalize(String(puzzle ?? ""))
+      }))
+      .filter(item => item.category && item.text);
+  }
+
+  async function loadLivePuzzles() {
+    const difficulty = userSettings.puzzleDifficulty;
+    const path = LIVE_PUZZLE_FILES[difficulty] ?? LIVE_PUZZLE_FILES.easy;
+
+    const response = await fetch(path, { cache: "no-store" });
+    if (!response.ok) {
+      throw new Error(
+        `Nem sikerült betölteni a feladványokat: ${path} (HTTP ${response.status})`
+      );
+    }
+
+    const puzzles = parsePuzzleCsv(await response.text());
+    const expectedCount = Math.max(
+      1,
+      Number(PUZZLE_CONFIG.expectedCountPerDifficulty ?? 100)
+    );
+
+    if (puzzles.length < expectedCount) {
+      throw new Error(
+        `A feladványlista hiányos: ${path} (${puzzles.length}/${expectedCount})`
+      );
+    }
+
+    state.livePuzzles = puzzles;
+    state.livePuzzleSource = path;
+    state.lastPuzzleIndex = -1;
+  }
+
   const DEFAULT_WHEEL_SEGMENTS = [
     { label: "1 000", type: "money", value: 1000 },
     { label: "1 500", type: "money", value: 1500 },
@@ -678,6 +762,8 @@
     justRevealed: new Set(),
     pendingWheelSegment: null,
     pendingWheelFromBot: false,
+    livePuzzles: [],
+    livePuzzleSource: null,
 
     voiceEngine: null,
     voiceModulePromise: null,
@@ -1157,16 +1243,57 @@
   }
 
   function pickPuzzle() {
+    const pool =
+      userSettings.puzzleMode === "live"
+        ? state.livePuzzles
+        : PUZZLES;
+
+    if (!pool.length) {
+      throw new Error("Nincs betöltött feladvány.");
+    }
+
     let idx;
     do {
-      idx = Math.floor(Math.random() * PUZZLES.length);
-    } while (PUZZLES.length > 1 && idx === state.lastPuzzleIndex);
+      idx = Math.floor(Math.random() * pool.length);
+    } while (pool.length > 1 && idx === state.lastPuzzleIndex);
 
     state.lastPuzzleIndex = idx;
-    return { ...PUZZLES[idx], text: normalize(PUZZLES[idx].text) };
+    return { ...pool[idx], text: normalize(pool[idx].text) };
   }
 
-  function startGame() {
+  async function startGame() {
+    const selected = [...document.querySelectorAll('.player-option input:checked')]
+      .map(input => input.value);
+
+    if (selected.length < 2) {
+      el.setupError.textContent = "Legalább két játékos szükséges.";
+      el.setupError.classList.remove("hidden");
+      return;
+    }
+
+    el.setupError.classList.add("hidden");
+    el.startGameBtn.disabled = true;
+
+    try {
+      if (userSettings.puzzleMode === "live") {
+        el.startGameBtn.textContent = "Feladványok betöltése…";
+        await loadLivePuzzles();
+      } else {
+        state.livePuzzles = [];
+        state.livePuzzleSource = null;
+        state.lastPuzzleIndex = -1;
+      }
+    } catch (error) {
+      console.error(error);
+      el.setupError.textContent =
+        "Az éles feladványok betöltése nem sikerült. Ellenőrizd a data mappát.";
+      el.setupError.classList.remove("hidden");
+      return;
+    } finally {
+      el.startGameBtn.disabled = false;
+      el.startGameBtn.textContent = "Játék indítása";
+    }
+
     unlockSfx();
     stopMusicTrack("lobby", {
       fadeMs: Number(MUSIC_CONFIG.lobby?.fadeOutMs ?? 350),
@@ -1174,15 +1301,6 @@
     });
     stopWinnerMusic();
 
-    const selected = [...document.querySelectorAll('.player-option input:checked')]
-      .map(input => input.value);
-
-    if (selected.length < 2) {
-      el.setupError.classList.remove("hidden");
-      return;
-    }
-
-    el.setupError.classList.add("hidden");
     state.players = selected.map(name => ({
       name,
       isBot: name === "Bot",
@@ -1191,6 +1309,7 @@
     }));
     state.currentIndex = 0;
     state.roundNumber = 0;
+    state.lastPuzzleIndex = -1;
 
     document.body.classList.remove("lobby-active");
     document.body.classList.add("game-active");
