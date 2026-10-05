@@ -1,4 +1,9 @@
 window.KRISZWHEEL_CONFIG = {
+  app: {
+    version: "0.8.0",
+    buildDate: "2026.10.05"
+  },
+
   gameplay: {
     // Egy magánhangzó ára.
     vowelPrice: 5000,
