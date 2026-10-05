@@ -17,6 +17,7 @@ Nincs backend, bundler vagy framework.
 ## 2. Betöltés
 
 ```html
+<script src="config/voice-config.js"></script>
 <script src="config/game-config.js"></script>
 <script src="app.js"></script>
 ```
@@ -27,10 +28,12 @@ A config létrehozza:
 
 `window.KRISZWHEEL_CONFIG`
 
-Az `app.js` aliasai:
+Az `app.js` fontos config aliasai:
 
 - `CONFIG`
+- `APP_CONFIG`
 - `GAMEPLAY_CONFIG`
+- `PUZZLE_CONFIG`
 - `WHEEL_CONFIG`
 - `BOT_CONFIG`
 - `AUDIO_CONFIG`
@@ -55,7 +58,19 @@ böngészőben tárolt felhasználói beállítások kezelése.
 
 ### config/game-config.js
 
-Hangolható paraméterek.
+Hangolható paraméterek, alkalmazás metaadatok és az éles CSV
+feladványforrások mappingje.
+
+### data/*.csv
+
+A négy éles feladványkészlet:
+
+- `child.csv`
+- `low.csv`
+- `med.csv`
+- `high.csv`
+
+Mindegyik `category,puzzle` formátumú, jelenleg 100 feladvánnyal.
 
 ## 4. State
 
@@ -76,10 +91,15 @@ playerTransitionTimer
 roundEndTimer
 victoryButtonTimer
 feedbackTimer
+autoSpinTimer
+turnReadyTimer
+letterRevealTimer
 roundNumber
 justRevealed
 pendingWheelSegment
 pendingWheelFromBot
+livePuzzles
+livePuzzleSource
 ```
 
 ## 5. Phase értékek
@@ -89,7 +109,9 @@ pendingWheelFromBot
 - `spinning` – kerék mozog
 - `wheelResult` – megállt eredmény látszik
 - `letter` – mássalhangzót vár
+- `letterReveal` – sikeres találat animációja és post-delay fut
 - `playerTransition` – váltási szünet
+- `turnReady` – a következő játékos már látszik, de input még tiltott
 - `roundEnd` – megfejtett forduló, felfedés / victory
 
 ## 6. Phaser scene-ek
@@ -259,7 +281,7 @@ spinWheel -> wheelSpin start
 wheel stop -> wheelSpin stop
 finishRound -> game fade out + winner fade in
 newRound -> winner stop + game music
-returnToLobby -> game/winner/wheel stop + lobby music
+returnToLobby -> game azonnali stop + winner/wheel stop + lobby music
 ```
 
 A game music célhangerő elsőként azt vizsgálja, hogy a voice owner van-e
@@ -324,8 +346,10 @@ Betöltéskor az `app.js` biztonságos fallbacket használ, ha a
 Az `autoSpinEnabled` runtime automatizmus külön `autoSpinTimer`-t használ,
 így nem ütközik a Bot `botTimer` kezelésével.
 
-A `puzzleMode` jelenleg kizárólag perzisztált preference; a
-`pickPuzzle()` nem olvassa.
+A `puzzleMode` és `puzzleDifficulty` együtt választják ki a
+feladványforrást. Teszt módban a beépített `PUZZLES` lista használódik,
+Éles módban a `loadLivePuzzles()` a `puzzles.files` mapping szerinti
+CSV-t tölti be. A parse eredménye a `state.livePuzzles` tömbbe kerül.
 
 A `playSfx()`:
 
@@ -404,3 +428,26 @@ Voice owner modell:
 - Bot ne kapjon emberi inputot;
 - solve dialog záródjon az értékelés előtt;
 - victory csak a betűfelfedés után jelenjen meg.
+
+
+## 19. Build meta és lobby státusz
+
+A `config/game-config.js` `app.version` és `app.buildDate` értékeit a
+`renderLobbyBuildInfo()` jeleníti meg a lobby jobb alsó sarkában. A státusz
+dinamikusan hozzáadja a `TESZT` vagy `ÉLES / <NEHÉZSÉG>` jelölést.
+
+Éles módban a tooltip a tényleges CSV-forrást és az elvárt elemszámot is
+mutatja.
+
+## 20. Találat utáni időzítés
+
+Sikeres mássalhangzónál a state nem vált azonnal `spin` értékre. A
+`letterReveal` fázis alatt a vezérlés tiltott. A timer hossza:
+
+```text
+(hits - 1) × letterHitGapMs
++ letterRevealAnimationMs
++ letterRevealPostDelayMs
+```
+
+Csak ezután engedélyeződik újra a pörgetés és a turn automation.
