@@ -66,6 +66,55 @@ function exceptionMatches(exception, beforeText, afterWord) {
   return beforeMatches && afterMatches;
 }
 
+
+function parseAdvancedName(text, advancedConfig) {
+  if (!advancedConfig?.enabled) {
+    return null;
+  }
+
+  const normalized = normalizeLetterText(text);
+  if (!normalized) {
+    return null;
+  }
+
+  const words = normalized.split(" ");
+
+  for (const exception of advancedConfig.exceptions ?? []) {
+    const value = String(exception.value ?? "").toLocaleUpperCase("hu-HU");
+    if (!value) continue;
+
+    for (const alias of exception.aliases ?? []) {
+      const normalizedAlias = normalizeLetterText(alias);
+      if (normalizedAlias && words.includes(normalizedAlias)) {
+        return {
+          type: "LETTER",
+          value,
+          matchedPhrase: normalizedAlias,
+          source: "advanced-name-exception",
+        };
+      }
+    }
+  }
+
+  const namesByLetter = advancedConfig.namesByLetter ?? {};
+
+  for (const [letter, names] of Object.entries(namesByLetter)) {
+    for (const name of names ?? []) {
+      const normalizedName = normalizeLetterText(name);
+      if (normalizedName && words.includes(normalizedName)) {
+        return {
+          type: "LETTER",
+          value: String(letter).toLocaleUpperCase("hu-HU"),
+          matchedPhrase: normalizedName,
+          source: "advanced-name",
+        };
+      }
+    }
+  }
+
+  return null;
+}
+
 function firstLetter(value) {
   const match = value.match(/\p{L}/u);
 
@@ -130,7 +179,10 @@ export function parseLetter(text, letterConfig) {
     }
   }
 
-  return null;
+  return parseAdvancedName(
+    text,
+    letterConfig.advancedNameRecognition
+  );
 }
 
 export function parseTranscript(text, config) {
