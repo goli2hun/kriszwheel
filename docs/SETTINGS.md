@@ -86,6 +86,34 @@ Alapérték:
 `pickPuzzle()` és a jelenlegi `PUZZLES` lista nincs rákötve erre a
 beállításra.
 
+### Lobby nehézség
+
+A nehézség nem a Beállítások képernyőn, hanem közvetlenül a lobby
+játékindító nézetében választható.
+
+DOM:
+
+`#difficultySelector`
+
+Mentett mező:
+
+`puzzleDifficulty`
+
+Értékek:
+
+- `child` – Gyerek;
+- `easy` – Könnyű;
+- `medium` – Közepes;
+- `hard` – Nehéz.
+
+Alapérték:
+
+`easy`
+
+A választás azonnal perzisztálódik. **Még nincs bekötve** a
+`pickPuzzle()` függvénybe. A tervezett működés szerint csak
+`puzzleMode = live` esetén fogja szűrni az éles feladványkészletet.
+
 ## 3. Zene és hangulat
 
 Minden zenei sávhoz két felhasználói beállítás tartozik:
@@ -244,6 +272,7 @@ Jelenlegi forma:
   "masterVolume": 1,
   "autoSpinEnabled": false,
   "puzzleMode": "test",
+  "puzzleDifficulty": "easy",
   "wheelSpinSoundEnabled": true,
   "wheelSpinVolume": 0.65,
   "lobbyMusicEnabled": true,

@@ -696,6 +696,19 @@ body.lobby-active .lobby-light-fx {
     gap: 12px;
   }
 
+  .lobby-difficulty-heading {
+    display: grid;
+    gap: 4px;
+  }
+
+  .lobby-difficulty-heading small {
+    text-align: left;
+  }
+
+  .difficulty-selector {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   body.lobby-active .player-option {
     min-height: 145px;
   }
@@ -2058,6 +2071,83 @@ body.game-active .app-shell {
 /* --------------------------------------------------------------------------
    Lobby / Beállítások
    -------------------------------------------------------------------------- */
+
+.lobby-difficulty {
+  margin: -4px 0 22px;
+  padding: 15px 16px 16px;
+  border: 1px solid rgba(136, 180, 239, .17);
+  border-radius: 16px;
+  background: rgba(5, 25, 58, .38);
+}
+
+.lobby-difficulty-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 11px;
+  text-align: left;
+}
+
+.lobby-difficulty-heading strong {
+  color: #ffe18a;
+  font-size: .88rem;
+  font-weight: 900;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+}
+
+.lobby-difficulty-heading small {
+  color: #8faacb;
+  font-size: .76rem;
+  line-height: 1.3;
+  text-align: right;
+}
+
+.difficulty-selector {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+}
+
+.difficulty-btn {
+  min-width: 0;
+  padding: 10px 9px;
+  border: 1px solid rgba(128, 174, 232, .30);
+  border-radius: 10px;
+  color: #cbdcf1;
+  background:
+    linear-gradient(180deg, rgba(29, 67, 115, .62), rgba(10, 34, 69, .72));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .055);
+  font: inherit;
+  font-size: .86rem;
+  font-weight: 850;
+  cursor: pointer;
+  transition:
+    transform .14s ease,
+    color .14s ease,
+    border-color .14s ease,
+    background .14s ease,
+    box-shadow .14s ease;
+}
+
+.difficulty-btn:hover,
+.difficulty-btn:focus-visible {
+  transform: translateY(-1px);
+  color: #ffffff;
+  border-color: rgba(255, 218, 104, .58);
+  outline: none;
+}
+
+.difficulty-btn.is-active {
+  color: #3e2b00;
+  border-color: rgba(255, 227, 133, .95);
+  background:
+    linear-gradient(135deg, #ffe894, #f2aa1c);
+  box-shadow:
+    0 0 16px rgba(255, 197, 51, .18),
+    inset 0 1px 0 rgba(255, 255, 255, .52);
+}
 
 .lobby-actions {
   display: flex;

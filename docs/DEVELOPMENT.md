@@ -31,16 +31,15 @@ URL:
 Módosítás után:
 
 1. lobby JavaScript hiba nélkül betölt;
-2. voice owner beállítása után a saját körében game music 0-ra halkul;
-3. másik játékos körében a game music visszaáll a beállított hangerőre;
-4. pörgetés alatt a voice owner mikrofonja szünetel;
-5. kerék fizikai megállásakor a mikrofon azonnal visszaindul;
-6. a mikrofon nem várja meg a `wheel.resultDisplayMs` végét;
-7. `wheelResult` alatt a phase-validáció megakadályozza a túl korai játékakciót;
-8. másik játékos körében a voice owner mikrofonja nem indul el;
-9. turnReady / Auto pörgetés / Bot flow regresszió nélkül működik;
-10. zenei életciklus és victory flow működik;
-11. puzzle, solve és játék vége flow működik.
+2. nehézségválasztó 4 gombja megjelenik;
+3. egyszerre pontosan egy nehézség aktív;
+4. első induláskor a Könnyű aktív;
+5. Gyerek / Könnyű / Közepes / Nehéz választás kattintható;
+6. a választás frissítés után megmarad;
+7. `pickPuzzle()` továbbra sem használja a `puzzleDifficulty` értéket;
+8. játékosválasztás és játékindítás regresszió nélkül működik;
+9. voice / zene / Auto pörgetés flow működik;
+10. puzzle, solve, victory és játék vége flow működik.
 
 ## 4. Beállítások tesztelése
 

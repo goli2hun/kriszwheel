@@ -303,6 +303,7 @@ soundsEnabled
 masterVolume
 autoSpinEnabled
 puzzleMode
+puzzleDifficulty
 wheelSpinSoundEnabled
 wheelSpinVolume
 lobbyMusicEnabled

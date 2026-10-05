@@ -115,6 +115,38 @@
         </label>
       </div>
 
+      <section class="lobby-difficulty"
+               aria-labelledby="difficultyTitle">
+        <div class="lobby-difficulty-heading">
+          <strong id="difficultyTitle">Nehézség</strong>
+          <small>
+            Éles feladványoknál ez határozza majd meg a feladvány szintjét.
+          </small>
+        </div>
+
+        <div id="difficultySelector"
+             class="difficulty-selector"
+             role="group"
+             aria-label="Feladvány nehézség">
+          <button type="button"
+                  class="difficulty-btn"
+                  data-difficulty="child"
+                  aria-pressed="false">Gyerek</button>
+          <button type="button"
+                  class="difficulty-btn is-active"
+                  data-difficulty="easy"
+                  aria-pressed="true">Könnyű</button>
+          <button type="button"
+                  class="difficulty-btn"
+                  data-difficulty="medium"
+                  aria-pressed="false">Közepes</button>
+          <button type="button"
+                  class="difficulty-btn"
+                  data-difficulty="hard"
+                  aria-pressed="false">Nehéz</button>
+        </div>
+      </section>
+
       <p id="setupError" class="error hidden">Legalább két játékos szükséges.</p>
 
       <div class="lobby-actions">

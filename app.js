@@ -17,6 +17,7 @@
     masterVolume: 1,
     autoSpinEnabled: false,
     puzzleMode: "test",
+    puzzleDifficulty: "easy",
 
     wheelSpinSoundEnabled:
       MUSIC_CONFIG.wheelSpin?.defaultEnabled !== false,
@@ -67,6 +68,12 @@
           ["test", "live"].includes(stored.puzzleMode)
             ? stored.puzzleMode
             : DEFAULT_USER_SETTINGS.puzzleMode,
+        puzzleDifficulty:
+          ["child", "easy", "medium", "hard"].includes(
+            stored.puzzleDifficulty
+          )
+            ? stored.puzzleDifficulty
+            : DEFAULT_USER_SETTINGS.puzzleDifficulty,
 
         wheelSpinSoundEnabled:
           typeof stored.wheelSpinSoundEnabled === "boolean"
@@ -724,6 +731,7 @@
     speechSupportBadge: document.getElementById("speechSupportBadge"),
     speechSupportText: document.getElementById("speechSupportText"),
     setupError: document.getElementById("setupError"),
+    difficultySelector: document.getElementById("difficultySelector"),
     playersList: document.getElementById("playersList"),
     categoryText: document.getElementById("categoryText"),
     puzzleBoard: document.getElementById("puzzleBoard"),
@@ -1022,6 +1030,36 @@
     el.settingsSaveStatus.textContent = "";
   }
 
+  function renderDifficultySelector() {
+    const valid = new Set(["child", "easy", "medium", "hard"]);
+    const selected = valid.has(userSettings.puzzleDifficulty)
+      ? userSettings.puzzleDifficulty
+      : "easy";
+
+    el.difficultySelector
+      .querySelectorAll("[data-difficulty]")
+      .forEach(button => {
+        const active =
+          button.dataset.difficulty === selected;
+
+        button.classList.toggle("is-active", active);
+        button.setAttribute(
+          "aria-pressed",
+          active ? "true" : "false"
+        );
+      });
+  }
+
+  function setPuzzleDifficulty(value) {
+    if (!["child", "easy", "medium", "hard"].includes(value)) {
+      return;
+    }
+
+    userSettings.puzzleDifficulty = value;
+    persistUserSettings(userSettings);
+    renderDifficultySelector();
+  }
+
   function showSettingsScreen() {
     populateSettingsForm();
     el.setupScreen.classList.add("hidden");
@@ -1038,6 +1076,7 @@
     el.settingsScreen.classList.add("hidden");
     el.setupScreen.classList.remove("hidden");
     el.settingsSaveStatus.textContent = "";
+    renderDifficultySelector();
     el.settingsBtn.focus();
   }
 
@@ -1099,6 +1138,7 @@
   }
 
   populateSettingsForm();
+  renderDifficultySelector();
 
   const normalize = (s) =>
     s.normalize("NFC")
@@ -3096,6 +3136,15 @@
       }
     }
   }
+
+  el.difficultySelector.addEventListener("click", event => {
+    const button = event.target.closest("[data-difficulty]");
+    if (!button || !el.difficultySelector.contains(button)) {
+      return;
+    }
+
+    setPuzzleDifficulty(button.dataset.difficulty);
+  });
 
   el.startGameBtn.addEventListener("click", startGame);
 

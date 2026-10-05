@@ -22,6 +22,19 @@ Választható játékosok:
 
 Minimum két játékos szükséges. Alapértelmezett kijelölés: Krisz + Bot.
 
+A lobbyban külön nehézségválasztó is van:
+
+- Gyerek
+- Könnyű
+- Közepes
+- Nehéz
+
+Alapértelmezés: **Könnyű**.
+
+A választás `puzzleDifficulty` néven azonnal mentődik. A jelenlegi
+tesztfeladvány-választás még nem használja; később csak éles feladványmódban
+kap szerepet.
+
 A lobby saját stúdió-hátteret és játékosportrékat használ.
 
 A lobbyban külön **Beállítások** gomb található. A Beállítások nézet két

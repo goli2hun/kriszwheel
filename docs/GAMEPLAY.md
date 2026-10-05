@@ -18,6 +18,16 @@ Elérhető játékosok:
 A Vendég 1 és Vendég 2 normál emberi játékosok; a Bot továbbra is az egyetlen
 automatikus játékos.
 
+A lobby nehézségválasztója:
+
+`Gyerek / Könnyű / Közepes / Nehéz`
+
+Alapérték: `Könnyű` (`easy`).
+
+A `puzzleDifficulty` most csak mentődik. A jelenlegi teszt
+`pickPuzzle()` logika **nem olvassa**. Később éles feladványmódban fogjuk
+felhasználni.
+
 A játék indulásakor:
 
 1. létrejön a játékoslista;
