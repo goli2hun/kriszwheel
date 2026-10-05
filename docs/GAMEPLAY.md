@@ -113,8 +113,12 @@ roundMoney += találatok × wheelValue
 
 Találat után ugyanaz a játékos újra pörget, de **nem azonnal**. A játék
 `letterReveal` fázisba lép, kivárja az összes találat felfedését, majd még
-`gameplay.letterRevealPostDelayMs` időt. Csak ezután tér vissza `spin`
-fázisba és indulhat kézi, Bot- vagy Auto pörgetés.
+`gameplay.letterRevealPostDelayMs` időt.
+
+Ha ezután maradt rejtett mássalhangzó, visszatér `spin` fázisba. Ha már
+**nincs több rejtett mássalhangzó**, a játék `solveOnly` állapotba kerül,
+kiírja ezt a játékosnak, és több pörgetést nem enged. Megfejtés és
+magánhangzó-vásárlás továbbra is lehetséges.
 
 Nincs találat esetén játékosváltás következik.
 
@@ -253,7 +257,10 @@ folyamatban lévő `roundMoney` nem jelenik meg megszerzett pénzként.
 A játékosok egymás alatt jelennek meg; az avatar és a megnyert összeg a
 korábbi grid-verziónál nagyobb hangsúlyt kap.
 
-A gombok a `victory.buttonDelayMs` idő után aktiválódnak.
+A gombok csak a `victory.buttonDelayMs` és a
+`victory.minimumCelebrationMs` közül a hosszabb idő letelte után
+aktiválódnak. Alapból legalább 3000 ms-ig nem lehet megszakítani az
+ünneplést.
 
 ### Következő feladvány
 
@@ -441,8 +448,14 @@ spinning
 wheelResult
   ↓
 letter
-  ├─ találat → letterReveal → spin
+  ├─ találat → letterReveal
+  │              ├─ van még mássalhangzó → spin
+  │              └─ nincs több mássalhangzó → solveOnly
   └─ hiba → playerTransition → turnReady → spin
+
+solveOnly
+  ├─ magánhangzó-vásárlás
+  └─ megfejtés
 
 hibás megfejtés
   ↓
