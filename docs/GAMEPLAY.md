@@ -514,3 +514,30 @@ sikeres megfejtés után.
 Ha egy nehézségi készlet teljesen elfogyott, a játék nem kezdi elölről:
 visszatér a lobbyba és jelzi, hogy azon a szinten már minden feladvány
 kijátszásra került.
+
+
+## 18. Haladó névfelismerés játék közben
+
+Ha a Beállításokban a **Haladó névfelismerés** engedélyezve van, a játék a
+beszédfelismerés final transcriptjében szereplő konfigurált magyar
+keresztneveket közvetlen betűként értelmezheti.
+
+Példák:
+
+```text
+Anna -> A
+Aladár -> A
+Béla -> B
+Botond -> B
+Krisztián -> K
+Ypszilon -> Y
+```
+
+Ez mássalhangzó- és magánhangzóbevitelhez is használható. Például:
+
+```text
+Magánhangzó Anna
+```
+
+A meglévő `mint/min` szabály változatlanul működik, tehát a funkció
+kiegészítő, nem helyettesítő felismerési mód.
