@@ -200,6 +200,9 @@ Tartalma:
 A Játék állása játékosonként kizárólag a `totalMoney` értéket mutatja. A
 folyamatban lévő `roundMoney` nem jelenik meg megszerzett pénzként.
 
+A játékosok egymás alatt jelennek meg; az avatar és a megnyert összeg a
+korábbi grid-verziónál nagyobb hangsúlyt kap.
+
 A gombok a `victory.buttonDelayMs` idő után aktiválódnak.
 
 ### Következő feladvány

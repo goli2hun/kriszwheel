@@ -1852,19 +1852,19 @@ body.game-active .app-shell {
 
 .victory-standings-list {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: .5cqw;
+  grid-template-columns: 1fr;
+  gap: .42cqw;
 }
 
 .victory-standing-player {
   min-width: 0;
-  padding: .42cqw .5cqw;
+  padding: .48cqw .68cqw;
   display: grid;
-  grid-template-columns: 2.2cqw minmax(0, 1fr);
+  grid-template-columns: 3.15cqw minmax(0, 1fr);
   align-items: center;
-  gap: .45cqw;
+  gap: .68cqw;
   border: 1px solid rgba(255, 255, 255, .09);
-  border-radius: .62cqw;
+  border-radius: .68cqw;
   background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
   text-align: left;
 }
@@ -1878,9 +1878,9 @@ body.game-active .app-shell {
 }
 
 .victory-standing-avatar {
-  width: 2.2cqw;
-  height: 2.2cqw;
-  padding: .09cqw;
+  width: 3.15cqw;
+  height: 3.15cqw;
+  padding: .11cqw;
   border-radius: 50%;
   background:
     conic-gradient(from 15deg, #fff3b5, #d28a19, #64acff, #1c4aa0, #f2bd43, #fff3b5);
@@ -1899,20 +1899,26 @@ body.game-active .app-shell {
 .victory-standing-copy {
   min-width: 0;
   display: grid;
-  gap: .12cqw;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto;
+  column-gap: .8cqw;
+  row-gap: .08cqw;
+  align-items: center;
 }
 
 .victory-standing-name-row {
   min-width: 0;
+  grid-column: 1;
+  grid-row: 1 / span 2;
   display: flex;
   align-items: center;
-  gap: .28cqw;
+  gap: .34cqw;
 }
 
 .victory-standing-name {
   overflow: hidden;
   color: #e6f1ff;
-  font-size: .53cqw;
+  font-size: .66cqw;
   font-weight: 900;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1930,18 +1936,26 @@ body.game-active .app-shell {
 }
 
 .victory-standing-money {
-  color: #ffffff;
+  grid-column: 2;
+  grid-row: 1;
+  color: #fff3b0;
   font-family: "Arial Black", Arial, Helvetica, sans-serif;
-  font-size: .66cqw;
+  font-size: .9cqw;
   font-weight: 900;
+  line-height: 1;
+  text-align: right;
   font-variant-numeric: tabular-nums;
+  text-shadow: 0 0 .45cqw rgba(255, 211, 78, .14);
 }
 
 .victory-standing-caption {
+  grid-column: 2;
+  grid-row: 2;
   color: #7898bf;
-  font-size: .31cqw;
+  font-size: .34cqw;
   font-weight: 700;
   letter-spacing: .035em;
+  text-align: right;
 }
 
 @media (max-aspect-ratio: 4 / 3) {
@@ -1950,8 +1964,13 @@ body.game-active .app-shell {
     min-width: 0;
   }
 
-  .victory-standings-list {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .victory-standing-avatar {
+    width: 3.6cqw;
+    height: 3.6cqw;
+  }
+
+  .victory-standing-player {
+    grid-template-columns: 3.6cqw minmax(0, 1fr);
   }
 }
 

@@ -177,14 +177,14 @@ DOM:
 
 A `VictoryScene` külön Phaser canvasban fut.
 
-A victory card szélesebb, és tartalmaz egy 3 oszlopos játékállás-gridet. A
-grid keskenyebb képaránynál 2 oszloposra vált.
+A victory card szélesebb, és a játékállás **egyetlen oszlopos listaként**
+jelenik meg: a játékosok egymás alatt láthatók.
 
-Minden standings kártya:
+Minden standings sor:
 
-- avatar;
-- név;
-- eddig megnyert összeg (`totalMoney`);
+- nagyobb avatar bal oldalon;
+- játékosnév középen;
+- nagyobb, jobbra igazított eddig megnyert összeg (`totalMoney`);
 - az aktuális forduló nyertesének kiemelése.
 
 A gombok `victory.buttonDelayMs` után aktiválódnak.

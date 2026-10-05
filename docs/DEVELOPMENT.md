@@ -73,9 +73,9 @@ Módosítás után:
 41. helyes solve után teljes betűfelfedés és letter_hit hangsor lefut;
 42. victory overlay megjelenik;
 43. győztes avatarja és pénzei helyesek;
-44. Játék állása minden aktuális játékost megjelenít;
+44. Játék állása minden aktuális játékost egymás alatt jelenít meg;
 45. standings csak `totalMoney` értéket mutat, folyó `roundMoney`-t nem;
-46. aktuális forduló nyertese kiemelve látszik;
+46. standings avatarok és nyeremények nagyobb méretben látszanak, a forduló nyertese kiemelve;
 47. tűzijáték fut;
 48. victory gombok késleltetve aktívak;
 49. Következő feladvány működik;
