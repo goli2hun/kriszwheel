@@ -72,13 +72,16 @@ Módosítás után:
 40. játékosváltási szünet működik;
 41. helyes solve után teljes betűfelfedés és letter_hit hangsor lefut;
 42. victory overlay megjelenik;
-43. avatar és pénzek helyesek;
-44. tűzijáték fut;
-45. victory gombok késleltetve aktívak;
-46. Következő feladvány működik;
-47. victory Játék vége lobbyba visz;
-48. stage Játék vége megerősítést kér;
-49. Teszt gomb config szerint működik.
+43. győztes avatarja és pénzei helyesek;
+44. Játék állása minden aktuális játékost megjelenít;
+45. standings csak `totalMoney` értéket mutat, folyó `roundMoney`-t nem;
+46. aktuális forduló nyertese kiemelve látszik;
+47. tűzijáték fut;
+48. victory gombok késleltetve aktívak;
+49. Következő feladvány működik;
+50. victory Játék vége lobbyba visz;
+51. stage Játék vége megerősítést kér;
+52. Teszt gomb config szerint működik.
 
 ## 4. Beállítások tesztelése
 

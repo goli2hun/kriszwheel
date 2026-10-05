@@ -129,7 +129,11 @@ Sikeres megfejtés után:
 - megfejtett feladvány;
 - forduló nyereménye;
 - összesített nyeremény;
+- az aktuális játék teljes állása minden résztvevő eddig megnyert pénzével;
 - Phaser tűzijáték.
+
+A játékállás kizárólag a `totalMoney` értéket mutatja. A még futó forduló
+`roundMoney` értéke nem számít megszerzett pénznek.
 
 A gombok késleltetve válnak aktívvá:
 

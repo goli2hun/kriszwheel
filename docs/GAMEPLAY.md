@@ -194,7 +194,11 @@ Tartalma:
 - feladvány;
 - forduló pénze;
 - összes pénz;
+- Játék állása panel minden aktuális játékossal;
 - Phaser tűzijáték.
+
+A Játék állása játékosonként kizárólag a `totalMoney` értéket mutatja. A
+folyamatban lévő `roundMoney` nem jelenik meg megszerzett pénzként.
 
 A gombok a `victory.buttonDelayMs` idő után aktiválódnak.
 

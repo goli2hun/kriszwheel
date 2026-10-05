@@ -291,6 +291,7 @@
     victoryPuzzle: document.getElementById("victoryPuzzle"),
     victoryRoundMoney: document.getElementById("victoryRoundMoney"),
     victoryTotalMoney: document.getElementById("victoryTotalMoney"),
+    victoryStandingsList: document.getElementById("victoryStandingsList"),
     victoryActions: document.getElementById("victoryActions"),
     nextRoundBtn: document.getElementById("nextRoundBtn"),
     victoryEndGameBtn: document.getElementById("victoryEndGameBtn"),
@@ -1846,6 +1847,56 @@
     return victoryGame.scene.getScene("VictoryScene");
   }
 
+  function renderVictoryStandings(winner) {
+    el.victoryStandingsList.replaceChildren();
+
+    state.players.forEach(player => {
+      const card = document.createElement("article");
+      card.className = "victory-standing-player";
+
+      if (player === winner) {
+        card.classList.add("is-winner");
+      }
+
+      const avatar = document.createElement("div");
+      avatar.className = "victory-standing-avatar";
+
+      const image = document.createElement("img");
+      setPlayerAvatar(image, player.name);
+      avatar.appendChild(image);
+
+      const copy = document.createElement("div");
+      copy.className = "victory-standing-copy";
+
+      const nameRow = document.createElement("div");
+      nameRow.className = "victory-standing-name-row";
+
+      const name = document.createElement("strong");
+      name.className = "victory-standing-name";
+      name.textContent = player.name;
+      nameRow.appendChild(name);
+
+      if (player === winner) {
+        const badge = document.createElement("span");
+        badge.className = "victory-standing-badge";
+        badge.textContent = "FORDULÓ NYERTESE";
+        nameRow.appendChild(badge);
+      }
+
+      const money = document.createElement("strong");
+      money.className = "victory-standing-money";
+      money.textContent = fmtMoney(player.totalMoney);
+
+      const caption = document.createElement("span");
+      caption.className = "victory-standing-caption";
+      caption.textContent = "EDDIG MEGNYERT PÉNZ";
+
+      copy.append(nameRow, money, caption);
+      card.append(avatar, copy);
+      el.victoryStandingsList.appendChild(card);
+    });
+  }
+
   function showVictoryOverlay(winner) {
     clearTimeout(state.victoryButtonTimer);
 
@@ -1855,6 +1906,10 @@
     el.victoryPuzzle.textContent = state.puzzle.text;
     el.victoryRoundMoney.textContent = fmtMoney(winner.roundMoney);
     el.victoryTotalMoney.textContent = fmtMoney(winner.totalMoney);
+
+    // A standings csak a már megnyert összeget mutatja.
+    // Az aktuális, még meg nem nyert roundMoney nem kerül bele.
+    renderVictoryStandings(winner);
 
     el.victoryActions.classList.remove("ready");
     el.victoryOverlay.classList.add("open");

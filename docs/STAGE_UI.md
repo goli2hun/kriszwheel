@@ -170,11 +170,22 @@ DOM:
 - `#victoryPuzzle`
 - `#victoryRoundMoney`
 - `#victoryTotalMoney`
+- `#victoryStandingsList`
 - `#victoryActions`
 - `#nextRoundBtn`
 - `#victoryEndGameBtn`
 
 A `VictoryScene` külön Phaser canvasban fut.
+
+A victory card szélesebb, és tartalmaz egy 3 oszlopos játékállás-gridet. A
+grid keskenyebb képaránynál 2 oszloposra vált.
+
+Minden standings kártya:
+
+- avatar;
+- név;
+- eddig megnyert összeg (`totalMoney`);
+- az aktuális forduló nyertesének kiemelése.
 
 A gombok `victory.buttonDelayMs` után aktiválódnak.
 

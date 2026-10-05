@@ -201,6 +201,10 @@ A solve form submit:
 Helyes válaszkor a `finishRound()` kiszámolja a még animálandó betűhelyek
 számát, majd csak a felfedés után hívja a `showVictoryOverlay()` függvényt.
 
+A `renderVictoryStandings(winner)` a `state.players` listából építi fel a
+játékállást, és szándékosan csak a `totalMoney` értéket olvassa. A
+`roundMoney` nem kerül bele az összesítőbe.
+
 ## 13. UI rétegrend
 
 ```text

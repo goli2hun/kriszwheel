@@ -1713,9 +1713,11 @@ body.game-active .app-shell {
 .victory-card {
   position: relative;
   z-index: 3;
-  width: min(38%, 620px);
-  min-width: 360px;
-  padding: 1.15cqw 1.65cqw 1.25cqw;
+  width: min(62%, 980px);
+  min-width: 560px;
+  max-height: 92%;
+  overflow-y: auto;
+  padding: 1.05cqw 1.5cqw 1.15cqw;
   text-align: center;
   border: .09cqw solid rgba(255, 220, 112, .58);
   border-radius: 1.25cqw;
@@ -1816,6 +1818,141 @@ body.game-active .app-shell {
   font-size: .86cqw;
   font-weight: 900;
   font-variant-numeric: tabular-nums;
+}
+
+.victory-standings {
+  margin: 0 0 .92cqw;
+  padding: .68cqw .78cqw .76cqw;
+  border: 1px solid rgba(149, 190, 244, .16);
+  border-radius: .78cqw;
+  background: rgba(3, 20, 55, .50);
+}
+
+.victory-standings-heading {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: .65cqw;
+  margin-bottom: .56cqw;
+  text-align: left;
+}
+
+.victory-standings-heading > span {
+  color: #a9c8ef;
+  font-size: .48cqw;
+  font-weight: 900;
+  letter-spacing: .13em;
+}
+
+.victory-standings-heading > small {
+  color: #7898c3;
+  font-size: .38cqw;
+  font-weight: 700;
+}
+
+.victory-standings-list {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: .5cqw;
+}
+
+.victory-standing-player {
+  min-width: 0;
+  padding: .42cqw .5cqw;
+  display: grid;
+  grid-template-columns: 2.2cqw minmax(0, 1fr);
+  align-items: center;
+  gap: .45cqw;
+  border: 1px solid rgba(255, 255, 255, .09);
+  border-radius: .62cqw;
+  background: linear-gradient(180deg, rgba(255,255,255,.055), rgba(255,255,255,.025));
+  text-align: left;
+}
+
+.victory-standing-player.is-winner {
+  border-color: rgba(255, 218, 103, .58);
+  background: linear-gradient(180deg, rgba(151,104,12,.22), rgba(52,39,14,.20));
+  box-shadow:
+    inset 0 0 .55cqw rgba(255,210,72,.08),
+    0 0 .55cqw rgba(255,201,45,.08);
+}
+
+.victory-standing-avatar {
+  width: 2.2cqw;
+  height: 2.2cqw;
+  padding: .09cqw;
+  border-radius: 50%;
+  background:
+    conic-gradient(from 15deg, #fff3b5, #d28a19, #64acff, #1c4aa0, #f2bd43, #fff3b5);
+}
+
+.victory-standing-avatar img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+  border-radius: 50%;
+  border: .07cqw solid #09245b;
+}
+
+.victory-standing-copy {
+  min-width: 0;
+  display: grid;
+  gap: .12cqw;
+}
+
+.victory-standing-name-row {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: .28cqw;
+}
+
+.victory-standing-name {
+  overflow: hidden;
+  color: #e6f1ff;
+  font-size: .53cqw;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.victory-standing-badge {
+  flex: 0 0 auto;
+  padding: .09cqw .25cqw;
+  border-radius: 999px;
+  color: #5b3c00;
+  background: #ffd765;
+  font-size: .29cqw;
+  font-weight: 900;
+  letter-spacing: .04em;
+}
+
+.victory-standing-money {
+  color: #ffffff;
+  font-family: "Arial Black", Arial, Helvetica, sans-serif;
+  font-size: .66cqw;
+  font-weight: 900;
+  font-variant-numeric: tabular-nums;
+}
+
+.victory-standing-caption {
+  color: #7898bf;
+  font-size: .31cqw;
+  font-weight: 700;
+  letter-spacing: .035em;
+}
+
+@media (max-aspect-ratio: 4 / 3) {
+  .victory-card {
+    width: min(82%, 980px);
+    min-width: 0;
+  }
+
+  .victory-standings-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 .victory-actions {
