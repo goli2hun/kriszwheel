@@ -14,6 +14,7 @@
   const VOICE_CONFIG = window.KRISZWHEEL_VOICE_CONFIG ?? {};
 
   const USER_SETTINGS_STORAGE_KEY = "kriszwheel.user-settings.v1";
+  const PUZZLE_HISTORY_STORAGE_KEY = "kriszwheel.puzzle-history.v1";
   const DEFAULT_USER_SETTINGS = Object.freeze({
     soundsEnabled: true,
     masterVolume: 1,
@@ -145,6 +146,60 @@
   }
 
   const userSettings = loadUserSettings();
+
+  function emptyPuzzleHistory() {
+    return {
+      child: [],
+      easy: [],
+      medium: [],
+      hard: []
+    };
+  }
+
+  function loadPuzzleHistory() {
+    try {
+      const stored = JSON.parse(
+        localStorage.getItem(PUZZLE_HISTORY_STORAGE_KEY) || "{}"
+      );
+      const history = emptyPuzzleHistory();
+
+      for (const difficulty of Object.keys(history)) {
+        const entries = Array.isArray(stored[difficulty])
+          ? stored[difficulty]
+          : [];
+
+        history[difficulty] = entries
+          .filter(entry =>
+            entry &&
+            Number.isInteger(entry.index) &&
+            typeof entry.text === "string" &&
+            entry.text
+          )
+          .map(entry => ({
+            index: entry.index,
+            text: String(entry.text)
+          }));
+      }
+
+      return history;
+    } catch {
+      return emptyPuzzleHistory();
+    }
+  }
+
+  function persistPuzzleHistory(history) {
+    try {
+      localStorage.setItem(
+        PUZZLE_HISTORY_STORAGE_KEY,
+        JSON.stringify(history)
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  const puzzleHistory = loadPuzzleHistory();
 
   const VOWELS = new Set(["A", "Á", "E", "É", "I", "Í", "O", "Ó", "Ö", "Ő", "U", "Ú", "Ü", "Ű"]);
   const ALPHABET = "AÁBCDEÉFGHIÍJKLMNOÓÖŐPQRSTUÚÜŰVWXYZ".split("");
@@ -1283,6 +1338,40 @@
     return state.players[state.currentIndex];
   }
 
+  function livePuzzleHistoryKey() {
+    return ["child", "easy", "medium", "hard"].includes(
+      userSettings.puzzleDifficulty
+    )
+      ? userSettings.puzzleDifficulty
+      : "easy";
+  }
+
+  function usedLivePuzzleTexts() {
+    const key = livePuzzleHistoryKey();
+    return new Set(
+      puzzleHistory[key].map(entry => normalize(entry.text))
+    );
+  }
+
+  function recordLivePuzzleUse(index, puzzleText) {
+    const key = livePuzzleHistoryKey();
+    const normalizedText = normalize(puzzleText);
+
+    if (
+      puzzleHistory[key].some(
+        entry => normalize(entry.text) === normalizedText
+      )
+    ) {
+      return;
+    }
+
+    puzzleHistory[key].push({
+      index,
+      text: normalizedText
+    });
+    persistPuzzleHistory(puzzleHistory);
+  }
+
   function pickPuzzle() {
     const pool =
       userSettings.puzzleMode === "live"
@@ -1291,6 +1380,37 @@
 
     if (!pool.length) {
       throw new Error("Nincs betöltött feladvány.");
+    }
+
+    if (userSettings.puzzleMode === "live") {
+      const usedTexts = usedLivePuzzleTexts();
+      const availableIndexes = pool
+        .map((puzzle, index) => ({ puzzle, index }))
+        .filter(
+          item => !usedTexts.has(normalize(item.puzzle.text))
+        )
+        .map(item => item.index);
+
+      if (!availableIndexes.length) {
+        const error = new Error(
+          "Ezen a nehézségi szinten minden feladványt kijátszottál."
+        );
+        error.code = "PUZZLE_POOL_EXHAUSTED";
+        throw error;
+      }
+
+      const idx =
+        availableIndexes[
+          Math.floor(Math.random() * availableIndexes.length)
+        ];
+
+      state.lastPuzzleIndex = idx;
+      recordLivePuzzleUse(idx, pool[idx].text);
+
+      return {
+        ...pool[idx],
+        text: normalize(pool[idx].text)
+      };
     }
 
     let idx;
@@ -1382,7 +1502,20 @@
     hideVictoryOverlay();
     hideStageFeedback();
     state.roundNumber += 1;
-    state.puzzle = pickPuzzle();
+
+    try {
+      state.puzzle = pickPuzzle();
+    } catch (error) {
+      if (error?.code === "PUZZLE_POOL_EXHAUSTED") {
+        returnToLobby();
+        el.setupError.textContent =
+          "Ezen a nehézségi szinten már minden feladványt kijátszottál. Válassz másik nehézséget.";
+        el.setupError.classList.remove("hidden");
+        return;
+      }
+      throw error;
+    }
+
     state.usedLetters.clear();
     state.revealed.clear();
     state.justRevealed.clear();
