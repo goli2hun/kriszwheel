@@ -3753,9 +3753,15 @@
   el.solveForm.addEventListener("submit", e => {
     e.preventDefault();
 
-    const answer = el.solveInput.value;
-    if (!answer.trim()) return;
+    const answer = el.solveInput.value
+      .normalize("NFC")
+      .replace(/[^\p{L}\p{N}\s]+/gu, "")
+      .replace(/\s+/g, " ")
+      .trim();
 
+    if (!answer) return;
+
+    el.solveInput.value = answer;
     state.voiceInputMode = null;
     state.voiceSolveDialogOwned = false;
     state.voiceIgnoreNextFinal = false;
