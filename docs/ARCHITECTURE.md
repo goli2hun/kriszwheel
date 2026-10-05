@@ -542,3 +542,22 @@ A teljes szavas egyezés csökkenti a részszavas fals pozitív találatokat.
 A beállítás user preference, ezért nem a statikus configban kapcsoljuk ki/be,
 hanem a `kriszwheel.user-settings.v1` objektumban tárolódik
 `advancedNameRecognitionEnabled` néven.
+
+
+## 24. Megfejtés-normalizálás
+
+A megfejtés-összehasonlítás külön `normalizeSolveText()` függvényt használ.
+
+A pipeline:
+
+1. `String(...)`;
+2. Unicode NFC normalizálás;
+3. magyar nagybetűsítés;
+4. minden nem betű és nem szám karakter eltávolítása.
+
+Ez mind a játékos inputjára, mind a `state.puzzle.text` értékére lefut,
+ezért az írásjelek és szóközök nem befolyásolják a helyes megfejtést.
+
+A gépelt és voice input a UI-ba kerülés előtt is tisztításra kerül; az
+összehasonlítás ettől függetlenül újra normalizál, így a szabály egy helyen
+biztosított.
