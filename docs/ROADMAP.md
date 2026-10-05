@@ -44,23 +44,14 @@ Kiemelten ellenőrizendő:
 - éles CSV-k mind a négy nehézségen;
 - hosszú vagy nehezen tördelhető feladványok.
 
-## P0 – Puzzle validátor
+## Elkészült – Puzzle validátor
 
-Az éles CSV-betöltés már ellenőrzi az elvárt minimális elemszámot, de kell
-egy teljes fejlesztői validátor is.
+A `tools/validate_puzzles.py` elkészült. Magyar kimenettel ellenőrzi a
+CSV-struktúrát, az elemszámot, duplikációkat, túl hosszú szavakat, 15 × 4-es
+táblára illeszthetőséget, szokatlan karaktereket és kategóriastatisztikát.
 
-Javasolt ellenőrzések:
-
-- pontos / minimális elemszám;
-- duplikált feladványok;
-- üres kategória vagy szöveg;
-- 15 × 4-es táblába való illeszthetőség;
-- túl hosszú szó;
-- támogatott magyar karakterek;
-- hibás CSV idézőjelezés;
-- kategóriastatisztika.
-
-A validátor lehet külön fejlesztői script, hogy a runtime egyszerű maradjon.
+A következő adatoldali lépés a validátor által talált hibák javítása, majd a
+nehézségi szintek minőségi kiegyensúlyozása.
 
 ## P1 – Teljes scoreboard
 
@@ -204,21 +195,27 @@ A refaktort csak stabil gameplay után érdemes elkezdeni.
 ## Ajánlott sorrend
 
 1. intenzív teszt + regressziójavítás;
-2. puzzle validátor;
-3. scoreboard;
-4. feladványadatbázis bővítése;
-5. hangok és UX finomhangolása;
-6. mobil / tablet;
-7. Bot fejlesztés;
-8. game-session;
-9. voice / Whisper további finomítás;
-10. moduláris refaktor;
-11. opcionális backend.
+2. validátor által talált puzzle-hibák javítása;
+3. sessionön belüli ismétlés kizárása;
+4. scoreboard;
+5. feladványadatbázis bővítése;
+6. hangok és UX finomhangolása;
+7. mobil / tablet;
+8. Bot fejlesztés;
+9. game-session;
+10. voice / Whisper további finomítás;
+11. moduláris refaktor;
+12. opcionális backend.
 
 ## Következő sprint
 
 A jelenlegi állapotban a legjobb rövid sprint:
 
-**intenzív tesztelés + puzzle validátor + hibajavítások**.
+**intenzív tesztelés + a validátor által talált puzzle-hibák javítása**.
 
 Ez stabil alapot ad az adatbázis további bővítéséhez és a mobilos körhöz.
+
+
+További, kevésbé kötött ötletek:
+
+[IDEAS.md](IDEAS.md)
