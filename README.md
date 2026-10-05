@@ -324,6 +324,7 @@ Részletes referencia:
 - [Voice recognition integráció](docs/VOICE_RECOGNITION.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Konfigurációs referencia](config/README.md)
+- [Feladványadatok és CSV-formátum](data/README.md)
 
 ## Projektstruktúra
 
@@ -342,7 +343,8 @@ kriszwheel/
 │   ├── child.csv
 │   ├── low.csv
 │   ├── med.csv
-│   └── high.csv
+│   ├── high.csv
+│   └── README.md
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── DEVELOPMENT.md
