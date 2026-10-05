@@ -182,11 +182,17 @@ window.KRISZWHEEL_CONFIG = {
   victory: {
     // Phaser tűzijáték a győzelmi képernyő mögött.
     fireworks: true,
+
+    // Az ünneplés garantált minimum ideje. A tűzijáték és a victory gombok
+    // nem zárhatják le ennél korábban az ünneplési szakaszt.
+    minimumCelebrationMs: 3000,
+
     fireworksDurationMs: 3500,
     burstIntervalMs: 480,
     particlesPerBurst: 28,
 
-    // A győzelmi képernyő gombjai csak ennyi idő után válnak aktívvá.
+    // A győzelmi képernyő gombjai csak ennyi idő után válnának aktívvá,
+    // de a minimumCelebrationMs mindig elsőbbséget élvez.
     buttonDelayMs: 1800,
 
     colors: [
