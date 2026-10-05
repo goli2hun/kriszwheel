@@ -155,9 +155,12 @@ A jelenlegi játékhoz még nem szükséges.
 
 ## P3 – Hangvezérlés / Whisper
 
-A lobbyban már elkészült a **Hangfelismerés** beállítási szekció. Jelenleg
-placeholder, a vezérlők inaktívak. A Whisper-integráció során ezt kell
-funkcionálisan bekötni.
+A voice-recognition labor reusable moduljai már bekerültek a KriszWheelbe.
+A lobby Hangfelismerés beállításai működnek: engedélyezés, provider, nyelv és
+mikrofonválasztás menthető.
+
+A következő lépés a `VoiceEngine` játék közbeni életciklusa és a unified
+COMMAND / LETTER események meglévő játékműveletekre kötése.
 
 Tervezett magyar parancsok:
 

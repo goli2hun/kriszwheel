@@ -36,32 +36,35 @@ Módosítás után:
 4. hangok be/ki kapcsoló menthető;
 5. fő hangerő menthető és frissítés után is megmarad;
 6. Vissza gomb eldobja a nem mentett módosítást;
-7. Hangfelismerés szekció látható, de még inaktív;
-8. játék indul;
-9. puzzle közép–közép;
-10. Pörgetés hover;
-11. Magánhangzó hover disabled állapotban is;
-12. Megfejtés hover;
-13. wheel overlay feljön;
-14. kerék célmezőre áll;
-15. eredmény automatikusan eltűnik;
-16. kis/nagybetű működik;
-17. ékezetes betű működik;
-18. több találat sorban villan;
-19. hangok sorban szólnak;
-20. magánhangzó ára levonódik;
-21. hibás solve dialog azonnal bezár;
-22. helytelen feedback látszik;
-23. játékosváltási szünet működik;
-24. helyes solve után teljes betűfelfedés lefut;
-25. victory overlay megjelenik;
-26. avatar és pénzek helyesek;
-27. tűzijáték fut;
-28. victory gombok késleltetve aktívak;
-29. Következő feladvány működik;
-30. victory Játék vége lobbyba visz;
-31. stage Játék vége megerősítést kér;
-32. Teszt gomb config szerint működik.
+7. Hangfelismerés támogatási státusz megjelenik;
+8. mikrofonlista betölt;
+9. Frissítés szükség esetén mikrofonengedélyt kér;
+10. provider, nyelv, engedélyezés és mikrofon menthető;
+11. játék indul;
+12. puzzle közép–közép;
+13. Pörgetés hover;
+14. Magánhangzó hover disabled állapotban is;
+15. Megfejtés hover;
+16. wheel overlay feljön;
+17. kerék célmezőre áll;
+18. eredmény automatikusan eltűnik;
+19. kis/nagybetű működik;
+20. ékezetes betű működik;
+21. több találat sorban villan;
+22. hangok sorban szólnak;
+23. magánhangzó ára levonódik;
+24. hibás solve dialog azonnal bezár;
+25. helytelen feedback látszik;
+26. játékosváltási szünet működik;
+27. helyes solve után teljes betűfelfedés lefut;
+28. victory overlay megjelenik;
+29. avatar és pénzek helyesek;
+30. tűzijáték fut;
+31. victory gombok késleltetve aktívak;
+32. Következő feladvány működik;
+33. victory Játék vége lobbyba visz;
+34. stage Játék vége megerősítést kér;
+35. Teszt gomb config szerint működik.
 
 ## 4. Beállítások tesztelése
 
@@ -80,7 +83,8 @@ Ellenőrzés:
 
 Részletek:
 
-[SETTINGS.md](SETTINGS.md)
+- [SETTINGS.md](SETTINGS.md)
+- [VOICE_RECOGNITION.md](VOICE_RECOGNITION.md)
 
 ## 5. Config-first szabály
 

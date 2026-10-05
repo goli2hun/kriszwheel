@@ -1,8 +1,12 @@
 # KriszWheel – konfigurációs referencia
 
-Központi konfiguráció:
+Központi játék-konfiguráció:
 
 `config/game-config.js`
+
+Hangfelismerési konfiguráció:
+
+`config/voice-config.js`
 
 A fájl az `app.js` előtt töltődik be, és ezt hozza létre:
 
@@ -15,6 +19,7 @@ window.KRISZWHEEL_CONFIG
 `index.html`:
 
 ```html
+<script src="config/voice-config.js"></script>
 <script src="config/game-config.js"></script>
 <script src="app.js"></script>
 ```
@@ -454,7 +459,22 @@ Ne tegyél titkos adatot ebbe a fájlba: kliensoldali JavaScript, minden
 böngészőből olvasható.
 
 
-## 11. Kapcsolódó roadmap
+## 11. voice-config.js
+
+A voice config a `voice-recognition` labor runtime konfigurációjának
+KriszWheel-változata.
+
+Fő csoportok:
+
+- `recognition` – nyelv, continuous, interim, alternatívák, restart delay;
+- `microphone` – preferált eszköznév szabályok;
+- `letters` – `mint/min` parser és kivételek;
+- `commands` – SPIN, SOLVE, VOWEL, GAME aliasok.
+
+A lobbyban módosítható értékek `localStorage`-ba kerülnek, nem írják át ezt
+a fájlt.
+
+## 12. Kapcsolódó roadmap
 
 A következő tervezett konfigurációs bővítések:
 

@@ -31,8 +31,12 @@ szekcióból áll:
 - **Hangfelismerés** – előkészített hely a hamarosan érkező magyar
   hangvezérléshez.
 
-Az általános felhasználói beállítások böngészőnként, `localStorage`-ban
-mentődnek. A hangfelismerés vezérlői az első verzióban még inaktívak.
+A felhasználói beállítások böngészőnként, `localStorage`-ban mentődnek.
+
+A Hangfelismerés szekció már kezeli az engedélyezést, a Browser
+SpeechRecognition providert, a magyar nyelvet, a mikrofon kiválasztását és a
+böngészőtámogatás visszajelzését. A voice modulok már a repó részei, de a
+hangvezérlés még nincs rákötve a játékmenetre.
 
 ### Játékszínpad
 
@@ -229,6 +233,7 @@ Részletes referencia:
 - [Játékszínpad és UI](docs/STAGE_UI.md)
 - [Fejlesztői útmutató](docs/DEVELOPMENT.md)
 - [Beállítások](docs/SETTINGS.md)
+- [Voice recognition integráció](docs/VOICE_RECOGNITION.md)
 - [Roadmap](docs/ROADMAP.md)
 - [Konfigurációs referencia](config/README.md)
 
@@ -243,6 +248,7 @@ kriszwheel/
 ├── README.md
 ├── config/
 │   ├── game-config.js
+│   ├── voice-config.js
 │   └── README.md
 ├── docs/
 │   ├── ARCHITECTURE.md
@@ -250,7 +256,13 @@ kriszwheel/
 │   ├── GAMEPLAY.md
 │   ├── ROADMAP.md
 │   ├── SETTINGS.md
-│   └── STAGE_UI.md
+│   ├── STAGE_UI.md
+│   └── VOICE_RECOGNITION.md
+├── speech/
+│   ├── provider.js
+│   ├── browser-provider.js
+│   ├── parsers.js
+│   └── voice-engine.js
 └── assets/
     ├── images/
     │   ├── adri.png

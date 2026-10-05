@@ -176,43 +176,85 @@
                aria-labelledby="speechSettingsTitle">
         <div class="settings-section-heading">
           <div>
-            <span class="settings-section-kicker">HAMAROSAN</span>
+            <span class="settings-section-kicker">VOICE INPUT</span>
             <h3 id="speechSettingsTitle">Hangfelismerés</h3>
           </div>
-          <span class="settings-status-badge">Előkészítve</span>
+          <span id="speechSupportBadge"
+                class="settings-status-badge"
+                data-state="checking">Ellenőrzés…</span>
         </div>
 
-        <p class="settings-section-copy">
-          Ez a szekció a készülő magyar hangvezérlés beállításainak helye.
-          A vezérlők most még inaktívak; a Whisper-integráció érkezésekor
-          innen lesz konfigurálható.
+        <p id="speechSupportText"
+           class="settings-section-copy"
+           aria-live="polite">
+          A böngésző hangfelismerési és mikrofon-támogatásának ellenőrzése…
         </p>
 
-        <label class="settings-toggle-row is-disabled"
+        <label class="settings-toggle-row"
                for="speechRecognitionEnabledSetting">
           <span>
             <strong>Hangfelismerés engedélyezése</strong>
-            <small>Pörgetés, betűmondás és megfejtés hangparancsokkal.</small>
+            <small>A következő integrációs lépésben ez kapcsolja majd a játék hangvezérlését.</small>
           </span>
-          <input id="speechRecognitionEnabledSetting"
-                 type="checkbox"
-                 disabled />
+          <input id="speechRecognitionEnabledSetting" type="checkbox" />
         </label>
 
-        <label class="settings-select-row is-disabled"
+        <label class="settings-select-row"
+               for="speechProviderSetting">
+          <span>
+            <strong>Felismerési motor</strong>
+            <small>A voice-recognition labor jelenlegi providere.</small>
+          </span>
+          <select id="speechProviderSetting">
+            <option value="browser">Böngésző · SpeechRecognition</option>
+            <option value="whisper" disabled>Whisper · hamarosan</option>
+          </select>
+        </label>
+
+        <label class="settings-select-row"
                for="speechLanguageSetting">
           <span>
             <strong>Felismerés nyelve</strong>
-            <small>Az első támogatott nyelv a magyar lesz.</small>
+            <small>A parser és a jelenlegi parancskészlet magyar nyelvre készült.</small>
           </span>
-          <select id="speechLanguageSetting" disabled>
+          <select id="speechLanguageSetting">
             <option value="hu-HU">Magyar (hu-HU)</option>
           </select>
         </label>
 
+        <div class="settings-select-row settings-microphone-row">
+          <span>
+            <strong>Mikrofon</strong>
+            <small id="speechMicrophoneHelp">
+              A lista engedély nélkül is betölthet, de az eszköznevekhez a böngésző mikrofonengedélyt kérhet.
+            </small>
+          </span>
+          <span class="settings-device-control">
+            <select id="speechMicrophoneSetting"
+                    aria-label="Hangfelismerés mikrofonja">
+              <option value="">Mikrofonok betöltése…</option>
+            </select>
+            <button id="refreshSpeechMicrophonesBtn"
+                    type="button"
+                    class="settings-small-btn">Frissítés</button>
+          </span>
+        </div>
+
+        <div class="speech-settings-info">
+          <strong>Betűfelismerési szabály</strong>
+          <span>
+            A voice modul a <code>mint</code> / <code>min</code> utáni szó első
+            betűjét használja. Kivételek: <code>Y mint ipszilon</code> és
+            <code>Duplavé mint Walter</code>.
+          </span>
+        </div>
+
         <div class="speech-settings-future">
-          <strong>Tervezett opciók</strong>
-          <span>Mikrofon · felismerési motor · érzékenység · parancsok · betűkivételek</span>
+          <strong>Ebben a commitban</strong>
+          <span>
+            A konfiguráció és a mikrofonválasztás már menthető. A tényleges
+            játékvezérlést a következő lépésben kötjük rá a VoiceEngine eseményeire.
+          </span>
         </div>
       </section>
 
@@ -396,6 +438,7 @@
     </form>
   </dialog>
 
+  <script src="config/voice-config.js"></script>
   <script src="config/game-config.js"></script>
   <script src="app.js"></script>
 </body>

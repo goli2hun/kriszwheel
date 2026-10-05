@@ -8,11 +8,16 @@
   const AUDIO_CONFIG = CONFIG.audio ?? {};
   const VICTORY_CONFIG = CONFIG.victory ?? {};
   const DEBUG_CONFIG = CONFIG.debug ?? {};
+  const VOICE_CONFIG = window.KRISZWHEEL_VOICE_CONFIG ?? {};
 
   const USER_SETTINGS_STORAGE_KEY = "kriszwheel.user-settings.v1";
   const DEFAULT_USER_SETTINGS = Object.freeze({
     soundsEnabled: true,
-    masterVolume: 1
+    masterVolume: 1,
+    speechRecognitionEnabled: false,
+    speechProvider: "browser",
+    speechLanguage: VOICE_CONFIG.recognition?.language ?? "hu-HU",
+    microphoneDeviceId: ""
   });
 
   const clamp01 = value =>
@@ -32,7 +37,23 @@
         masterVolume:
           stored.masterVolume == null
             ? DEFAULT_USER_SETTINGS.masterVolume
-            : clamp01(stored.masterVolume)
+            : clamp01(stored.masterVolume),
+        speechRecognitionEnabled:
+          typeof stored.speechRecognitionEnabled === "boolean"
+            ? stored.speechRecognitionEnabled
+            : DEFAULT_USER_SETTINGS.speechRecognitionEnabled,
+        speechProvider:
+          stored.speechProvider === "browser"
+            ? stored.speechProvider
+            : DEFAULT_USER_SETTINGS.speechProvider,
+        speechLanguage:
+          typeof stored.speechLanguage === "string" && stored.speechLanguage
+            ? stored.speechLanguage
+            : DEFAULT_USER_SETTINGS.speechLanguage,
+        microphoneDeviceId:
+          typeof stored.microphoneDeviceId === "string"
+            ? stored.microphoneDeviceId
+            : DEFAULT_USER_SETTINGS.microphoneDeviceId
       };
     } catch {
       return { ...DEFAULT_USER_SETTINGS };
@@ -216,7 +237,13 @@
     masterVolumeSetting: document.getElementById("masterVolumeSetting"),
     masterVolumeValue: document.getElementById("masterVolumeValue"),
     speechRecognitionEnabledSetting: document.getElementById("speechRecognitionEnabledSetting"),
+    speechProviderSetting: document.getElementById("speechProviderSetting"),
     speechLanguageSetting: document.getElementById("speechLanguageSetting"),
+    speechMicrophoneSetting: document.getElementById("speechMicrophoneSetting"),
+    refreshSpeechMicrophonesBtn: document.getElementById("refreshSpeechMicrophonesBtn"),
+    speechMicrophoneHelp: document.getElementById("speechMicrophoneHelp"),
+    speechSupportBadge: document.getElementById("speechSupportBadge"),
+    speechSupportText: document.getElementById("speechSupportText"),
     setupError: document.getElementById("setupError"),
     playersList: document.getElementById("playersList"),
     categoryText: document.getElementById("categoryText"),
@@ -267,11 +294,185 @@
       `${Math.round(Number(el.masterVolumeSetting.value))}%`;
   }
 
+  function normalizeMicrophoneLabel(value) {
+    return String(value ?? "")
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .toLocaleLowerCase("hu-HU");
+  }
+
+  function speechRecognitionSupported() {
+    return Boolean(
+      window.SpeechRecognition || window.webkitSpeechRecognition
+    );
+  }
+
+  function microphoneApiSupported() {
+    return Boolean(
+      navigator.mediaDevices?.enumerateDevices &&
+      navigator.mediaDevices?.getUserMedia
+    );
+  }
+
+  function microphonePreferenceScore(device) {
+    const label = normalizeMicrophoneLabel(device.label);
+    let score = 0;
+
+    for (const rule of VOICE_CONFIG.microphone?.preferenceRules ?? []) {
+      const token = normalizeMicrophoneLabel(rule.contains);
+      if (token && label.includes(token)) {
+        score += Number(rule.score) || 0;
+      }
+    }
+
+    if (device.deviceId === "default") {
+      score -= Number(VOICE_CONFIG.microphone?.defaultDevicePenalty ?? 0);
+    }
+
+    return score;
+  }
+
+  function choosePreferredMicrophone(devices, preferredId = "") {
+    if (
+      preferredId &&
+      devices.some(device => device.deviceId === preferredId)
+    ) {
+      return preferredId;
+    }
+
+    return [...devices]
+      .sort(
+        (a, b) =>
+          microphonePreferenceScore(b) -
+          microphonePreferenceScore(a)
+      )[0]?.deviceId ?? "";
+  }
+
+  function renderSpeechSupportState() {
+    const recognitionOk = speechRecognitionSupported();
+    const microphoneOk = microphoneApiSupported();
+    const supported = recognitionOk && microphoneOk;
+
+    el.speechSupportBadge.dataset.state =
+      supported ? "ready" : "unavailable";
+    el.speechSupportBadge.textContent =
+      supported ? "Elérhető" : "Nem támogatott";
+
+    if (supported) {
+      el.speechSupportText.textContent =
+        "A böngésző SpeechRecognition és mikrofon API-ja elérhető. A beállítások menthetők; a játékvezérlés bekötése a következő lépés.";
+    } else if (!microphoneOk) {
+      el.speechSupportText.textContent =
+        "A böngésző mikrofon API-ja nem érhető el. Használj localhostot vagy HTTPS-t modern böngészőben.";
+    } else {
+      el.speechSupportText.textContent =
+        "A mikrofon API elérhető, de a böngésző SpeechRecognition providere nem támogatott. Chrome vagy Edge ajánlott.";
+    }
+
+    el.speechRecognitionEnabledSetting.disabled = !supported;
+    el.refreshSpeechMicrophonesBtn.disabled = !microphoneOk;
+    el.speechMicrophoneSetting.disabled = !microphoneOk;
+  }
+
+  async function requestSpeechMicrophonePermission() {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false
+    });
+    stream.getTracks().forEach(track => track.stop());
+  }
+
+  async function refreshSpeechMicrophones({
+    requestPermission = false,
+    preferredId = null
+  } = {}) {
+    renderSpeechSupportState();
+
+    if (!microphoneApiSupported()) {
+      el.speechMicrophoneSetting.replaceChildren();
+      const option = document.createElement("option");
+      option.value = "";
+      option.textContent = "Mikrofon API nem érhető el";
+      el.speechMicrophoneSetting.append(option);
+      return;
+    }
+
+    el.refreshSpeechMicrophonesBtn.disabled = true;
+    el.speechMicrophoneHelp.textContent = requestPermission
+      ? "Mikrofonengedély kérése és eszközlista frissítése…"
+      : "Mikrofonlista frissítése…";
+
+    try {
+      if (requestPermission) {
+        await requestSpeechMicrophonePermission();
+      }
+
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const audioInputs = devices.filter(
+        device => device.kind === "audioinput"
+      );
+
+      const currentId =
+        preferredId ??
+        el.speechMicrophoneSetting.value ??
+        userSettings.microphoneDeviceId;
+
+      el.speechMicrophoneSetting.replaceChildren();
+
+      if (audioInputs.length === 0) {
+        const option = document.createElement("option");
+        option.value = "";
+        option.textContent = "Nem található mikrofon";
+        el.speechMicrophoneSetting.append(option);
+        el.speechMicrophoneHelp.textContent =
+          "A böngésző nem adott vissza audio bemenetet.";
+        return;
+      }
+
+      audioInputs.forEach((device, index) => {
+        const option = document.createElement("option");
+        option.value = device.deviceId;
+        option.textContent =
+          device.label || `Mikrofon ${index + 1}`;
+        el.speechMicrophoneSetting.append(option);
+      });
+
+      const selectedId = choosePreferredMicrophone(
+        audioInputs,
+        currentId
+      );
+
+      if (selectedId) {
+        el.speechMicrophoneSetting.value = selectedId;
+      }
+
+      const labelsVisible = audioInputs.some(device => device.label);
+      el.speechMicrophoneHelp.textContent = labelsVisible
+        ? "Válaszd ki azt a mikrofont, amelyet a hangfelismerés használjon."
+        : "Az eszközök elérhetők, de a neveikhez mikrofonengedély szükséges. Nyomd meg a Frissítés gombot.";
+    } catch (error) {
+      el.speechMicrophoneHelp.textContent =
+        error?.name === "NotAllowedError"
+          ? "A mikrofonengedélyt a böngészőben letiltottad vagy nem adtad meg."
+          : `A mikrofonlista nem frissíthető: ${error?.message ?? error}`;
+    } finally {
+      el.refreshSpeechMicrophonesBtn.disabled =
+        !microphoneApiSupported();
+    }
+  }
+
   function populateSettingsForm() {
     el.soundsEnabledSetting.checked = userSettings.soundsEnabled;
     el.masterVolumeSetting.value =
       String(Math.round(userSettings.masterVolume * 100));
+    el.speechRecognitionEnabledSetting.checked =
+      userSettings.speechRecognitionEnabled;
+    el.speechProviderSetting.value =
+      userSettings.speechProvider;
+    el.speechLanguageSetting.value =
+      userSettings.speechLanguage;
     updateMasterVolumeLabel();
+    renderSpeechSupportState();
     el.settingsSaveStatus.textContent = "";
   }
 
@@ -280,6 +481,11 @@
     el.setupScreen.classList.add("hidden");
     el.settingsScreen.classList.remove("hidden");
     el.settingsSaveBtn.focus();
+
+    void refreshSpeechMicrophones({
+      requestPermission: false,
+      preferredId: userSettings.microphoneDeviceId
+    });
   }
 
   function showSetupScreen() {
@@ -294,6 +500,19 @@
     userSettings.masterVolume = clamp01(
       Number(el.masterVolumeSetting.value) / 100
     );
+    userSettings.speechRecognitionEnabled =
+      el.speechRecognitionEnabledSetting.checked;
+    userSettings.speechProvider =
+      el.speechProviderSetting.value || "browser";
+    userSettings.speechLanguage =
+      el.speechLanguageSetting.value ||
+      VOICE_CONFIG.recognition?.language ||
+      "hu-HU";
+
+    if (el.speechMicrophoneSetting.value) {
+      userSettings.microphoneDeviceId =
+        el.speechMicrophoneSetting.value;
+    }
 
     const persisted = persistUserSettings(userSettings);
 
@@ -1320,6 +1539,23 @@
   el.masterVolumeSetting.addEventListener(
     "input",
     updateMasterVolumeLabel
+  );
+  el.refreshSpeechMicrophonesBtn.addEventListener(
+    "click",
+    () => void refreshSpeechMicrophones({
+      requestPermission: true
+    })
+  );
+
+  navigator.mediaDevices?.addEventListener?.(
+    "devicechange",
+    () => {
+      if (!el.settingsScreen.classList.contains("hidden")) {
+        void refreshSpeechMicrophones({
+          requestPermission: false
+        });
+      }
+    }
   );
 
   el.spinBtn.addEventListener("click", () => spinWheel(false));

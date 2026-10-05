@@ -264,7 +264,27 @@ A `playSfx()`:
 A Hangfelismerés szekció DOM-ja már létezik, de a vezérlők egyelőre
 `disabled` állapotúak.
 
-## 17. Fontos invariánsok
+## 17. Voice recognition alrendszer
+
+A reusable voice modulok a külön voice laborból érkeztek:
+
+```text
+config/voice-config.js
+speech/provider.js
+speech/browser-provider.js
+speech/parsers.js
+speech/voice-engine.js
+```
+
+A klasszikus `app.js` a lobby settingshez a
+`window.KRISZWHEEL_VOICE_CONFIG` globális configot olvassa.
+
+A tényleges `VoiceEngine` integráció ES module importtal történik majd.
+
+A játékmenet kizárólag unified voice eventeket kap; nyers transcriptet nem
+parse-ol közvetlenül.
+
+## 18. Fontos invariánsok
 
 - config mindig az app előtt töltődjön;
 - wheel segment count egyezzen a PNG cikkelyszámmal;

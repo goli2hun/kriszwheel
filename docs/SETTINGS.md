@@ -39,82 +39,129 @@ Belső tárolás:
 
 `0.0–1.0`
 
-Az egyedi SFX hangerő és a fő hangerő összeszorzódik.
+## 3. Hangfelismerés
 
-## 3. Mentés
+A voice-alrendszer alapja a külön `goli2hun/voice-recognition` laborból
+érkezett, a következő forrásverzióból:
+
+`6afec468b2231d23594c35a56b88b5273b869733`
+
+Ebben a lépésben a **lobby beállítások** vannak bekötve. A hang még nem vezérli
+a játékot.
+
+### Engedélyezés
+
+DOM:
+
+`#speechRecognitionEnabledSetting`
+
+Mentett mező:
+
+`speechRecognitionEnabled`
+
+### Provider
+
+DOM:
+
+`#speechProviderSetting`
+
+Jelenleg:
+
+`browser` → Browser SpeechRecognition.
+
+A Whisper opció csak előkészített, még nem választható.
+
+### Nyelv
+
+DOM:
+
+`#speechLanguageSetting`
+
+Jelenlegi érték:
+
+`hu-HU`
+
+### Mikrofon
+
+DOM:
+
+- `#speechMicrophoneSetting`
+- `#refreshSpeechMicrophonesBtn`
+- `#speechMicrophoneHelp`
+
+A Beállítások megnyitásakor a játék engedélykérés nélkül megpróbálja
+felsorolni az audio inputokat.
+
+A `Frissítés` gomb mikrofonengedélyt kérhet, majd újra lekéri az eszközöket.
+Ez azért fontos, mert a böngésző sok esetben csak engedély után adja vissza
+a mikrofonok valódi nevét.
+
+A preferált mikrofon kiválasztási szabályai a
+`config/voice-config.js` fájlban vannak.
+
+## 4. Felhasználói settings objektum
 
 Tárolási kulcs:
 
 `kriszwheel.user-settings.v1`
 
-Jelenlegi objektum:
+Jelenlegi forma:
 
 ```json
 {
   "soundsEnabled": true,
-  "masterVolume": 1
+  "masterVolume": 1,
+  "speechRecognitionEnabled": false,
+  "speechProvider": "browser",
+  "speechLanguage": "hu-HU",
+  "microphoneDeviceId": ""
 }
 ```
 
-A mentés böngészőnként történik `localStorage` használatával.
+A régebbi settings objektumok továbbra is betölthetők; a hiányzó voice mezők
+default értéket kapnak.
 
-Ha a tartós tárolás nem érhető el, a beállítás az aktuális munkamenetben
-továbbra is működik, és a UI erről visszajelzést ad.
+## 5. Vissza
 
-## 4. Vissza
+A `Vissza` gomb nem menti a módosításokat. Újranyitáskor a legutóbb mentett
+értékek töltődnek vissza.
 
-A `Vissza` gomb:
+## 6. Voice modulok
 
-1. nem menti az aktuális módosításokat;
-2. újratölti a formot a legutóbbi mentett/runtime értékekből;
-3. visszatér a lobby játékosválasztó képernyőjére.
+A KriszWheelbe áthozott reusable modulok:
 
-A kiválasztott lobby-játékosok nem vesznek el, mert ugyanaz a DOM marad
-meg, csak a nézetek láthatósága változik.
+```text
+config/voice-config.js
+speech/provider.js
+speech/browser-provider.js
+speech/parsers.js
+speech/voice-engine.js
+```
 
-## 5. Hangfelismerés
+A benchmark és a voice-recognition demo debug UI-ja szándékosan nem része
+ennek az integrációs commitnak.
 
-A szekció UI-ja elkészült, de még nem aktív.
+## 7. Betűfelismerési szabály
 
-Előkészített DOM:
+A parser a konfigurált kapcsolószót keresi:
 
-- `#speechRecognitionEnabledSetting`;
-- `#speechLanguageSetting`.
+```text
+B mint Balázs -> B
+Cé mint Cecil -> C
+akármi min Dénes -> D
+```
 
-Első nyelv:
+A kapcsoló előtti rész normál esetben nem lényeges. A kapcsoló utáni szó első
+betűje lesz a játékbetű.
 
-`Magyar (hu-HU)`
+Konfigurált kivételek:
 
-Tervezett későbbi beállítások:
+```text
+Y mint ipszilon -> Y
+Duplavé mint Walter -> W
+```
 
-- hangfelismerés engedélyezése;
-- mikrofon;
-- felismerési motor;
-- érzékenység;
-- trigger/parancsok;
-- betűfelismerési kivételek.
+## 8. Következő integrációs lépés
 
-A jelenlegi vezérlők szándékosan `disabled` állapotúak.
-
-## 6. Statikus config és felhasználói settings
-
-A két rendszer különböző:
-
-### config/game-config.js
-
-Fejlesztői/játékparaméterek:
-
-- kerék;
-- Bot;
-- időzítések;
-- assetek;
-- victory;
-- alap SFX hangerők.
-
-### localStorage settings
-
-A játékos által a lobbyból módosítható preferenciák.
-
-Ezt a szétválasztást a hangfelismerés integrációjánál is meg kell tartani:
-a technikai defaultok mehetnek configba, a felhasználó által választott
-mikrofon/engedélyezés/érzékenység pedig a settings rendszerbe.
+A következő commitban a `VoiceEngine` példányosítása és a unified
+`COMMAND` / `LETTER` események meglévő KriszWheel akciókra kötése következik.

@@ -1675,6 +1675,8 @@ body.lobby-active .lobby-actions .btn {
 body.lobby-active .settings-panel {
   width: min(820px, 92vw);
   max-width: 820px;
+  max-height: calc(100vh - 70px);
+  overflow-y: auto;
   margin: clamp(105px, 12vh, 145px) auto 3vh;
   padding: 26px 30px 28px;
   background:
@@ -1833,6 +1835,75 @@ body.lobby-active .settings-panel {
   opacity: .55;
 }
 
+.settings-status-badge[data-state="ready"] {
+  color: #a9edbf;
+  border-color: rgba(92, 218, 132, .32);
+  background: rgba(62, 193, 104, .10);
+}
+
+.settings-status-badge[data-state="unavailable"] {
+  color: #ffb4b4;
+  border-color: rgba(255, 113, 113, .30);
+  background: rgba(220, 65, 65, .10);
+}
+
+.settings-device-control {
+  min-width: 330px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-device-control select {
+  min-width: 0;
+  flex: 1;
+  padding: 8px 10px;
+  color: #d8e7fa;
+  background: #102849;
+  border: 1px solid rgba(255, 255, 255, .12);
+  border-radius: 8px;
+}
+
+.settings-small-btn {
+  padding: 8px 12px;
+  color: #eef6ff;
+  font-weight: 800;
+  white-space: nowrap;
+  background: rgba(62, 109, 171, .36);
+  border: 1px solid rgba(146, 190, 244, .25);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.settings-small-btn:hover:not(:disabled) {
+  background: rgba(74, 132, 205, .52);
+}
+
+.settings-small-btn:disabled {
+  cursor: default;
+  opacity: .5;
+}
+
+.speech-settings-info {
+  margin-top: 12px;
+  padding: 12px 14px;
+  display: grid;
+  gap: 5px;
+  border-radius: 10px;
+  color: #aac2df;
+  background: rgba(44, 100, 170, .10);
+  font-size: .82rem;
+  line-height: 1.45;
+}
+
+.speech-settings-info strong {
+  color: #eef6ff;
+}
+
+.speech-settings-info code {
+  color: #ffe59a;
+}
+
 .speech-settings-future {
   margin-top: 12px;
   padding: 12px 14px;
@@ -1899,8 +1970,14 @@ body.lobby-active .settings-panel {
   }
 
   .settings-range-control,
-  .settings-select-row select {
+  .settings-select-row select,
+  .settings-device-control {
     width: 100%;
     min-width: 0;
+  }
+
+  .settings-device-control {
+    align-items: stretch;
+    flex-direction: column;
   }
 }
