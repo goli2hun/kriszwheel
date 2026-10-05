@@ -470,3 +470,38 @@ Ha nincs ilyen karakter:
 
 A `spinWheel()` és az Auto/Bot automatizmus külön guardot is tartalmaz,
 így versenyhelyzetből sem indulhat új pörgetés.
+
+
+## 22. Tartós puzzle-előzmény
+
+A `PUZZLE_HISTORY_STORAGE_KEY` értéke:
+
+`kriszwheel.puzzle-history.v1`
+
+A history objektum külön tömböt tart fenn a négy nehézséghez:
+
+```text
+child
+easy
+medium
+hard
+```
+
+Egy bejegyzés:
+
+```js
+{
+  index: 42,
+  text: "A NORMALIZÁLT FELADVÁNY"
+}
+```
+
+A `pickPuzzle()` éles módban csak olyan indexek közül választ, amelyek
+normalizált szövege még nincs az adott nehézség history-jában. A kiválasztott
+feladvány azonnal bekerül a history-ba.
+
+Az index diagnosztikai információ; az ismétlés kizárásának stabil kulcsa a
+normalizált szöveg, mert az index CSV-átrendezéskor megváltozhat.
+
+Teljes készletkimerüléskor `PUZZLE_POOL_EXHAUSTED` hiba keletkezik, amit a
+`newRound()` kezel: visszalép a lobbyba és felhasználói hibaüzenetet mutat.
