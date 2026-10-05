@@ -4,8 +4,9 @@ Magyar nyelvű, böngészős Szerencsekerék-játék saját lobbyval, TV-stúdi�
 játékszínpaddal, Phaser 3 kerékanimációval, billentyűzetes betűbevitellel,
 Bot-játékossal, győzelmi effektekkel és központi konfigurációval.
 
-A projekt jelenleg frontend-only prototípus: nincs még backend, adatbázis vagy
-Whisper integráció.
+A projekt jelenleg frontend-only alkalmazás: nincs backend vagy adatbázis.
+A böngészős hangvezérlés már integrált; a Whisper provider későbbi bővítési
+lehetőség.
 
 ## Jelenlegi állapot
 
@@ -31,11 +32,22 @@ A lobbyban külön nehézségválasztó is van:
 
 Alapértelmezés: **Könnyű**.
 
-A választás `puzzleDifficulty` néven azonnal mentődik. A jelenlegi
-tesztfeladvány-választás még nem használja; később csak éles feladványmódban
-kap szerepet.
+A választás `puzzleDifficulty` néven azonnal mentődik. **Éles** feladványmódban
+ez választja ki a betöltött CSV-adatforrást:
+
+- Gyerek → `data/child.csv`
+- Könnyű → `data/low.csv`
+- Közepes → `data/med.csv`
+- Nehéz → `data/high.csv`
+
+Mind a négy éles lista jelenleg 100 egyedi feladványt tartalmaz.
 
 A lobby saját stúdió-hátteret és játékosportrékat használ.
+
+A lobby jobb alsó sarkában build-információ látszik, például:
+`v0.8.0 · 2026.10.05 · ÉLES / KÖZEPES`. Teszt módban csak `TESZT`
+jelenik meg. Hoverre a konkrét feladványforrás és az elvárt elemszám is
+kiolvasható.
 
 A lobbyban külön **Beállítások** gomb található. A Beállítások nézet két
 szekcióból áll:
@@ -49,14 +61,14 @@ A felhasználói beállítások böngészőnként, `localStorage`-ban mentődnek
 Az **Auto pörgetés** alapból ki van kapcsolva. Bekapcsolva emberi játékosnál,
 `spin` fázisban rövid késleltetés után automatikusan elindítja a kereket.
 
-A **Feladványmód** alapértéke `Teszt`. A `Teszt / Éles` választás már
-mentődik, de ebben a verzióban még nincs összekötve a tényleges
-feladványforrással.
+A **Feladványmód** alapértéke `Teszt`. Teszt módban a beépített minták,
+Éles módban a kiválasztott nehézséghez tartozó CSV tölthető be. Induláskor
+a játék ellenőrzi, hogy az éles lista legalább a konfigurált elemszámot
+tartalmazza; hibás vagy hiányzó fájlnál nem indul el csendben fallbackkel.
 
-A Hangfelismerés szekció már kezeli az engedélyezést, a Browser
-SpeechRecognition providert, a magyar nyelvet, a mikrofon kiválasztását és a
-böngészőtámogatás visszajelzését. A voice modulok már a repó részei, de a
-hangvezérlés még nincs rákötve a játékmenetre.
+A Hangfelismerés szekció kezeli az engedélyezést, a Browser SpeechRecognition
+providert, a magyar nyelvet, a mikrofon kiválasztását és a böngészőtámogatás
+visszajelzését. A voice modulok a játékmenetre is rá vannak kötve.
 
 ### Játékszínpad
 
@@ -198,8 +210,10 @@ Az aktív mikrofon ducking továbbra is megmarad más helyzetekre; a saját kör
 némítása elsőbbséget élvez.
 
 Több azonos betűnél a felvillanások és a találati hangok sorban futnak.
-Helyes megfejtésnél a betűfelfedési `letter_hit` hangok megmaradnak, ezek
-mellé indul a győzelmi zene.
+Sikeres mássalhangzó után a következő pörgetés csak az összes találat teljes
+felfedése után, további 1 másodperc késleltetéssel engedélyeződik
+(`gameplay.letterRevealPostDelayMs`). Helyes megfejtésnél a betűfelfedési
+`letter_hit` hangok megmaradnak, ezek mellé indul a győzelmi zene.
 
 A böngésző autoplay szabályai miatt a lobby zene első indulását a böngésző
 blokkolhatja. Ilyenkor az első kattintás vagy billentyű után automatikusan
@@ -287,12 +301,14 @@ Központi fájl:
 
 Fő csoportok:
 
-- `gameplay`
-- `wheel`
-- `bot`
-- `audio`
-- `victory`
-- `debug`
+- `app` – verzió és build dátum;
+- `gameplay`;
+- `puzzles` – éles CSV-források és elvárt elemszám;
+- `wheel`;
+- `bot`;
+- `audio`;
+- `victory`;
+- `debug`.
 
 Részletes referencia:
 
@@ -322,6 +338,11 @@ kriszwheel/
 │   ├── game-config.js
 │   ├── voice-config.js
 │   └── README.md
+├── data/
+│   ├── child.csv
+│   ├── low.csv
+│   ├── med.csv
+│   └── high.csv
 ├── docs/
 │   ├── ARCHITECTURE.md
 │   ├── DEVELOPMENT.md
