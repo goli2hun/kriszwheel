@@ -97,7 +97,23 @@ Ne hardcode-olj olyan értéket az `app.js`-be, ami configból kezelhető.
 - feedback;
 - debug/game-end.
 
-## 8. Új puzzle
+## 8. Puzzle validátor
+
+Minden feladványmódosítás után futtasd:
+
+```powershell
+python tools/validate_puzzles.py
+```
+
+A script magyar kimenetet ad. A `[HIBA]` jelölések javítandók; ezeknél a
+folyamat exit kódja 1. A szintek közötti ismétlések
+`[FIGYELMEZTETÉS]` szinten jelennek meg.
+
+A validátor a játék `layoutPuzzleRows()` logikájának 15 × 4-es
+korlátozását modellezi, így kiszúrja azokat a feladványokat is, amelyek
+runtime fallbackkel csonkolódnának.
+
+## 9. Új puzzle
 
 Tesztfeladványt az `app.js` `PUZZLES` tömbjébe lehet tenni.
 
@@ -158,11 +174,11 @@ isBot: name === "Bot"
 
 Ezért a Vendég 1 és Vendég 2 automatikusan emberi játékosként működik.
 
-## 10. Hangcsere
+## 11. Hangcsere
 
 A fájlutak és fontos hangerők configból állíthatók.
 
-## 11. Victory tuning
+## 12. Victory tuning
 
 Config:
 
@@ -173,13 +189,13 @@ Config:
 - buttonDelayMs;
 - colors.
 
-## 12. Debug
+## 13. Debug
 
 `debug.showTestButton`
 
 Release-jellegű tesztnél célszerű false.
 
-## 13. Gyakori hibák
+## 14. Gyakori hibák
 
 ### Rossz mezőn áll meg a kerék
 
@@ -202,7 +218,7 @@ Ellenőrizd a CDN-t és a console-t.
 
 A `--ff-only` szándékosan nem írja felül a helyi munkát.
 
-## 14. Dokumentációs szabály
+## 15. Dokumentációs szabály
 
 Funkciómódosításnál:
 
@@ -216,7 +232,7 @@ Funkciómódosításnál:
 - ROADMAP – terv változás.
 
 
-## 15. Verziózás
+## 16. Verziózás
 
 A lobbyban megjelenő verzió és build dátum:
 
