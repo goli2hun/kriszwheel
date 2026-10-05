@@ -12,6 +12,8 @@
   const VICTORY_CONFIG = CONFIG.victory ?? {};
   const DEBUG_CONFIG = CONFIG.debug ?? {};
   const VOICE_CONFIG = window.KRISZWHEEL_VOICE_CONFIG ?? {};
+  const HUNGARIAN_NAMES_CONFIG =
+    window.KRISZWHEEL_HUNGARIAN_NAMES ?? {};
 
   const USER_SETTINGS_STORAGE_KEY = "kriszwheel.user-settings.v1";
   const PUZZLE_HISTORY_STORAGE_KEY = "kriszwheel.puzzle-history.v1";
@@ -44,6 +46,7 @@
       Number(MUSIC_CONFIG.game?.defaultVolume ?? 0.20),
 
     speechRecognitionEnabled: false,
+    advancedNameRecognitionEnabled: false,
     speechProvider: "browser",
     speechLanguage: VOICE_CONFIG.recognition?.language ?? "hu-HU",
     microphoneDeviceId: ""
@@ -119,6 +122,10 @@
           typeof stored.speechRecognitionEnabled === "boolean"
             ? stored.speechRecognitionEnabled
             : DEFAULT_USER_SETTINGS.speechRecognitionEnabled,
+        advancedNameRecognitionEnabled:
+          typeof stored.advancedNameRecognitionEnabled === "boolean"
+            ? stored.advancedNameRecognitionEnabled
+            : DEFAULT_USER_SETTINGS.advancedNameRecognitionEnabled,
         speechProvider:
           stored.speechProvider === "browser"
             ? stored.speechProvider
@@ -915,6 +922,7 @@
     autoSpinEnabledSetting: document.getElementById("autoSpinEnabledSetting"),
     puzzleModeSetting: document.getElementById("puzzleModeSetting"),
     speechRecognitionEnabledSetting: document.getElementById("speechRecognitionEnabledSetting"),
+    advancedNameRecognitionSetting: document.getElementById("advancedNameRecognitionSetting"),
     speechProviderSetting: document.getElementById("speechProviderSetting"),
     speechLanguageSetting: document.getElementById("speechLanguageSetting"),
     speechMicrophoneSetting: document.getElementById("speechMicrophoneSetting"),
@@ -1213,6 +1221,8 @@
 
     el.speechRecognitionEnabledSetting.checked =
       userSettings.speechRecognitionEnabled;
+    el.advancedNameRecognitionSetting.checked =
+      userSettings.advancedNameRecognitionEnabled;
     el.speechProviderSetting.value =
       userSettings.speechProvider;
     el.speechLanguageSetting.value =
@@ -1341,6 +1351,8 @@
 
     userSettings.speechRecognitionEnabled =
       el.speechRecognitionEnabledSetting.checked;
+    userSettings.advancedNameRecognitionEnabled =
+      el.advancedNameRecognitionSetting.checked;
     userSettings.speechProvider =
       el.speechProviderSetting.value || "browser";
     userSettings.speechLanguage =
@@ -2256,6 +2268,21 @@
     handleConsonant(letter, false);
   }
 
+  function currentVoiceLetterConfig() {
+    return {
+      ...VOICE_CONFIG.letters,
+      advancedNameRecognition: {
+        enabled: Boolean(
+          userSettings.advancedNameRecognitionEnabled
+        ),
+        namesByLetter:
+          HUNGARIAN_NAMES_CONFIG.namesByLetter ?? {},
+        exceptions:
+          HUNGARIAN_NAMES_CONFIG.exceptions ?? []
+      }
+    };
+  }
+
   function handleVoiceCommand(event) {
     if (!voiceActionAllowed()) return;
 
@@ -2293,7 +2320,7 @@
 
         const inlineLetter = state.voiceParseLetter?.(
           event.transcript,
-          VOICE_CONFIG.letters
+          currentVoiceLetterConfig()
         );
 
         if (inlineLetter && VOWELS.has(normalize(inlineLetter.value))) {
@@ -2429,7 +2456,8 @@
           userSettings.speechLanguage ||
           VOICE_CONFIG.recognition?.language ||
           "hu-HU"
-      }
+      },
+      letters: currentVoiceLetterConfig()
     };
 
     state.voiceEngine = new engineModule.VoiceEngine(
