@@ -89,7 +89,7 @@ window.KRISZWHEEL_CONFIG = {
 
     files: {
       letterHit: "assets/sound/sfx/letter_hit.wav",
-      letterMiss: "assets/sound/sfx/letter_miss.wav",
+      letterMiss: "assets/sound/sfx/letter_miss.mp3",
       solveSuccess: "assets/sound/sfx/solve_success.wav",
       solveFail: "assets/sound/sfx/solve_fail.wav"
     }

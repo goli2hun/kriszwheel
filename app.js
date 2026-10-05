@@ -34,7 +34,7 @@
 
   const SFX = {
     letterHit: AUDIO_CONFIG.files?.letterHit ?? "assets/sound/sfx/letter_hit.wav",
-    letterMiss: AUDIO_CONFIG.files?.letterMiss ?? "assets/sound/sfx/letter_miss.wav",
+    letterMiss: AUDIO_CONFIG.files?.letterMiss ?? "assets/sound/sfx/letter_miss.mp3",
     solveSuccess: AUDIO_CONFIG.files?.solveSuccess ?? "assets/sound/sfx/solve_success.wav",
     solveFail: AUDIO_CONFIG.files?.solveFail ?? "assets/sound/sfx/solve_fail.wav"
   };

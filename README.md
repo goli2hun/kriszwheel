@@ -134,7 +134,7 @@ Két út van:
 Jelenlegi SFX:
 
 - `letter_hit.wav`
-- `letter_miss.wav`
+- `letter_miss.mp3`
 - `solve_success.wav`
 - `solve_fail.wav`
 
