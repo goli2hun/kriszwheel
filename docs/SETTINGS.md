@@ -226,6 +226,36 @@ Mentett mező:
 
 `speechRecognitionEnabled`
 
+### Haladó névfelismerés
+
+DOM:
+
+`#advancedNameRecognitionSetting`
+
+Mentett mező:
+
+`advancedNameRecognitionEnabled`
+
+Alapérték:
+
+`false`
+
+Bekapcsolva a parser a transcript bármely szavát összeveti a
+`config/hungarian-names.js` névlistájával. Ha talál egyezést, a névhez
+rendelt betűt adja vissza, ezért nem szükséges a `mint/min` szerkezet.
+
+Példák:
+
+```text
+Anna -> A
+Aladár -> A
+Béla -> B
+Botond -> B
+Ypszilon -> Y
+```
+
+A hagyományos `mint/min` felismerés továbbra is működik.
+
 ### Provider
 
 DOM:
@@ -290,6 +320,7 @@ Jelenlegi forma:
   "gameMusicEnabled": true,
   "gameMusicVolume": 0.2,
   "speechRecognitionEnabled": false,
+  "advancedNameRecognitionEnabled": false,
   "speechProvider": "browser",
   "speechLanguage": "hu-HU",
   "microphoneDeviceId": ""
