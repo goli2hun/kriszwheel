@@ -171,6 +171,18 @@ Submitkor a dialog azonnal bezár.
 
 A válasz normalizálása:
 
+- Unicode NFC;
+- magyar nagybetűsítés;
+- minden írásjel és egyéb speciális karakter eltávolítása;
+- a szóközök eltávolítása az összehasonlítási alakból;
+- csak betűk és számok maradnak.
+
+Ugyanez a normalizálás történik az eltárolt feladványszövegen is, ezért például
+`KÉK-ZÖLD!`, `kék zöld` és `KÉK, ZÖLD` azonos megfejtésnek számít.
+
+A kézzel beírt és a hangból érkező megfejtés ugyanazt a normalizálási
+útvonalat használja.
+
 - NFC;
 - magyar nagybetű;
 - több szóköz → egy szóköz;
