@@ -2863,9 +2863,11 @@
       const cy = canvasSize / 2;
       const wheelSize = Number(WHEEL_CONFIG.wheelSize ?? 536);
       const labelRadius = Number(WHEEL_CONFIG.labelRadius ?? 188);
+      const wheelScale = Math.max(0.1, Number(WHEEL_CONFIG.scale ?? 1));
       const startOffsetDeg = Number(WHEEL_CONFIG.startOffsetDeg ?? -90);
 
       this.wheelContainer = this.add.container(cx, cy);
+      this.wheelContainer.setScale(wheelScale);
 
       const wheel = this.add.image(0, 0, "wheel-face");
       wheel.setDisplaySize(wheelSize, wheelSize);
