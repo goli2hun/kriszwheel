@@ -76,6 +76,11 @@ Alap:
 
 A hang ugyanilyen ütemben fut.
 
+Sikeres mássalhangzónál a UI a felfedés teljes ideje alatt `letterReveal`
+fázisban marad, ezért a Pörgetés gomb és az automatizmusok nem indulhatnak
+el idő előtt. Az utolsó felfedés után még
+`gameplay.letterRevealPostDelayMs` várakozás következik.
+
 ## 6. Kategória
 
 DOM:
@@ -272,7 +277,30 @@ Tartalom:
 - felismert command vagy letter;
 - hibaüzenet.
 
-## 18. Reszponzivitás
+## 18. Lobby build-információ
+
+DOM:
+
+`#lobbyBuildInfo`
+
+Elhelyezés:
+
+- lobby jobb alsó sarok;
+- fix pozíció;
+- diszkrét monospace megjelenés;
+- játék közben rejtett.
+
+Formátum:
+
+```text
+v0.8.0 · 2026.10.05 · TESZT
+v0.8.0 · 2026.10.05 · ÉLES / KÖZEPES
+```
+
+Éles módban a `title` tooltip a konkrét CSV-forrást és az elvárt
+feladványszámot mutatja.
+
+## 19. Reszponzivitás
 
 A stage megtartja a 1672:941 arányt.
 
@@ -282,7 +310,7 @@ A wheel overlay saját négyzetes területet használ.
 
 A teljes mobil-layout még nem végleges.
 
-## 19. Háttérkép cseréje
+## 20. Háttérkép cseréje
 
 Új háttérnél ellenőrizendő:
 
