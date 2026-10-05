@@ -61,7 +61,7 @@ Kézi kikapcsoláskor:
 
 - provider stop/abort;
 - audio trackek stop;
-- voice owner törlődik;
+- a globális mikrofon runtime állapot törlődik;
 - függő voice input mód törlődik.
 
 Automatikus szüneteltetéskor a provider és az audio track leáll, de a
@@ -80,10 +80,13 @@ játékos a voice owner. Ekkor a phase még `wheelResult` lehet.
 A mikrofon nem várja meg a `wheel.resultDisplayMs` leteltét. A
 játékműveletek ettől függetlenül továbbra is saját phase-validációt használnak.
 
-Ha az owner köre később visszatér, a mikrofon az új pörgetés megállásakor
-kapcsol vissza, nem a kör elején.
+Játékosváltáskor a globális mikrofonállapot megmarad. Emberi játékosnál a
+mikrofon használható, Bot körében viszont automatikusan szünetel és a gomb
+letiltott. A következő emberi játékosnál a globális bekapcsolt állapot újra
+érvényesül.
 
-Lobbyba visszalépéskor a voice runtime és a voice owner teljesen leáll.
+Lobbyba visszalépéskor a voice runtime és a globális mikrofonállapot teljesen
+leáll.
 
 ## COMMAND események
 
@@ -200,17 +203,17 @@ Tervezett:
 - később Whisper provider.
 
 
-## Játékzene és voice owner
+## Játékzene és globális mikrofon
 
-A voice owner saját körében a játékzene célhangereje alapértelmezés szerint
-0, a `audio.music.game.voiceOwnerTurnMultiplier` miatt. Ez a némítás a teljes
-saját körre vonatkozik, nem csak az aktív listening időre.
+Ha a globális mikrofon be van kapcsolva és emberi játékos van soron, a
+játékzene célhangereje alapértelmezés szerint a
+`voiceOwnerTurnMultiplier` értékével szorzódik. A jelenlegi alapérték 0,
+tehát ilyenkor a játékzene néma. Bot körében ez a szabály nem aktív.
 
-Más játékos körében a játékzene visszaáll a normál célhangerőre. Az általános
-mikrofon-ducking ettől külön mechanizmus.
+Az aktív mikrofon-ducking ettől külön mechanizmus.
 
 A pörgetés alatt a mikrofon szünetel, majd a kerék fizikai megállásakor azonnal
-visszakapcsolhat, miközben a zene továbbra is a voice-owner szabály szerint
+visszakapcsolhat, miközben a zene továbbra is a globális mikrofon szabály szerint
 marad némítva.
 
 
