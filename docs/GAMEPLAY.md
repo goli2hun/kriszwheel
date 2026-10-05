@@ -331,36 +331,17 @@ Feltétel:
 
 ### Mikrofon gomb
 
-Az aktuális játékos avatárja fölött található.
+- `KI` → a globális mikrofon ki van kapcsolva;
+- `BE` / `HALLGAT` → a globális mikrofon aktív;
+- bármely emberi játékos ki- vagy bekapcsolhatja;
+- játékosváltáskor az állapot megmarad;
+- Bot körében a gomb le van tiltva és a listening szünetel;
+- a következő emberi játékosnál a bekapcsolt állapot visszaáll;
+- pörgetés alatt a mikrofon szünetel, majd a kerék megállásakor visszakapcsol.
 
-- `KI` → nincs aktív voice owner;
-- `BE` / `HALLGAT` → a voice owner mikrofonja aktív;
-- `VÁR` → az owner megmaradt, de a listening szünetel.
-
-Automatikus szünet:
-
-- játékosváltáskor;
-- másik játékos körében;
-- a pörgetés teljes ideje alatt;
-- forduló végén.
-
-Automatikus visszakapcsolás:
-
-- csak a voice owner körében;
-- **azonnal a kerék fizikai megállásakor**, már `wheelResult` fázisban;
-- nem várja meg a kerékeredmény kijelzési időzítőjének végét.
-
-A hangparancsok játékműveletei továbbra is fázisellenőrzöttek, tehát attól,
-hogy a mikrofon már hallgat, `wheelResult` alatt nem lehet idő előtt betűt
-érvényesíteni.
-
-Ha a voice owner köre később visszatér, a mikrofon a spin elején továbbra sem
-aktív; a kerék megállásakor kapcsol vissza.
-
-Ha a voice owner van soron, a `game_music.mp3` célhangereje 0, tehát a
-saját kör teljes ideje alatt nem szól. Másik játékos körében visszaáll.
-
-A mikrofonos ducking más helyzetekben továbbra is használható.
+Ha a globális mikrofon be van kapcsolva és emberi játékos van soron, a
+`game_music.mp3` célhangereje a voice konfiguráció szerint csökkenthető
+(alapból 0-ra).
 
 ### Pörgetés
 
