@@ -78,17 +78,10 @@
     "Vendég 2": "assets/images/guest2.png"
   };
 
-  const GUEST_PLAYERS = new Set(["Vendég 1", "Vendég 2"]);
-
   function setPlayerAvatar(imageElement, playerName, altText = null) {
     const safeName = PLAYER_IMAGES[playerName] ? playerName : "Bot";
     imageElement.src = PLAYER_IMAGES[safeName];
     imageElement.alt = altText ?? `${playerName} profilképe`;
-
-    const isGuest = GUEST_PLAYERS.has(safeName);
-    imageElement.classList.toggle("is-guest-avatar", isGuest);
-    imageElement.classList.toggle("guest-avatar-1", safeName === "Vendég 1");
-    imageElement.classList.toggle("guest-avatar-2", safeName === "Vendég 2");
   }
 
   const SFX = {

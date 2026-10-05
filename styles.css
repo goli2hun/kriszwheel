@@ -176,47 +176,6 @@ h2 {
     box-shadow .2s ease;
 }
 
-/* A Vendég PNG-kben nagyobb a képen belüli margó. A crop réteg megtartja
-   ugyanazt a külső avatar-méretet, miközben csak a portrét nagyítja. */
-.guest-avatar-clip {
-  position: absolute;
-  inset: 0;
-  display: block;
-  overflow: hidden;
-  border-radius: 50%;
-}
-
-.guest-avatar-clip .guest-avatar-1 {
-  transform: translateY(5px) scale(1.42);
-}
-
-.guest-avatar-clip .guest-avatar-2 {
-  transform: translateY(8px) scale(1.50);
-}
-
-.player-option:hover .guest-avatar-clip .guest-avatar-1 {
-  transform: translateY(5px) scale(1.46);
-}
-
-.player-option:hover .guest-avatar-clip .guest-avatar-2 {
-  transform: translateY(8px) scale(1.54);
-}
-
-/* A screenshot alapján mért igazítás: a vendég arcok az előző verzióban
-   5 / 8 px-cel túl magasan ültek. A runtime nézetek fix crop wrappert
-   használnak, így a portré mozgatható a külső kör eltolása nélkül. */
-.stage-current-avatar-clip img.guest-avatar-1,
-.victory-avatar-clip img.guest-avatar-1 {
-  top: 4.3%;
-  transform: scale(1.42);
-}
-
-.stage-current-avatar-clip img.guest-avatar-2,
-.victory-avatar-clip img.guest-avatar-2 {
-  top: 6.9%;
-  transform: scale(1.50);
-}
-
 .player-option strong {
   color: #dbe8ff;
   font-size: 1rem;
@@ -1185,17 +1144,7 @@ body.game-active .app-shell {
   box-shadow: 0 0 .78cqw rgba(255, 205, 70, .32);
 }
 
-.stage-current-avatar-clip {
-  position: absolute;
-  inset: .24cqw;
-  overflow: hidden;
-  border-radius: 50%;
-}
-
-.stage-current-avatar-clip img {
-  position: absolute;
-  top: 0;
-  left: 0;
+.stage-current-avatar-ring img {
   display: block;
   width: 100%;
   height: 100%;
@@ -1622,21 +1571,7 @@ body.game-active .app-shell {
     0 0 1.8cqw rgba(255, 190, 39, .33);
 }
 
-.victory-avatar-clip {
-  position: absolute;
-  inset: .28cqw;
-  overflow: hidden;
-  border-radius: 50%;
-}
-
-.victory-avatar-ring {
-  position: relative;
-}
-
-.victory-avatar-clip img {
-  position: absolute;
-  top: 0;
-  left: 0;
+.victory-avatar-ring img {
   display: block;
   width: 100%;
   height: 100%;

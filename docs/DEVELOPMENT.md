@@ -147,16 +147,10 @@ A két vendég PNG avatart használ:
 - `assets/images/guest1.png`
 - `assets/images/guest2.png`
 
-A vendég PNG-k nagyobb belső margóval készültek, ezért a lobby külön
-`guest-avatar-clip` crop réteget használ. A 2026-10-05-i képernyőkép alapján
-a portrék pozíciója külön lett bemérve:
-
-- Vendég 1: 1.42× zoom, 5 px lefelé;
-- Vendég 2: 1.50× zoom, 8 px lefelé.
-
-A játékszínpad és a győzelmi képernyő külön fix crop wrappert használ
-(`stage-current-avatar-clip`, `victory-avatar-clip`), ezért a vendégportré
-eltolása nem mozdítja el a külső avatarkört.
+A Vendég 1 és Vendég 2 avatarjai ugyanarra a képkivágásra és méretre
+készülnek, mint Krisz, Adri, Alíz és Bot. Nem használnak külön crop,
+zoom, pozíció vagy guest-specifikus CSS szabályt; minden avatar ugyanazt
+az `.avatar-photo`, stage és victory megjelenítést kapja.
 
 A Bot felismerése továbbra is:
 
