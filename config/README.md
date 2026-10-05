@@ -126,13 +126,30 @@ canvasSize: 600
 
 A Phaser scene logikai szélessége és magassága.
 
+### wheel.scale
+
+```js
+scale: 1.10
+```
+
+A teljes forgó kerék méretszorzója, beleértve a kerékgrafikát és a
+cikkelyfeliratokat is.
+
+- `1.00` = eredeti méret;
+- `1.10` = 10%-kal nagyobb;
+- `0.90` = 10%-kal kisebb.
+
+A jelenlegi `wheelSize: 536` mellett a `scale: 1.10` kb. 590 px-es
+megjelenített kerékátmérőt ad.
+
 ### wheel.wheelSize
 
 ```js
 wheelSize: 536
 ```
 
-A keréksprite megjelenített mérete a Phaser canvason.
+A keréksprite alapmérete a Phaser canvason. A tényleges megjelenített méretet
+a `wheel.scale` szorozza fel.
 
 ### wheel.labelRadius
 
