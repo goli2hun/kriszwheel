@@ -249,3 +249,30 @@ A lobbyban megjelenő verzió és build dátum:
 `config/game-config.js -> app.version / app.buildDate`
 
 Új tesztelési csomagnál ezt a két értéket érdemes együtt frissíteni.
+
+
+## 17. Puzzle-előzmény nullázása
+
+A böngészős puzzle-history közvetlenül Pythonból nem írható megbízhatóan.
+Ezért a projekt reset marker mechanizmust használ.
+
+Új feladványcsomag kiadásakor futtasd:
+
+```powershell
+python tools/reset_puzzle_history.py
+```
+
+A script új `resetId` értéket ír ide:
+
+`data/puzzle-history-reset.json`
+
+A játék következő indításakor összeveti ezt a böngészőben utoljára alkalmazott
+reset azonosítóval. Ha új resetet talál:
+
+1. törli a `kriszwheel.puzzle-history.v1` localStorage kulcsot;
+2. üres előzményt hoz létre;
+3. eltárolja az alkalmazott reset ID-t;
+4. a resetet ugyanabban a böngészőben nem futtatja le újra.
+
+Ha minden telepítésen / gépen nullázni szeretnéd az előzményt, a
+`data/puzzle-history-reset.json` módosítását is commitolni és deployolni kell.
