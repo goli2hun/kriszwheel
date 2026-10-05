@@ -328,6 +328,7 @@ Részletes referencia:
 - [Beállítások](docs/SETTINGS.md)
 - [Voice recognition integráció](docs/VOICE_RECOGNITION.md)
 - [Roadmap](docs/ROADMAP.md)
+- [Továbbfejlesztési ötletek](docs/IDEAS.md)
 - [Konfigurációs referencia](config/README.md)
 - [Feladványadatok és CSV-formátum](data/README.md)
 
@@ -354,10 +355,13 @@ kriszwheel/
 │   ├── ARCHITECTURE.md
 │   ├── DEVELOPMENT.md
 │   ├── GAMEPLAY.md
+│   ├── IDEAS.md
 │   ├── ROADMAP.md
 │   ├── SETTINGS.md
 │   ├── STAGE_UI.md
 │   └── VOICE_RECOGNITION.md
+├── tools/
+│   └── validate_puzzles.py
 ├── speech/
 │   ├── provider.js
 │   ├── browser-provider.js
