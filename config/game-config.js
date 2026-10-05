@@ -7,6 +7,13 @@ window.KRISZWHEEL_CONFIG = {
     // felvillanások és hangok között.
     letterHitGapMs: 500,
 
+    // Egy betű felfedési animációjának hossza.
+    letterRevealAnimationMs: 720,
+
+    // Sikeres mássalhangzó után, az utolsó betű teljes felfedését követően
+    // még ennyit várunk, mielőtt újra engedélyezzük / automatizáljuk a pörgetést.
+    letterRevealPostDelayMs: 1000,
+
     // Játékosváltáskor ennyi ideig marad látható az előző kör visszajelzése,
     // mielőtt a következő játékos neve megjelenik.
     playerSwitchDelayMs: 1000,
