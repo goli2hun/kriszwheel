@@ -539,7 +539,9 @@
 
   function startLobbyMusic() {
     stopMusicTrack("winner", { fadeMs: 180, reset: true });
-    stopMusicTrack("game", { fadeMs: 220, reset: false });
+
+    // A lobbyban soha ne szóljon át a játékzene.
+    stopMusicTrack("game", { fadeMs: 0, reset: false });
     stopMusicTrack("wheelSpin", { fadeMs: 80, reset: true });
 
     playMusicTrack("lobby", {
@@ -671,6 +673,7 @@
     feedbackTimer: null,
     autoSpinTimer: null,
     turnReadyTimer: null,
+    letterRevealTimer: null,
     roundNumber: 0,
     justRevealed: new Set(),
     pendingWheelSegment: null,
@@ -1208,8 +1211,10 @@
     clearTimeout(state.botTimer);
     clearTimeout(state.autoSpinTimer);
     clearTimeout(state.turnReadyTimer);
+    clearTimeout(state.letterRevealTimer);
     state.autoSpinTimer = null;
     state.turnReadyTimer = null;
+    state.letterRevealTimer = null;
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
     clearTimeout(state.victoryButtonTimer);
@@ -1442,7 +1447,7 @@
     el.spinBtn.disabled = !human || state.phase !== "spin";
     el.solveBtn.disabled =
       !human ||
-      ["spinning", "wheelResult", "playerTransition", "roundEnd", "setup"].includes(state.phase);
+      ["spinning", "wheelResult", "letterReveal", "playerTransition", "roundEnd", "setup"].includes(state.phase);
 
     // A középső képi gomb csak jelzi, hogy most betűt várunk.
     // A tényleges választás közvetlen billentyűleütéssel történik.
@@ -2379,15 +2384,44 @@
       playHitSequence(hits);
       const award = hits * state.wheelValue;
       currentPlayer().roundMoney += award;
-      setMessage(
-        `${letter}: ${hits} találat. Nyeremény: ${fmtMoney(award)}. Pörgethetsz újra.`
-      );
-      state.phase = "spin";
+
+      state.phase = "letterReveal";
       state.wheelValue = null;
+      setMessage(
+        `${letter}: ${hits} találat. Nyeremény: ${fmtMoney(award)}. Betűk felfedése…`
+      );
+
       renderAll();
       updateControls();
-      checkAutoSolved();
-      maybeRunTurnAutomation();
+
+      if (checkAutoSolved()) {
+        return true;
+      }
+
+      const revealAnimationMs = Math.max(
+        0,
+        Number(GAMEPLAY_CONFIG.letterRevealAnimationMs ?? 720)
+      );
+      const postRevealDelayMs = Math.max(
+        0,
+        Number(GAMEPLAY_CONFIG.letterRevealPostDelayMs ?? 1000)
+      );
+      const revealDurationMs =
+        ((hits - 1) * LETTER_HIT_GAP_MS) + revealAnimationMs;
+
+      clearTimeout(state.letterRevealTimer);
+      state.letterRevealTimer = setTimeout(() => {
+        state.letterRevealTimer = null;
+
+        if (state.phase !== "letterReveal") return;
+
+        state.phase = "spin";
+        setMessage(
+          `${letter}: ${hits} találat. Nyeremény: ${fmtMoney(award)}. Pörgethetsz újra.`
+        );
+        updateControls();
+        maybeRunTurnAutomation();
+      }, revealDurationMs + postRevealDelayMs);
     } else {
       state.justRevealed.clear();
       playSfx("letterMiss");
@@ -2466,7 +2500,9 @@
     startWinnerMusic();
     clearTimeout(state.botTimer);
     clearTimeout(state.turnReadyTimer);
+    clearTimeout(state.letterRevealTimer);
     state.turnReadyTimer = null;
+    state.letterRevealTimer = null;
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
     hideStageFeedback();
@@ -3326,8 +3362,10 @@
     clearTimeout(state.botTimer);
     clearTimeout(state.autoSpinTimer);
     clearTimeout(state.turnReadyTimer);
+    clearTimeout(state.letterRevealTimer);
     state.autoSpinTimer = null;
     state.turnReadyTimer = null;
+    state.letterRevealTimer = null;
     clearTimeout(state.wheelConfirmTimer);
     clearTimeout(state.playerTransitionTimer);
     clearTimeout(state.roundEndTimer);
