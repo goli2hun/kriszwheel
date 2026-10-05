@@ -600,6 +600,36 @@ body.lobby-active .avatar-frame {
   height: 116px;
 }
 
+body.lobby-active .lobby-build-info {
+  position: fixed;
+  right: 22px;
+  bottom: 16px;
+  z-index: 4;
+  max-width: calc(100vw - 44px);
+  color: rgba(229, 239, 255, .72);
+  font-family: "Cascadia Mono", "Consolas", monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .04em;
+  text-align: right;
+  text-shadow: 0 1px 4px rgba(0, 0, 0, .72);
+  user-select: none;
+  pointer-events: auto;
+}
+
+body:not(.lobby-active) .lobby-build-info {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  body.lobby-active .lobby-build-info {
+    right: 12px;
+    bottom: 10px;
+    max-width: calc(100vw - 24px);
+    font-size: 10px;
+  }
+}
+
 body.lobby-active #startGameBtn {
   min-width: 210px;
   color: #171006;
