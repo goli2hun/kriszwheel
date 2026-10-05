@@ -212,8 +212,13 @@ némítása elsőbbséget élvez.
 Több azonos betűnél a felvillanások és a találati hangok sorban futnak.
 Sikeres mássalhangzó után a következő pörgetés csak az összes találat teljes
 felfedése után, további 1 másodperc késleltetéssel engedélyeződik
-(`gameplay.letterRevealPostDelayMs`). Helyes megfejtésnél a betűfelfedési
-`letter_hit` hangok megmaradnak, ezek mellé indul a győzelmi zene.
+(`gameplay.letterRevealPostDelayMs`). Ha nincs több rejtett mássalhangzó,
+a játék ezt külön jelzi és több pörgetést nem enged; megfejtés és
+magánhangzó-vásárlás továbbra is lehetséges.
+
+Helyes megfejtésnél a betűfelfedési `letter_hit` hangok megmaradnak, ezek
+mellé indul a győzelmi zene és a tűzijáték. A victory ünneplés minimum ideje
+paraméterezhető (`victory.minimumCelebrationMs`), alapból 3000 ms.
 
 A böngésző autoplay szabályai miatt a lobby zene első indulását a böngésző
 blokkolhatja. Ilyenkor az első kattintás vagy billentyű után automatikusan
