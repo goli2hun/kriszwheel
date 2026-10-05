@@ -36,10 +36,16 @@ Módosítás után:
 4. első induláskor a Könnyű aktív;
 5. Gyerek / Könnyű / Közepes / Nehéz választás kattintható;
 6. a választás frissítés után megmarad;
-7. `pickPuzzle()` továbbra sem használja a `puzzleDifficulty` értéket;
-8. játékosválasztás és játékindítás regresszió nélkül működik;
-9. voice / zene / Auto pörgetés flow működik;
-10. puzzle, solve, victory és játék vége flow működik.
+7. Teszt módban a beépített mintafeladványokból választ;
+8. Éles módban Gyerek / Könnyű / Közepes / Nehéz rendre a
+   `child.csv` / `low.csv` / `med.csv` / `high.csv` fájlból tölt;
+9. mind a négy éles CSV 100 érvényes és egyedi feladványt tartalmaz;
+10. hiányzó vagy rövid éles CSV esetén a játék hibát jelez és nem indul;
+11. a lobby jobb alsó build-információja frissül mód- és nehézségváltáskor;
+12. játékosválasztás és játékindítás regresszió nélkül működik;
+13. voice / zene / Auto pörgetés flow működik;
+14. sikeres mássalhangzó után nincs pörgetés az utolsó felfedés + post-delay előtt;
+15. puzzle, solve, victory és játék vége flow működik.
 
 ## 4. Beállítások tesztelése
 
@@ -93,13 +99,29 @@ Ne hardcode-olj olyan értéket az `app.js`-be, ami configból kezelhető.
 
 ## 8. Új puzzle
 
-Jelenleg az `app.js` `PUZZLES` tömbjébe kerül.
+Tesztfeladványt az `app.js` `PUZZLES` tömbjébe lehet tenni.
+
+Éles feladványt a megfelelő CSV-be kell felvenni:
+
+- `data/child.csv`
+- `data/low.csv`
+- `data/med.csv`
+- `data/high.csv`
+
+CSV fejléc:
+
+```csv
+category,puzzle
+```
 
 Fontos:
 
+- maradjon meg a fejléc;
+- minden sorban legyen kategória és feladvány;
+- ne legyen duplikált feladvány ugyanabban a listában;
 - férjen el 15 × 4 cellán;
 - hosszú szó esetén tördelést tesztelni;
-- kategóriát megadni.
+- a lista érje el a `puzzles.expectedCountPerDifficulty` minimumot.
 
 ## 9. Új játékos
 
@@ -192,3 +214,12 @@ Funkciómódosításnál:
 - SETTINGS – lobby és felhasználói beállítások;
 - config/README – statikus config kulcs;
 - ROADMAP – terv változás.
+
+
+## 15. Verziózás
+
+A lobbyban megjelenő verzió és build dátum:
+
+`config/game-config.js -> app.version / app.buildDate`
+
+Új tesztelési csomagnál ezt a két értéket érdemes együtt frissíteni.
