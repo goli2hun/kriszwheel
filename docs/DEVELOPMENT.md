@@ -276,3 +276,36 @@ reset azonosítóval. Ha új resetet talál:
 
 Ha minden telepítésen / gépen nullázni szeretnéd az előzményt, a
 `data/puzzle-history-reset.json` módosítását is commitolni és deployolni kell.
+
+
+## 18. Haladó névfelismerés bővítése
+
+A névlista itt található:
+
+`config/hungarian-names.js`
+
+Új magyar keresztnév felvételéhez a megfelelő betű tömbjéhez add hozzá a
+nevet:
+
+```js
+B: ["Béla", "Botond", "Balázs"]
+```
+
+Parserkód módosítása nem szükséges.
+
+Speciális, nem normál keresztnév-alapú alakot az `exceptions` tömbben adj
+meg:
+
+```js
+{ value: "Y", aliases: ["ypszilon", "ipszilon"] }
+```
+
+Smoke test új név vagy parsermódosítás után:
+
+1. Haladó névfelismerés KI → az önálló név ne adjon LETTER eseményt;
+2. Haladó névfelismerés BE → `Anna` → A;
+3. ugyanarra a betűre több név működjön;
+4. `Ypszilon` → Y;
+5. a régi `B mint Balázs` forma továbbra is működjön;
+6. magánhangzó módban például `Magánhangzó Anna` → A;
+7. részszó ne váltson ki téves találatot.
