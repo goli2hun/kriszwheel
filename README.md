@@ -48,6 +48,10 @@ Az előzmény nehézségenként külön tárolódik, és az index mellett a norm
 feladványszöveget is megőrzi, így CSV-átrendezés után sem tér vissza egy már
 látott feladvány.
 
+Új feladványkészlet kiadásakor az előzmény globálisan nullázható a
+`python tools/reset_puzzle_history.py` paranccsal létrehozott új reset marker
+commitolásával.
+
 A lobby saját stúdió-hátteret és játékosportrékat használ.
 
 A lobby jobb alsó sarkában build-információ látszik, például:
@@ -367,7 +371,8 @@ kriszwheel/
 │   ├── STAGE_UI.md
 │   └── VOICE_RECOGNITION.md
 ├── tools/
-│   └── validate_puzzles.py
+│   ├── validate_puzzles.py
+│   └── reset_puzzle_history.py
 ├── speech/
 │   ├── provider.js
 │   ├── browser-provider.js
