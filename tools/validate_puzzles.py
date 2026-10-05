@@ -3,12 +3,15 @@
 
 Használat a repository gyökeréből:
     python tools/validate_puzzles.py
+    python tools/validate_puzzles.py --javitas
 
-A script csak ellenőriz, nem módosít fájlokat.
+Alapból csak ellenőriz. A --javitas kapcsolóval a valódi hibát okozó
+feladványsorokat törli a CSV-kből.
 """
 
 from __future__ import annotations
 
+import argparse
 import csv
 import sys
 import unicodedata
@@ -39,6 +42,7 @@ class PuzzleEntry:
     category: str
     puzzle: str
     normalized: str
+    invalid: bool = False
 
 
 def normalize_text(value: str) -> str:
@@ -116,6 +120,7 @@ def read_dataset(
     relative_path: str,
     errors: list[str],
     warnings: list[str],
+    repair: bool = False,
 ) -> list[PuzzleEntry]:
     path = root / relative_path
 
@@ -143,31 +148,30 @@ def read_dataset(
                 print_issue("[HIBA]", path, 1, message)
                 return []
 
+            raw_rows: list[dict[str, str]] = []
+
             for row_number, row in enumerate(reader, start=2):
                 category = (row.get("category") or "").strip()
                 puzzle = (row.get("puzzle") or "").strip()
                 normalized = normalize_text(puzzle)
+                row_invalid = False
 
-                entry = PuzzleEntry(
-                    level=level,
-                    path=path,
-                    row_number=row_number,
-                    category=category,
-                    puzzle=puzzle,
-                    normalized=normalized,
-                )
-                entries.append(entry)
+                raw_rows.append({
+                    "category": category,
+                    "puzzle": puzzle,
+                })
 
                 if not category:
                     message = "Üres kategória."
                     errors.append(message)
+                    row_invalid = True
                     print_issue("[HIBA]", path, row_number, message)
 
                 if not puzzle:
                     message = "Üres feladvány."
                     errors.append(message)
+                    row_invalid = True
                     print_issue("[HIBA]", path, row_number, message)
-                    continue
 
                 if puzzle != unicodedata.normalize("NFC", puzzle):
                     message = "A feladvány nem NFC Unicode-normalizált."
@@ -184,6 +188,7 @@ def read_dataset(
                 if not any(is_letter(char) for char in puzzle):
                     message = "A feladvány nem tartalmaz betűt."
                     errors.append(message)
+                    row_invalid = True
                     print_issue("[HIBA]", path, row_number, message)
 
                 too_long_words = [
@@ -195,6 +200,7 @@ def read_dataset(
                         + ", ".join(repr(word) for word in too_long_words)
                     )
                     errors.append(message)
+                    row_invalid = True
                     print_issue("[HIBA]", path, row_number, message)
 
                 layout = layout_puzzle_rows(normalized)
@@ -204,7 +210,20 @@ def read_dataset(
                         f"{BOARD_COLS}×{BOARD_ROWS}-es táblára."
                     )
                     errors.append(message)
+                    row_invalid = True
                     print_issue("[HIBA]", path, row_number, message)
+
+                entries.append(
+                    PuzzleEntry(
+                        level=level,
+                        path=path,
+                        row_number=row_number,
+                        category=category,
+                        puzzle=puzzle,
+                        normalized=normalized,
+                        invalid=row_invalid,
+                    )
+                )
 
     except (csv.Error, UnicodeError, OSError) as exc:
         message = f"Nem olvasható szabályos UTF-8 CSV-ként: {exc}"
@@ -226,18 +245,50 @@ def read_dataset(
         puzzle for puzzle, count in normalized_counter.items() if count > 1
     }
 
+    duplicate_rows_to_remove: set[int] = set()
+
     for duplicate in sorted(duplicates):
-        rows = [
-            str(entry.row_number)
-            for entry in entries
-            if entry.normalized == duplicate
+        duplicate_entries = [
+            entry for entry in entries if entry.normalized == duplicate
         ]
+        rows = [str(entry.row_number) for entry in duplicate_entries]
         message = (
             f"Duplikált feladvány: {duplicate!r} "
             f"(sorok: {', '.join(rows)})"
         )
         errors.append(message)
         print_issue("[HIBA]", path, None, message)
+
+        # Javító módban az első példányt megtartjuk, a továbbiakat töröljük.
+        duplicate_rows_to_remove.update(
+            entry.row_number for entry in duplicate_entries[1:]
+        )
+
+    if repair:
+        invalid_rows = {
+            entry.row_number for entry in entries if entry.invalid
+        }
+        rows_to_remove = invalid_rows | duplicate_rows_to_remove
+
+        if rows_to_remove:
+            kept_rows = [
+                row
+                for index, row in enumerate(raw_rows, start=2)
+                if index not in rows_to_remove
+            ]
+
+            with path.open("w", encoding="utf-8", newline="") as handle:
+                writer = csv.DictWriter(
+                    handle,
+                    fieldnames=EXPECTED_HEADER,
+                    lineterminator="\n",
+                )
+                writer.writeheader()
+                writer.writerows(kept_rows)
+
+            print(
+                f"  [JAVÍTVA] {len(rows_to_remove)} hibás sor törölve."
+            )
 
     category_counts = Counter(
         entry.category for entry in entries if entry.category
@@ -290,11 +341,48 @@ def check_cross_dataset_duplicates(
         print(f"  [FIGYELMEZTETÉS] {message}")
 
 
-def main() -> int:
-    root = Path(__file__).resolve().parents[1]
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "KriszWheel feladvány-validátor. Alapból csak ellenőriz; "
+            "--javitas kapcsolóval törli a hibás CSV-sorokat."
+        )
+    )
+    parser.add_argument(
+        "--javitas",
+        action="store_true",
+        help=(
+            "Törli a valódi hibát okozó feladványokat a CSV-kből, "
+            "majd újraellenőrzi a készletet."
+        ),
+    )
+    return parser.parse_args()
+
+
+def run_validation(root: Path, repair: bool = False) -> tuple[list[str], list[str], list[PuzzleEntry]]:
     errors: list[str] = []
     warnings: list[str] = []
     all_entries: list[PuzzleEntry] = []
+
+    for level, relative_path in DATASETS.items():
+        all_entries.extend(
+            read_dataset(
+                root,
+                level,
+                relative_path,
+                errors,
+                warnings,
+                repair=repair,
+            )
+        )
+
+    check_cross_dataset_duplicates(all_entries, warnings)
+    return errors, warnings, all_entries
+
+
+def main() -> int:
+    args = parse_args()
+    root = Path(__file__).resolve().parents[1]
 
     print("KriszWheel – Feladvány-validátor")
     print("=" * 38)
@@ -303,12 +391,16 @@ def main() -> int:
         f"Elvárt elemszám: {EXPECTED_COUNT} / nehézség"
     )
 
-    for level, relative_path in DATASETS.items():
-        all_entries.extend(
-            read_dataset(root, level, relative_path, errors, warnings)
-        )
+    if args.javitas:
+        print("Mód: JAVÍTÁS – a hibás feladványsorok törlésre kerülnek.")
+        errors, warnings, all_entries = run_validation(root, repair=True)
 
-    check_cross_dataset_duplicates(all_entries, warnings)
+        print("\nÚjraellenőrzés a javítás után")
+        print("-" * 38)
+        errors, warnings, all_entries = run_validation(root, repair=False)
+    else:
+        print("Mód: ELLENŐRZÉS – a fájlok nem módosulnak.")
+        errors, warnings, all_entries = run_validation(root, repair=False)
 
     print("\n" + "=" * 38)
     print(f"Összes ellenőrzött feladvány: {len(all_entries)}")
