@@ -486,3 +486,31 @@ lobbyban és a játék nem indul el.
 
 A véletlen választás ugyanazon játékfolyamon belül nem engedi, hogy közvetlenül
 egymás után ugyanaz az index következzen.
+
+
+## 17. Feladvány-előzmény
+
+Éles módban egy már megjelent feladvány ugyanazon böngészőben többé nem kerül
+újra kiválasztásra.
+
+A tartós előzmény nehézségenként külön tárolódik:
+
+- `child` – Gyerek;
+- `easy` – Könnyű;
+- `medium` – Közepes;
+- `hard` – Nehéz.
+
+A tárolási kulcs:
+
+`kriszwheel.puzzle-history.v1`
+
+Minden rekord az eredeti listaindexet és a normalizált feladványszöveget is
+eltárolja. A kiválasztás a szöveg alapján zárja ki a már látott feladványokat,
+ezért egy CSV későbbi sorrendmódosítása sem teszi őket újra elérhetővé.
+
+A feladvány már a kiválasztás pillanatában kijátszottnak számít, nem csak
+sikeres megfejtés után.
+
+Ha egy nehézségi készlet teljesen elfogyott, a játék nem kezdi elölről:
+visszatér a lobbyba és jelzi, hogy azon a szinten már minden feladvány
+kijátszásra került.
