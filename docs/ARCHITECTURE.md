@@ -285,8 +285,8 @@ newRound -> winner stop + game music
 returnToLobby -> game azonnali stop + winner/wheel stop + lobby music
 ```
 
-A game music célhangerő elsőként azt vizsgálja, hogy a voice owner van-e
-soron. Ha igen:
+A game music célhangerő azt vizsgálja, hogy a globális mikrofon be van-e
+kapcsolva és emberi játékos van-e soron. Ha igen:
 
 ```text
 gameMusicVolume × masterVolume × voiceOwnerTurnMultiplier
@@ -389,7 +389,6 @@ voiceActive
 voiceStartPending
 voiceEngineState
 voiceArmed
-voiceOwnerName
 voiceSessionToken
 voiceInputMode
 voiceIgnoreNextFinal
@@ -417,13 +416,17 @@ fallbackje lép életbe.
 A mikrofon gomb runtime kapcsoló, a lobby
 `speechRecognitionEnabled` értéke pedig master engedély.
 
-Voice owner modell:
+Globális mikrofon modell:
 
-- manuális bekapcsoláskor `voiceOwnerName` az aktuális emberi játékos;
-- `voiceArmed` megőrzi a tulajdonost akkor is, amikor a listening szünetel;
-- `nextPlayer()` és `spinWheel()` preserve-arm leállítást végez;
-- a Phaser kerék megállásakor `resumeVoiceAfterWheelStop()` owner esetén
-  már `wheelResult` fázisban visszaindíthatja a VoiceEngine-et;
+- `voiceArmed` jelzi, hogy a mikrofon globálisan be van kapcsolva;
+- bármely emberi játékos módosíthatja ezt az állapotot;
+- `currentPlayerCanUseVoice()` csak emberi játékosnál ad igaz értéket;
+- Bot körében a mikrofon gomb tiltott és a listening szünetel;
+- `nextPlayer()` és `spinWheel()` preserve-arm leállítást végez, így a
+  globális bekapcsolt állapot megmarad;
+- emberi játékosra visszaérve a VoiceEngine újraindulhat;
+- a Phaser kerék megállásakor `resumeVoiceAfterWheelStop()` már
+  `wheelResult` fázisban visszaindíthatja a VoiceEngine-et;
 - `voiceSessionToken` megakadályozza, hogy egy későn visszatérő async
   `getUserMedia()` hívás rossz körben újraindítsa a mikrofont.
 
