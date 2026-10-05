@@ -40,10 +40,7 @@ window.KRISZWHEEL_CONFIG = {
       easy: "data/low.csv",
       medium: "data/med.csv",
       hard: "data/high.csv"
-    },
-
-    // Induláskor legalább ennyi érvényes feladványt várunk a kiválasztott fájlban.
-    expectedCountPerDifficulty: 100
+    }
   },
 
   wheel: {
