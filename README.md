@@ -324,7 +324,7 @@ Fő csoportok:
 
 - `app` – verzió és build dátum;
 - `gameplay`;
-- `puzzles` – éles CSV-források és elvárt elemszám;
+- `puzzles` – éles CSV-források;
 - `wheel`;
 - `bot`;
 - `audio`;
