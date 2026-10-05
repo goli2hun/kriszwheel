@@ -121,7 +121,12 @@ A solve dialog voice módban megnyílik.
 
 A következő final transcript teljes válaszként kerül a:
 
-`trySolve(answer, false)`
+`trySolve(answer, false)
+
+A voice megfejtés előtt a transcriptből minden írásjel / speciális karakter
+kikerül, majd a `trySolve()` mind a bemondott választ, mind az eltárolt
+feladványt betű+szám alapú összehasonlítási alakra normalizálja. A szóközök
+sem számítanak, az ékezetes magyar betűk viszont megmaradnak.`
 
 függvénybe.
 
