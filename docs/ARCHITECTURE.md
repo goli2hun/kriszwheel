@@ -262,13 +262,17 @@ newRound -> winner stop + game music
 returnToLobby -> game/winner/wheel stop + lobby music
 ```
 
-Aktív / induló mikrofon mellett a játékzene célhangereje:
+A game music célhangerő elsőként azt vizsgálja, hogy a voice owner van-e
+soron. Ha igen:
 
 ```text
-gameMusicVolume × masterVolume × microphoneDuckMultiplier
+gameMusicVolume × masterVolume × voiceOwnerTurnMultiplier
 ```
 
-A mikrofon leállásakor a hangerő `microphoneRestoreFadeMs` alatt áll vissza.
+Alapból `voiceOwnerTurnMultiplier = 0`, tehát a saját kör teljesen néma.
+
+Más esetben aktív / induló mikrofon mellett a normál
+`microphoneDuckMultiplier` érvényes.
 
 A lobby music indulását autoplay policy blokkolhatja; az első `pointerdown`
 vagy `keydown` újrapróbálja a képernyőhöz tartozó zenei szinkront.
@@ -385,8 +389,8 @@ Voice owner modell:
 - manuális bekapcsoláskor `voiceOwnerName` az aktuális emberi játékos;
 - `voiceArmed` megőrzi a tulajdonost akkor is, amikor a listening szünetel;
 - `nextPlayer()` és `spinWheel()` preserve-arm leállítást végez;
-- pénzmező után `resumeVoiceAfterWheel()` csak owner + `letter` fázisban
-  indítja vissza a VoiceEngine-et;
+- a Phaser kerék megállásakor `resumeVoiceAfterWheelStop()` owner esetén
+  már `wheelResult` fázisban visszaindíthatja a VoiceEngine-et;
 - `voiceSessionToken` megakadályozza, hogy egy későn visszatérő async
   `getUserMedia()` hívás rossz körben újraindítsa a mikrofont.
 

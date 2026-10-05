@@ -290,7 +290,17 @@
   function targetMusicVolume(name) {
     let volume = baseMusicVolume(name);
 
-    if (name === "game" && state.gameMusicDucked) {
+    if (
+      name === "game" &&
+      state.voiceArmed &&
+      voiceOwnerIsCurrentPlayer()
+    ) {
+      volume *= clamp01(
+        Number(
+          MUSIC_CONFIG.game?.voiceOwnerTurnMultiplier ?? 0
+        )
+      );
+    } else if (name === "game" && state.gameMusicDucked) {
       volume *= clamp01(
         Number(
           MUSIC_CONFIG.game?.microphoneDuckMultiplier ?? 0.10
@@ -504,6 +514,19 @@
       "game",
       targetMusicVolume("game"),
       fadeMs
+    );
+  }
+
+  function syncGameMusicForCurrentPlayer() {
+    const audio = musicTracks.game;
+    if (!audio || audio.paused || !musicTrackEnabled("game")) {
+      return;
+    }
+
+    fadeMusicTo(
+      "game",
+      targetMusicVolume("game"),
+      Number(MUSIC_CONFIG.game?.voiceOwnerTurnFadeMs ?? 180)
     );
   }
 
@@ -1471,6 +1494,7 @@
     setGameMusicDucked(
       state.voiceActive || state.voiceStartPending
     );
+    syncGameMusicForCurrentPlayer();
 
     const temporarilyBlocked = [
       "spinning",
@@ -2035,7 +2059,10 @@
       return;
     }
 
-    if (automatic && state.phase !== "letter") {
+    if (
+      automatic &&
+      !["wheelResult", "letter"].includes(state.phase)
+    ) {
       return;
     }
 
@@ -2088,7 +2115,10 @@
         sessionToken !== state.voiceSessionToken ||
         !state.voiceArmed ||
         !voiceOwnerIsCurrentPlayer() ||
-        (automatic && state.phase !== "letter")
+        (
+          automatic &&
+          !["wheelResult", "letter"].includes(state.phase)
+        )
       ) {
         stopVoiceMediaStream();
         return;
@@ -2127,11 +2157,11 @@
     }
   }
 
-  async function resumeVoiceAfterWheel() {
+  async function resumeVoiceAfterWheelStop() {
     if (
       !state.voiceArmed ||
       !voiceOwnerIsCurrentPlayer() ||
-      state.phase !== "letter"
+      !["wheelResult", "letter"].includes(state.phase)
     ) {
       updateVoiceRuntimeUi();
       return;
@@ -2233,6 +2263,7 @@
         (state.currentIndex + 1) % state.players.length;
       state.phase = "turnReady";
 
+      syncGameMusicForCurrentPlayer();
       renderAll();
       updateControls();
 
@@ -2966,10 +2997,6 @@
     renderAll();
     updateControls();
 
-    if (!fromBot) {
-      void resumeVoiceAfterWheel();
-    }
-
     if (fromBot) {
       state.botTimer = setTimeout(() => {
         const consonant = randomUnusedConsonant();
@@ -3041,6 +3068,10 @@
         `A kerék eredménye: ${formatWheelResult(segment)}.`
       );
       updateControls();
+
+      if (!fromBot) {
+        void resumeVoiceAfterWheelStop();
+      }
 
       clearTimeout(state.wheelConfirmTimer);
       state.wheelConfirmTimer = setTimeout(

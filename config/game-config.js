@@ -138,7 +138,12 @@ window.KRISZWHEEL_CONFIG = {
         // Aktív mikrofon mellett a játékzene ennyiszeres hangerőre halkul.
         microphoneDuckMultiplier: 0.10,
         microphoneDuckFadeMs: 220,
-        microphoneRestoreFadeMs: 650
+        microphoneRestoreFadeMs: 650,
+
+        // Ha a voice owner van soron, a játékzene teljesen elnémul.
+        // 0 = néma, 1 = normál hangerő.
+        voiceOwnerTurnMultiplier: 0,
+        voiceOwnerTurnFadeMs: 180
       }
     }
   },

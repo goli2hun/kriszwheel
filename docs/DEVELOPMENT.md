@@ -30,24 +30,17 @@ URL:
 
 Módosítás után:
 
-1. lobby JavaScript hiba nélkül betölt; 
-2. első user gesture után lobby zene hallható, ha engedélyezett;
-3. Beállításokban mind a négy zenei elem enable + hangerő értéke menthető;
-4. játék indításakor lobby zene leáll;
-5. engedélyezett játékzene diszkréten elindul;
-6. stage `♫ Játékzene` kapcsoló azonnal ki-/bekapcsol és ment;
-7. pörgetés teljes ideje alatt `wheel_spinning.mp3` szól;
-8. kerék megállásakor a forgási hang leáll;
-9. mikrofon bekapcsolásakor a játékzene lehalkul;
-10. mikrofon szünetelésekor a játékzene visszaerősödik;
-11. sikeres megfejtéskor a játékzene leáll/fade-el;
-12. winner music nulláról fokozatosan felerősödik;
-13. következő feladványnál winner music leáll és game music visszatér;
-14. lobbyba visszatéréskor game/winner/wheel zene leáll, lobby music elindul;
-15. masterVolume minden zenei sáv tényleges hangerejét szorozza;
-16. zenei kapcsolók KI állapotában az adott sáv nem indul;
-17. voice owner / turnReady / Auto pörgetés regresszió nélkül működik;
-18. puzzle, solve, victory és játék vége flow működik.
+1. lobby JavaScript hiba nélkül betölt;
+2. voice owner beállítása után a saját körében game music 0-ra halkul;
+3. másik játékos körében a game music visszaáll a beállított hangerőre;
+4. pörgetés alatt a voice owner mikrofonja szünetel;
+5. kerék fizikai megállásakor a mikrofon azonnal visszaindul;
+6. a mikrofon nem várja meg a `wheel.resultDisplayMs` végét;
+7. `wheelResult` alatt a phase-validáció megakadályozza a túl korai játékakciót;
+8. másik játékos körében a voice owner mikrofonja nem indul el;
+9. turnReady / Auto pörgetés / Bot flow regresszió nélkül működik;
+10. zenei életciklus és victory flow működik;
+11. puzzle, solve és játék vége flow működik.
 
 ## 4. Beállítások tesztelése
 

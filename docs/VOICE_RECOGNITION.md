@@ -73,11 +73,15 @@ Automatikus szünet történik:
 - pörgetés indulásakor;
 - forduló végén.
 
-Pénzmezős pörgetés után, `letter` fázisban a VoiceEngine automatikusan
-visszaindul, ha az aktuális játékos megegyezik a voice ownerrel.
+A Phaser kerék tween befejezésekor, tehát **a kerék fizikai megállásának
+pillanatában**, a VoiceEngine automatikusan visszaindul, ha az aktuális
+játékos a voice owner. Ekkor a phase még `wheelResult` lehet.
 
-Ha az owner köre később visszatér, a mikrofon csak **az új pörgetés után**
-kapcsol vissza, nem már a kör elején.
+A mikrofon nem várja meg a `wheel.resultDisplayMs` leteltét. A
+játékműveletek ettől függetlenül továbbra is saját phase-validációt használnak.
+
+Ha az owner köre később visszatér, a mikrofon az új pörgetés megállásakor
+kapcsol vissza, nem a kör elején.
 
 Lobbyba visszalépéskor a voice runtime és a voice owner teljesen leáll.
 

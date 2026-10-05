@@ -316,14 +316,20 @@ Automatikus szünet:
 Automatikus visszakapcsolás:
 
 - csak a voice owner körében;
-- csak pénzmezős pörgetés után, amikor `phase = letter`.
+- **azonnal a kerék fizikai megállásakor**, már `wheelResult` fázisban;
+- nem várja meg a kerékeredmény kijelzési időzítőjének végét.
 
-Ha a voice owner köre később visszatér, a mikrofon **nem** kapcsol be már a
-`spin` fázis elején; előbb pörgetni kell.
+A hangparancsok játékműveletei továbbra is fázisellenőrzöttek, tehát attól,
+hogy a mikrofon már hallgat, `wheelResult` alatt nem lehet idő előtt betűt
+érvényesíteni.
 
-Amíg a mikrofon aktív vagy indul, a `game_music.mp3` automatikusan a
-konfigurált duck hangerőre halkul. A mikrofon leállásakor fokozatosan
-visszaerősödik.
+Ha a voice owner köre később visszatér, a mikrofon a spin elején továbbra sem
+aktív; a kerék megállásakor kapcsol vissza.
+
+Ha a voice owner van soron, a `game_music.mp3` célhangereje 0, tehát a
+saját kör teljes ideje alatt nem szól. Másik játékos körében visszaáll.
+
+A mikrofonos ducking más helyzetekben továbbra is használható.
 
 ### Pörgetés
 

@@ -177,9 +177,12 @@ A négy sáv külön engedélyezhető és külön hangerőt kap a Beállítások
 A játékzene a stage bal felső `♫ Játékzene` gombjával játék közben is
 azonnal ki-/bekapcsolható; ez a választás mentődik.
 
-Aktív mikrofon alatt a játékzene automatikusan lehalkul
-(`audio.music.game.microphoneDuckMultiplier`), majd a mikrofon
-szüneteltetésekor fokozatosan visszaáll.
+A voice owner **saját körében** a játékzene teljesen elnémul
+(`audio.music.game.voiceOwnerTurnMultiplier = 0`). Más játékos körében
+visszaáll a beállított hangerőre.
+
+Az aktív mikrofon ducking továbbra is megmarad más helyzetekre; a saját kör
+némítása elsőbbséget élvez.
 
 Több azonos betűnél a felvillanások és a találati hangok sorban futnak.
 Helyes megfejtésnél a betűfelfedési `letter_hit` hangok megmaradnak, ezek

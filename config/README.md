@@ -404,7 +404,23 @@ fadeInMs: 700,
 fadeOutMs: 350,
 microphoneDuckMultiplier: 0.10,
 microphoneDuckFadeMs: 220,
-microphoneRestoreFadeMs: 650
+microphoneRestoreFadeMs: 650,
+voiceOwnerTurnMultiplier: 0,
+voiceOwnerTurnFadeMs: 180
+```
+
+Voice owner saját körében a célhangerő:
+
+```text
+gameMusicVolume × masterVolume × voiceOwnerTurnMultiplier
+```
+
+Alapból a multiplier `0`, tehát teljes csend.
+
+Más esetben aktív mikrofon mellett:
+
+```text
+gameMusicVolume × masterVolume × microphoneDuckMultiplier
 ```
 
 A `defaultEnabled` és `defaultVolume` csak hiányzó user setting esetén
