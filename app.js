@@ -1254,9 +1254,11 @@
       const source =
         LIVE_PUZZLE_FILES[userSettings.puzzleDifficulty] ??
         LIVE_PUZZLE_FILES.easy;
-      const count = Number(PUZZLE_CONFIG.expectedCountPerDifficulty ?? 100);
+      const count = state.livePuzzles.length;
       el.lobbyBuildInfo.title =
-        `Feladványforrás: ${source} · ${count} feladvány`;
+        count > 0
+          ? `Feladványforrás: ${source} · ${count} betöltött feladvány`
+          : `Feladványforrás: ${source}`;
     } else {
       el.lobbyBuildInfo.title =
         `Feladványforrás: beépített tesztlista · ${PUZZLES.length} feladvány`;
