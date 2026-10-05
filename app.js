@@ -1086,7 +1086,9 @@
   const fmtMoney = (n) =>
     new Intl.NumberFormat("hu-HU").format(n) + " Ft";
 
-  const currentPlayer = () => state.players[state.currentIndex];
+  function currentPlayer() {
+    return state.players[state.currentIndex];
+  }
 
   function pickPuzzle() {
     let idx;

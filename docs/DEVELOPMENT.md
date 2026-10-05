@@ -30,7 +30,7 @@ URL:
 
 Módosítás után:
 
-1. lobby betölt;
+1. lobby JavaScript hiba nélkül betölt; 
 2. első user gesture után lobby zene hallható, ha engedélyezett;
 3. Beállításokban mind a négy zenei elem enable + hangerő értéke menthető;
 4. játék indításakor lobby zene leáll;
