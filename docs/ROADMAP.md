@@ -47,7 +47,7 @@ Kiemelten ellenőrizendő:
 ## Elkészült – Puzzle validátor
 
 A `tools/validate_puzzles.py` elkészült. Magyar kimenettel ellenőrzi a
-CSV-struktúrát, az elemszámot, duplikációkat, túl hosszú szavakat, 15 × 4-es
+CSV-struktúrát, a nem üres készletet, duplikációkat, túl hosszú szavakat, 15 × 4-es
 táblára illeszthetőséget, szokatlan karaktereket és kategóriastatisztikát.
 
 A következő adatoldali lépés a validátor által talált hibák javítása, majd a
